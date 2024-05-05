@@ -1,8 +1,11 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
+import { lazy } from "solid-js";
+import { Router, Route } from "@solidjs/router";
 
 import "./index.css";
 import App from "./App";
+const ImageDetailed = lazy(() => import("./ImageDetailed"));
 
 const root = document.getElementById("root");
 
@@ -12,4 +15,11 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(() => <App name="Artemiy" />, root!);
+render(
+  () => (
+    <Router root={App}>
+      <Route path="/images/:id" component={ImageDetailed} />
+    </Router>
+  ),
+  root!,
+);
