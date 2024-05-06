@@ -1,20 +1,51 @@
-import type { Component } from "solid-js";
+import { For, type Component } from "solid-js";
 
 import styles from "./App.module.css";
+
+const Header: Component = () => {
+  return (
+    <section class={styles.headerWrapper}>
+      <header class={styles.header}>
+        <a class={styles.blinkName} href="/" aria-label="@NotLebedev/Artemiy">
+          <span class={styles.atName}>@NotLebedev</span>
+          <span class={styles.normalName}>Artemiy</span>
+        </a>
+        <nav class={styles.headerNav} role="navigation">
+          <ul>
+            <li>
+              <a href="/blog">Blog</a>
+            </li>
+            <li>
+              <a href="/photo">Photo</a>
+            </li>
+            <li>
+              <a href="/about">About</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+    </section>
+  );
+};
+
+const Content: Component<{ children?: any }> = (props) => {
+  return (
+    <main class={styles.content}>
+      {props.children}
+      <For each={[...Array(100).keys()]}>
+        {(item, index) => {
+          return <p>Cock</p>;
+        }}
+      </For>
+    </main>
+  );
+};
 
 const App: Component<{ children?: any }> = (props) => {
   return (
     <div class={styles.App}>
-      <header class={styles.header}>
-        <p>Hello, World!</p>
-        <nav>
-          <a href="/" style={{ "margin-right": "10px" }}>
-            Home
-          </a>
-          <a href="/images/capitol-bw">One</a>
-        </nav>
-        {props.children}
-      </header>
+      <Header />
+      <Content children={props.children} />
     </div>
   );
 };
