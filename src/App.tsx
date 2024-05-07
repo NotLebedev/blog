@@ -1,4 +1,5 @@
 import { For, type Component } from "solid-js";
+import { Books, Image, Question } from "phosphor-solid";
 
 import styles from "./App.module.css";
 
@@ -8,18 +9,27 @@ const Header: Component = () => {
       <header class={styles.header}>
         <a class={styles.blinkName} href="/" aria-label="@NotLebedev/Artemiy">
           <span class={styles.atName}>@NotLebedev</span>
-          <span class={styles.normalName}>Artemiy</span>
+          <span class={styles.normalName}> Artemiy</span>
         </a>
         <nav class={styles.headerNav} role="navigation">
           <ul>
             <li>
-              <a href="/blog">Blog</a>
+              <a href="/blog">
+                <Books size={32} />
+                Blog
+              </a>
             </li>
             <li>
-              <a href="/photo">Photo</a>
+              <a href="/photo">
+                <Image size={32} />
+                Photo
+              </a>
             </li>
             <li>
-              <a href="/about">About</a>
+              <a href="/about">
+                <Question size={32} />
+                About
+              </a>
             </li>
           </ul>
         </nav>
