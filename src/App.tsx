@@ -2,33 +2,33 @@ import { For, type Component } from "solid-js";
 import { Books, Image, Question } from "phosphor-solid";
 
 import styles from "./App.module.css";
+import DualText from "./Components/DualText";
 
 const Header: Component = () => {
   return (
     <section class={styles.headerWrapper}>
       <header class={styles.header}>
-        <a class={styles.blinkName} href="/" aria-label="@NotLebedev/Artemiy">
-          <span class={styles.atName}>@NotLebedev</span>
-          <span class={styles.normalName}> Artemiy</span>
+        <a class={styles.name} href="/">
+          <DualText default="@NotLebedev" alt=" Artemiy" />
         </a>
         <nav class={styles.headerNav} role="navigation">
           <ul>
             <li>
               <a href="/blog">
                 <Books size={32} />
-                Blog
+                <DualText default="Blog" alt="Read" />
               </a>
             </li>
             <li>
               <a href="/photo">
                 <Image size={32} />
-                Photo
+                <DualText default="Photo" alt="Watch" />
               </a>
             </li>
             <li>
               <a href="/about">
                 <Question size={32} />
-                About
+                <DualText default="About" alt="Learn" />
               </a>
             </li>
           </ul>

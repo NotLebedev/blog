@@ -45,57 +45,15 @@
   align-items: center;
 }
 
-.headerNav a:hover {
-  color: #A497AF;
-}
-
-.blinkName {
+.name {
   color: white;
   font-family: 'Consolas', 'Monaco', monospace;
   font-weight: bold;
   font-style: normal;
   font-size: 2em;
   text-decoration: none;
-  text-align: left;
-  /*
-    Using grid to place both variants in same place
-    Using height so that text fills all available
-    vertical space in flex and then placing it back
-    in the middle with align-items. This way hover
-    zone is much larger and effect is prettier
-  */
-  display: grid;
   height: 100%;
   align-items: center;
-}
-
-/* 
-  This plus display: grid in .blinkName make both
-  spans occupy same place
-*/
-.blinkName .atName, .blinkName .normalName {
-  grid-row: 1;
-  grid-column: 1;
-}
-
-.blinkName .atName {
-  opacity: 100%;
-  transition: opacity 0.3s ease-in;
-}
-
-.blinkName .normalName {
-  opacity: 0%;
-  transition: opacity 0.3s ease-in;
-
-  white-space: pre;
-}
-
-.blinkName:hover .atName {
-  opacity: 0%;
-}
-
-.blinkName:hover .normalName {
-  opacity: 100%;
 }
 
 .headerWrapper {
