@@ -59,13 +59,15 @@
 .headerWrapper {
   width: 100vw;
   position: fixed;
-  top: 0;
   left: 50%;
   right: 50%;
   margin-left: -50vw;
   margin-right: 50vw;
   background: #960018;
   z-index: 100;
+
+  top: 0px;
+  transition: top 0.3s;
 }
 
 .link {
