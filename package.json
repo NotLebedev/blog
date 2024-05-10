@@ -24,6 +24,8 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.0.20",
+    "@fontsource/roboto": "^5.0.13",
     "@solidjs/router": "^0.13.3",
     "phosphor-solid": "^1.1.5",
     "solid-js": "^1.8.11"

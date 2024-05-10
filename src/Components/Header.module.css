@@ -45,7 +45,7 @@
 
 .headerNav a {
   color: white;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: var(--monospace-font);
   font-weight: bold;
   font-style: normal;
   text-decoration: none;
@@ -57,7 +57,7 @@
 
 .name {
   color: white;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: var(--monospace-font);
   font-weight: bold;
   font-style: normal;
   font-size: 2em;
