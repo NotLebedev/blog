@@ -1,29 +1,30 @@
 .container {
     text-align: left;
-    display: grid;
+    display: inline-grid;
     height: 100%;
     align-items: center;
 }
 
-.container > .default, .container > .alt {
+.container>.default,
+.container>.alt {
     grid-row: 1;
     grid-column: 1;
     transition: opacity 0.3s ease-in;
     white-space: pre;
 }
 
-.container > .default {
+.container>.default {
     opacity: 100%;
 }
 
-.container:hover > .default {
+.container:hover>.default {
     opacity: 0%;
 }
 
-.container > .alt {
+.container>.alt {
     opacity: 0%;
 }
 
-.container:hover > .alt {
-    opacity: 100%;   
+.container:hover>.alt {
+    opacity: 100%;
 }

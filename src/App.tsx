@@ -1,19 +1,10 @@
-import { For, type Component } from "solid-js";
+import { type Component } from "solid-js";
 
 import styles from "./App.module.css";
 import Header from "./Components/Header";
 
 const Content: Component<{ children?: any }> = (props) => {
-  return (
-    <main class={styles.content}>
-      {props.children}
-      <For each={[...Array(100).keys()]}>
-        {(item, index) => {
-          return <p>Cock</p>;
-        }}
-      </For>
-    </main>
-  );
+  return <main class={styles.content}>{props.children}</main>;
 };
 
 const App: Component<{ children?: any }> = (props) => {
