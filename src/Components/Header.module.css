@@ -29,6 +29,10 @@
   color: #fff;
 }
 
+.header a {
+  color: white;
+}
+
 .headerNav ul {
   display: flex;
   align-items: center;
