@@ -7,7 +7,8 @@ import "./index.css";
 import App from "./App";
 
 const Home = lazy(() => import("./Pages/Home"));
-const ImageDetailed = lazy(() => import("./ImageDetailed"));
+const Photo = lazy(() => import("./Pages/Photo"));
+const ImageDetailed = lazy(() => import("./Pages/PhotoDetailed"));
 const NotFound = lazy(() => import("./Pages/NotFound"));
 
 const root = document.getElementById("root");
@@ -22,6 +23,7 @@ render(
   () => (
     <Router root={App}>
       <Route path="/" component={Home} />
+      <Route path="/photo" component={Photo} />
       <Route path="/photo/:id" component={ImageDetailed} />
       <Route path="*" component={NotFound} />
     </Router>

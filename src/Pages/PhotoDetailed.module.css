@@ -1,0 +1,30 @@
+.article {
+    margin-top: 2.5rem;
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.article img {
+    max-width: 100%;
+    max-height: calc(100vh - 70px - 6.9rem);
+    align-self: center;
+}
+
+.infoBanner {
+    align-self: center;
+}
+
+.photoInfo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.photoInfo p {
+    margin-left: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
