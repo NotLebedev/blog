@@ -1,9 +1,6 @@
-.grid {
-  /* max-width: 80vw; */
-}
-
 .gridRow {
   width: 100%;
+  max-height: 33vh;
   display: table;
   border-collapse: collapse;
 }
@@ -15,7 +12,6 @@
 
 .grid img {
   max-width: 100%;
-  /* width: auto; */
   height: auto;
   display: block;
 }
