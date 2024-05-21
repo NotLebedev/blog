@@ -1,0 +1,21 @@
+.grid {
+  /* max-width: 80vw; */
+}
+
+.gridRow {
+  width: 100%;
+  display: table;
+  border-collapse: collapse;
+}
+
+.gridItem {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.grid img {
+  max-width: 100%;
+  /* width: auto; */
+  height: auto;
+  display: block;
+}

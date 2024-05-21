@@ -1,7 +1,8 @@
 type ImageInfo = {
   id: string;
   name: string;
-  file: string;
+  // All previews are 512 high
+  previewWidth: number;
   camera?: string;
   lens?: string;
   flim?: string;
@@ -30,5 +31,14 @@ async function getDB(): Promise<Database | undefined> {
   return db;
 }
 
+function getImageURL(info: ImageInfo): string {
+  return `/images/${info.id}/image.jpg`;
+}
+
+function getPreviewURL(info: ImageInfo): string {
+  return `/images/${info.id}/preview.jpg`;
+}
+
 export type { Database, ImageInfo };
+export { getImageURL, getPreviewURL };
 export default getDB;

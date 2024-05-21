@@ -10,7 +10,7 @@ import {
 import { useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
-import getDB from "../Data/Database";
+import getDB, { getImageURL } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import { Aperture, ArrowDown, Camera, FilmStrip } from "phosphor-solid";
 
@@ -45,7 +45,7 @@ const PhotoDetailed: Component = () => {
       db?.images?.find((el) => el.id == params.id),
     );
 
-    const [imageURL] = createResource(imageInfo, (info) => info?.file);
+    const [imageURL] = createResource(imageInfo, getImageURL);
 
     return (
       <div class={style.article}>
