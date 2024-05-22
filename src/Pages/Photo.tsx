@@ -10,7 +10,7 @@ import {
   onCleanup,
   JSX,
 } from "solid-js";
-import getDB, { Database, ImageInfo, getPreviewURL } from "../Data/Database";
+import getDB, { Database, getPreviewURL } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
 
@@ -22,7 +22,7 @@ function fitImages(
   screenSize: ScreenSize,
 ): JSX.Element[][] {
   let result: JSX.Element[][] = [];
-  const targetHeight = Math.min(screenSize.height / 3, 512);
+  const targetHeight = Math.min(screenSize.height / 2, 512);
   const resizeFactor = targetHeight / 512;
 
   console.log(targetHeight);
@@ -59,7 +59,19 @@ function preloadImages(db: Database): ImagePreload[] {
     result.push({
       width: item.previewWidth,
       image: (
-        <Suspense fallback={<div>Loading ...</div>}>
+        <Suspense
+          fallback={
+            <svg
+              width={item.previewWidth}
+              height={512}
+              style={{
+                "max-width": "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+          }
+        >
           <AsyncImage src={imageUrl} />
         </Suspense>
       ),
