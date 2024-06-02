@@ -19,10 +19,18 @@
     {
       devShells = eachSystem (pkgs: {
         default = pkgs.mkShell {
-          buildInputs = [
-            pkgs.nodejs
-            pkgs.nodePackages.typescript
-            pkgs.nodePackages.typescript-language-server
+          buildInputs = with pkgs; [
+            nodejs
+            nodePackages.typescript
+            nodePackages.typescript-language-server
+
+            (python312.withPackages (python-pkgs: with python-pkgs; [
+              pydantic
+              typer
+            ]))
+
+            mypy
+            ruff
           ];
         };
       });

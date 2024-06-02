@@ -17,5 +17,17 @@
   "[css]": {
     "editor.tabSize": 2,
     "editor.defaultFormatter": "vscode.css-language-features"
-  }
+  },
+  "python.languageServer": "Jedi",
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.autoImportCompletions": true,
+  "ruff.nativeServer": true,
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
 }
