@@ -2,3 +2,5 @@ node_modules
 dist
 .direnv
 .vite
+**/__pycache__
+.mypy_cache
