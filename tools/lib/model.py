@@ -6,9 +6,7 @@ from pydantic import AfterValidator, BaseModel, Field, ValidationInfo
 from typing_extensions import Annotated
 
 from .validation_context import (
-    ValidationContext,
     get_context,
-    init_context,
     set_context,
 )
 
@@ -36,7 +34,10 @@ class ImageInfo(BaseModel):
     previewWidth: int = Field(gt=0)
     camera: Optional[str] = None
     lens: Optional[str] = None
-    flim: Optional[str] = None
+    film: Optional[str] = None
+
+    def __init__(self, /, **data: Any) -> None:
+        set_context(self, data)
 
 
 # Use pydantic class that will create a type-checking constructor
@@ -46,7 +47,10 @@ class Database(BaseModel):
     def __init__(self, /, **data: Any) -> None:
         set_context(self, data)
 
+    def add_image(self, image: ImageInfo) -> None:
+        self.images.insert(0, image)
+
 
 def load_database(filename: str) -> Database:
-    with open(filename) as file, init_context(ValidationContext(base_path=filename)):
+    with open(path.join(filename, "db.json")) as file:
         return Database(**json.load(file))

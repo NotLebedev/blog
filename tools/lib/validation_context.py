@@ -16,7 +16,7 @@ _init_context_var = ContextVar(
 )
 
 
-def set_context(model: BaseModel, data: Any):
+def set_context(model: BaseModel, data: Any) -> None:
     model.__pydantic_validator__.validate_python(
         data,
         self_instance=model,

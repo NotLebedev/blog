@@ -27,6 +27,7 @@
             (python312.withPackages (python-pkgs: with python-pkgs; [
               pydantic
               typer
+              pillow
             ]))
 
             mypy
