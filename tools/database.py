@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 from os import path
-from typing import Final
+from typing import Final, Optional
 
 import typer
-from lib import input_maybe
+import yaml
+from lib.edit import edit, yaml_stub
 from lib.image import create_resized
 from lib.model import ImageInfo, load_database
 from lib.validation_context import ValidationContext, init_context
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
+from yaml import CLoader
 
 app = typer.Typer()
 image_app = typer.Typer()
@@ -39,24 +41,28 @@ def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
             print(f"Could not open file {e.filename}")
             return
 
-        id = input("Image id: ")
-        name = input("Image name: ")
-        camera = input_maybe("Camera used (optional): ")
-        lens = input_maybe("Lens used (optional): ")
-        film = input_maybe("Film used (optional): ")
-        previewWidth = create_resized(id, image)
+        class Test(BaseModel):
+            id: str
+            name: str
+            camera: Optional[str] = None
+            lens: Optional[str] = None
+            film: Optional[str] = None
 
-        if any(image.id == id for image in db.images):
+        info = Test(**yaml.load(edit(yaml_stub(Test)), Loader=CLoader))
+
+        previewWidth = create_resized(info.id, image)
+
+        if any(image.id == info.id for image in db.images):
             raise ValueError(f"Image with id {id} already exists in database")
 
         db.add_image(
             ImageInfo(
-                id=id,
-                name=name,
+                id=info.id,
+                name=info.name,
                 previewWidth=previewWidth,
-                camera=camera,
-                lens=lens,
-                film=film,
+                camera=info.camera,
+                lens=info.lens,
+                film=info.film,
             )
         )
 

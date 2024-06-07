@@ -28,6 +28,7 @@
               pydantic
               typer
               pillow
+              pyyaml
             ]))
 
             mypy
