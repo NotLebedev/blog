@@ -25,8 +25,10 @@ def validate(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
             load_database(db_dir)
         except ValidationError as e:
             print(f"Validation failed: {e}")
+            exit(1)
         except FileNotFoundError as e:
             print(f"Could not open file {e.filename}")
+            exit(1)
 
 
 @image_app.command("add")
@@ -36,10 +38,10 @@ def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
             db = load_database(db_dir)
         except ValidationError as e:
             print(f"Validation failed: {e}")
-            return
+            exit(1)
         except FileNotFoundError as e:
             print(f"Could not open file {e.filename}")
-            return
+            exit(1)
 
         class Test(BaseModel):
             id: str
@@ -68,6 +70,25 @@ def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
 
         with open(path.join(db_dir, "db.json"), "w") as file:
             file.write(db.model_dump_json())
+
+
+@image_app.command("edit")
+def image_edit(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+    with init_context(ValidationContext(base_path=db_dir)):
+        try:
+            db = load_database(db_dir)
+        except ValidationError as e:
+            print(f"Validation failed: {e}")
+            exit(1)
+        except FileNotFoundError as e:
+            print(f"Could not open file {e.filename}")
+            exit(1)
+
+        try:
+            info = next(filter(lambda el: el.id == image, db.images))
+        except StopIteration:
+            print(f"Image {image} not found")
+            exit(1)
 
 
 if __name__ == "__main__":

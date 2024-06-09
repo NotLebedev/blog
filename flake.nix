@@ -29,6 +29,7 @@
               typer
               pillow
               pyyaml
+              pytest
             ]))
 
             mypy
