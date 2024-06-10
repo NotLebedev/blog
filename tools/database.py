@@ -157,5 +157,21 @@ def image_remove(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
         )
 
 
+@image_app.command("list")
+def image_list(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+    with init_context(ValidationContext(base_path=db_dir)):
+        try:
+            db = load_database(db_dir)
+        except ValidationError as e:
+            print(f"Validation failed: {e}")
+            exit(1)
+        except FileNotFoundError as e:
+            print(f"Could not open file {e.filename}")
+            exit(1)
+
+    for image in db.images:
+        print(image.id)
+
+
 if __name__ == "__main__":
     app()
