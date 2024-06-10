@@ -3,10 +3,12 @@ from tempfile import NamedTemporaryFile
 from typing import Any, List, Optional, Type, TypeVar
 
 import pytest
+import yaml
 from pydantic import BaseModel
+from yaml import CLoader
 
 
-def edit(content: str) -> str:
+def _edit(content: str) -> str:
     """
     Prompt user to edit content using his preferred editor
     """
@@ -22,6 +24,14 @@ def edit(content: str) -> str:
 
 
 T = TypeVar("T", bound=BaseModel)
+
+
+def edit(clazz: Type[T] | T) -> T:
+    if isinstance(clazz, type):
+        typ = clazz
+    else:
+        typ = type(clazz)
+    return typ(**yaml.load(_edit(yaml_stub(clazz)), Loader=CLoader))
 
 
 def yaml_stub(clazz: Type[T] | T) -> str:
@@ -43,11 +53,11 @@ def yaml_type_stub(clazz: Type[T]) -> str:
     return "\n".join(result) + "\n"
 
 
-def yaml_object_stub(object: BaseModel) -> str:
+def yaml_object_stub(obj: BaseModel) -> str:
     result: List[str] = []
-    for field, value in object.__dict__.items():
+    for field, value in obj.__dict__.items():
         # Check that type annotation is valid
-        _ = is_optional(object.__annotations__[field])
+        _ = is_optional(obj.__annotations__[field])
 
         if value is None:
             result.append(f"# {field}: ")
@@ -57,12 +67,12 @@ def yaml_object_stub(object: BaseModel) -> str:
 
 
 def is_optional(annotation: Any) -> bool:
-    if annotation == str:
+    if annotation in [str, "str"]:
         return False
-    elif annotation == Optional[str]:
+    elif annotation in [Optional[str], "Optional[str]"]:
         return True
     else:
-        raise TypeError(f"Type {type} is unsupported when creating yaml stub")
+        raise TypeError(f"Type {annotation} is unsupported when creating yaml stub")
 
 
 def test_yaml_type_stub_correct() -> None:

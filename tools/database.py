@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
+import os
 from os import path
 from typing import Final, Optional
 
 import typer
-import yaml
-from lib.edit import edit, yaml_stub
+from lib.edit import edit
 from lib.image import create_resized
 from lib.model import ImageInfo, load_database
 from lib.validation_context import ValidationContext, init_context
 from pydantic import BaseModel, ValidationError
-from yaml import CLoader
 
 app = typer.Typer()
 image_app = typer.Typer()
@@ -31,6 +32,34 @@ def validate(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
             exit(1)
 
 
+class ImageInfoPrompt(BaseModel):
+    id: str
+    name: str
+    camera: Optional[str] = None
+    lens: Optional[str] = None
+    film: Optional[str] = None
+
+    @staticmethod
+    def copy_of(copy_of: ImageInfo) -> ImageInfoPrompt:
+        return ImageInfoPrompt(
+            id=copy_of.id,
+            name=copy_of.name,
+            camera=copy_of.camera,
+            lens=copy_of.lens,
+            film=copy_of.film,
+        )
+
+    def to_image_info(self, previewWidth: int) -> ImageInfo:
+        return ImageInfo(
+            id=self.id,
+            name=self.name,
+            previewWidth=previewWidth,
+            camera=self.camera,
+            lens=self.lens,
+            film=self.film,
+        )
+
+
 @image_app.command("add")
 def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
     with init_context(ValidationContext(base_path=db_dir)):
@@ -43,30 +72,14 @@ def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
             print(f"Could not open file {e.filename}")
             exit(1)
 
-        class Test(BaseModel):
-            id: str
-            name: str
-            camera: Optional[str] = None
-            lens: Optional[str] = None
-            film: Optional[str] = None
-
-        info = Test(**yaml.load(edit(yaml_stub(Test)), Loader=CLoader))
+        info = edit(ImageInfoPrompt)
 
         previewWidth = create_resized(info.id, image)
 
         if any(image.id == info.id for image in db.images):
             raise ValueError(f"Image with id {id} already exists in database")
 
-        db.add_image(
-            ImageInfo(
-                id=info.id,
-                name=info.name,
-                previewWidth=previewWidth,
-                camera=info.camera,
-                lens=info.lens,
-                film=info.film,
-            )
-        )
+        db.add_image(info.to_image_info(previewWidth))
 
         with open(path.join(db_dir, "db.json"), "w") as file:
             file.write(db.model_dump_json())
@@ -89,6 +102,30 @@ def image_edit(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
         except StopIteration:
             print(f"Image {image} not found")
             exit(1)
+
+        prompt = ImageInfoPrompt.copy_of(info)
+
+        prompt = edit(prompt)
+
+        if prompt.id != info.id:
+            os.rename(
+                path.join(db_dir, "images", info.id),
+                path.join(db_dir, "images", prompt.id),
+            )
+
+        try:
+            db.images[db.images.index(info)] = prompt.to_image_info(info.previewWidth)
+        except Exception as e:
+            if prompt.id != info.id:
+                # If editing database failed rollback filesystem change
+                os.rename(
+                    path.join(db_dir, "images", prompt.id),
+                    path.join(db_dir, "images", info.id),
+                )
+            raise e
+
+        with open(path.join(db_dir, "db.json"), "w") as file:
+            file.write(db.model_dump_json())
 
 
 if __name__ == "__main__":
