@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from os import path
 from typing import Final, Optional
 
@@ -126,6 +127,34 @@ def image_edit(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
 
         with open(path.join(db_dir, "db.json"), "w") as file:
             file.write(db.model_dump_json())
+
+
+@image_app.command("remove")
+def image_remove(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+    with init_context(ValidationContext(base_path=db_dir)):
+        try:
+            db = load_database(db_dir)
+        except ValidationError as e:
+            print(f"Validation failed: {e}")
+            exit(1)
+        except FileNotFoundError as e:
+            print(f"Could not open file {e.filename}")
+            exit(1)
+
+        try:
+            info = next(filter(lambda el: el.id == image, db.images))
+        except StopIteration:
+            print(f"Image {image} not found")
+            exit(1)
+
+        db.images.remove(info)
+
+        with open(path.join(db_dir, "db.json"), "w") as file:
+            file.write(db.model_dump_json())
+
+        shutil.rmtree(
+            path.join(db_dir, "images", info.id),
+        )
 
 
 if __name__ == "__main__":
