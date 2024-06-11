@@ -6,6 +6,7 @@ import {
   Switch,
   Match,
   JSX,
+  createSignal,
 } from "solid-js";
 import { useParams } from "@solidjs/router";
 
@@ -39,6 +40,10 @@ const PhotoDetailed: Component = () => {
   // Putting all chained resources into separate component
   // https://github.com/solidjs/solid/discussions/1015
   const Suspended = () => {
+    let infoRef: HTMLElement | undefined = undefined;
+
+    let atTop = true;
+
     const [db] = createResource(getDB);
 
     const [imageInfo] = createResource(db, (db) =>
@@ -56,11 +61,25 @@ const PhotoDetailed: Component = () => {
           <Match when={true}>
             <AsyncImage src={imageURL} />
             <h2 class={style.infoBanner}>
-              <ArrowDown />
-              Photo Info
-              <ArrowDown />
+              <button
+                class={style.photoInfoButton}
+                onClick={() => {
+                  if (atTop) {
+                    infoRef!.scrollIntoView({ behavior: "smooth" });
+                    atTop = false;
+                  } else {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    atTop = true;
+                  }
+                }}
+              >
+                <ArrowDown class={style.arrow} />
+                Photo Info
+                <ArrowDown class={style.arrow} />
+              </button>
             </h2>
             <Show when={imageInfo()}>
+              <a ref={infoRef} />
               <InfoItem icon={Spacing} text={imageInfo()?.name} />
               <InfoItem icon={Camera} text={imageInfo()?.camera} />
               <InfoItem icon={Aperture} text={imageInfo()?.lens} />
