@@ -47,8 +47,6 @@ const PhotoDetailed: Component = () => {
   const Suspended = () => {
     let infoRef: HTMLElement | undefined = undefined;
 
-    let atTop = true;
-
     const [db] = createResource(getDB);
 
     const [imageInfo] = createResource(db, (db) =>
@@ -56,6 +54,14 @@ const PhotoDetailed: Component = () => {
     );
 
     const [imageURL] = createResource(imageInfo, getImageURL);
+
+    function scrollInfo() {
+      if (window.scrollY == 0) {
+        infoRef!.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
 
     return (
       <div class={style.article}>
@@ -66,18 +72,7 @@ const PhotoDetailed: Component = () => {
           <Match when={true}>
             <AsyncImage src={imageURL} />
             <h2 class={style.infoBanner}>
-              <button
-                class={style.photoInfoButton}
-                onClick={() => {
-                  if (atTop) {
-                    infoRef!.scrollIntoView({ behavior: "smooth" });
-                    atTop = false;
-                  } else {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                    atTop = true;
-                  }
-                }}
-              >
+              <button class={style.photoInfoButton} onClick={scrollInfo}>
                 <ArrowDown class={style.arrow} />
                 Photo Info
                 <ArrowDown class={style.arrow} />
