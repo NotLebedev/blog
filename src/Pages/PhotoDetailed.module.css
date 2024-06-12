@@ -18,15 +18,22 @@
 
 .photoInfo {
     display: flex;
-    align-items: center;
+    align-items: top;
     font-size: 1.5rem;
     margin-top: 0.5rem;
+}
+
+.photoInfo svg {
+    margin-top: 0.2rem;
+    flex-basis: 1.5rem;
+    min-width: 1.5rem;
 }
 
 .photoInfo p {
     margin-left: 0.5rem;
     margin-top: 0;
     margin-bottom: 0;
+
 }
 
 .photoInfoButton {
@@ -38,4 +45,8 @@
     font: inherit;
     cursor: pointer;
     outline: inherit;
+}
+
+.infoBlock {
+    max-width: 80rem;
 }

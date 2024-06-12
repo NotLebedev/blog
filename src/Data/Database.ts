@@ -3,6 +3,7 @@ type ImageInfo = {
   name: string;
   // All previews are 512 high
   previewWidth: number;
+  description?: string;
   camera?: string;
   lens?: string;
   flim?: string;

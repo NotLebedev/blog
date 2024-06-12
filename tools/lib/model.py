@@ -32,6 +32,7 @@ class ImageInfo(BaseModel):
     name: str
     # All previews are 512 high
     previewWidth: int = Field(gt=0)
+    description: Optional[str] = None
     camera: Optional[str] = None
     lens: Optional[str] = None
     film: Optional[str] = None

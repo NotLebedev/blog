@@ -36,6 +36,7 @@ def validate(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
 class ImageInfoPrompt(BaseModel):
     id: str
     name: str
+    description: Optional[str] = None
     camera: Optional[str] = None
     lens: Optional[str] = None
     film: Optional[str] = None
@@ -45,6 +46,7 @@ class ImageInfoPrompt(BaseModel):
         return ImageInfoPrompt(
             id=copy_of.id,
             name=copy_of.name,
+            description=copy_of.description,
             camera=copy_of.camera,
             lens=copy_of.lens,
             film=copy_of.film,
@@ -55,6 +57,7 @@ class ImageInfoPrompt(BaseModel):
             id=self.id,
             name=self.name,
             previewWidth=previewWidth,
+            description=self.description,
             camera=self.camera,
             lens=self.lens,
             film=self.film,

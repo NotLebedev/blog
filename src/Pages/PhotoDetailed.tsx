@@ -6,14 +6,19 @@ import {
   Switch,
   Match,
   JSX,
-  createSignal,
 } from "solid-js";
 import { useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
 import getDB, { getImageURL } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
-import { Aperture, ArrowDown, Camera, FilmStrip } from "phosphor-solid";
+import {
+  Aperture,
+  ArrowDown,
+  ArticleNyTimes,
+  Camera,
+  FilmStrip,
+} from "phosphor-solid";
 
 const PhotoDetailed: Component = () => {
   const params = useParams();
@@ -78,13 +83,19 @@ const PhotoDetailed: Component = () => {
                 <ArrowDown class={style.arrow} />
               </button>
             </h2>
-            <Show when={imageInfo()}>
-              <a ref={infoRef} />
-              <InfoItem icon={Spacing} text={imageInfo()?.name} />
-              <InfoItem icon={Camera} text={imageInfo()?.camera} />
-              <InfoItem icon={Aperture} text={imageInfo()?.lens} />
-              <InfoItem icon={FilmStrip} text={imageInfo()?.flim} />
-            </Show>
+            <div class={style.infoBlock}>
+              <Show when={imageInfo()}>
+                <a ref={infoRef} />
+                <InfoItem icon={Spacing} text={imageInfo()?.name} />
+                <InfoItem
+                  icon={ArticleNyTimes}
+                  text={imageInfo()?.description}
+                />
+                <InfoItem icon={Camera} text={imageInfo()?.camera} />
+                <InfoItem icon={Aperture} text={imageInfo()?.lens} />
+                <InfoItem icon={FilmStrip} text={imageInfo()?.flim} />
+              </Show>
+            </div>
           </Match>
         </Switch>
       </div>
