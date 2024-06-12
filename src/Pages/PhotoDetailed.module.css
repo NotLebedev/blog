@@ -1,5 +1,5 @@
 .article {
-    margin-top: 2.5rem;
+    margin-top: 0.5rem;
     margin-bottom: 3rem;
     display: flex;
     flex-direction: column;
@@ -8,7 +8,7 @@
 
 .article img {
     max-width: 100%;
-    max-height: calc(100vh - 70px - 6.9rem);
+    max-height: calc(100vh - var(--header-height) - 4.5rem);
     align-self: center;
 }
 
@@ -36,6 +36,16 @@
 
 }
 
+.altArrow {
+    display: inline-grid;
+}
+
+.altArrow div {
+    grid-row: 1;
+    grid-column: 1;
+    transition: opacity 0.3s ease-in;
+}
+
 .photoInfoButton {
     position: relative;
     background: none;
@@ -45,13 +55,8 @@
     font: inherit;
     cursor: pointer;
     outline: inherit;
-    display: flex;
-    align-items: center;
-}
-
-.photoInfoButton .arrow {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-top: 0.5rem;
+    align-self: center;
 }
 
 .infoBlock {

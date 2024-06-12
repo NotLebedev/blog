@@ -15,10 +15,25 @@ import AsyncImage from "../Components/AsyncImage";
 import {
   Aperture,
   ArrowDown,
+  ArrowUp,
   ArticleNyTimes,
   Camera,
   FilmStrip,
 } from "phosphor-solid-js";
+import { usePageContext } from "../App";
+
+const AltArrow: Component<{ atTop: boolean }> = (props) => {
+  return (
+    <div class={style.altArrow}>
+      <div style={{ opacity: props.atTop ? "100%" : "0%" }}>
+        <ArrowDown class={style.arrow} size="3rem" />
+      </div>
+      <div style={{ opacity: !props.atTop ? "100%" : "0%" }}>
+        <ArrowUp class={style.arrow} size="3rem" />
+      </div>
+    </div>
+  );
+};
 
 const PhotoDetailed: Component = () => {
   const params = useParams();
@@ -54,6 +69,7 @@ const PhotoDetailed: Component = () => {
     );
 
     const [imageURL] = createResource(imageInfo, getImageURL);
+    const { atTop } = usePageContext()!;
 
     function scrollInfo() {
       if (window.scrollY == 0) {
@@ -71,13 +87,9 @@ const PhotoDetailed: Component = () => {
           </Match>
           <Match when={true}>
             <AsyncImage src={imageURL} />
-            <h2 class={style.infoBanner}>
-              <button class={style.photoInfoButton} onClick={scrollInfo}>
-                <ArrowDown class={style.arrow} />
-                Photo Info
-                <ArrowDown class={style.arrow} />
-              </button>
-            </h2>
+            <button class={style.photoInfoButton} onClick={scrollInfo}>
+              <AltArrow atTop={atTop()} />
+            </button>
             <div class={style.infoBlock}>
               <Show when={imageInfo()}>
                 <a ref={infoRef} />
