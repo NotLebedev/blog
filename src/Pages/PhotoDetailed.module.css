@@ -1,64 +1,63 @@
 .article {
-    margin-top: 0.5rem;
-    margin-bottom: 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
+  margin-top: 0.5rem;
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 }
 
 .article img {
-    max-width: 100%;
-    max-height: calc(100vh - var(--header-height) - 4.5rem);
-    align-self: center;
+  max-width: 100%;
+  max-height: calc(100vh - var(--header-height) - 4.5rem);
+  align-self: center;
 }
 
 .infoBanner {
-    align-self: center;
+  align-self: center;
 }
 
 .photoInfo {
-    display: flex;
-    align-items: top;
-    font-size: 1.5rem;
-    margin-top: 0.5rem;
+  display: flex;
+  align-items: top;
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .photoInfo svg {
-    margin-top: 0.2rem;
-    flex-basis: 1.5rem;
-    min-width: 1.5rem;
+  margin-top: 0.2rem;
+  flex-basis: 1.5rem;
+  min-width: 1.5rem;
 }
 
 .photoInfo p {
-    margin-left: 0.5rem;
-    margin-top: 0;
-    margin-bottom: 0;
-
+  margin-left: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .altArrow {
-    display: inline-grid;
+  display: inline-grid;
 }
 
 .altArrow div {
-    grid-row: 1;
-    grid-column: 1;
-    transition: opacity 0.3s ease-in;
+  grid-row: 1;
+  grid-column: 1;
+  transition: opacity 0.3s ease-in;
 }
 
 .photoInfoButton {
-    position: relative;
-    background: none;
-    color: inherit;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
-    margin-top: 0.5rem;
-    align-self: center;
+  position: relative;
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  margin-top: 0.5rem;
+  align-self: center;
 }
 
 .infoBlock {
-    max-width: 80rem;
+  max-width: 80rem;
 }

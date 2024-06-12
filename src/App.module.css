@@ -30,13 +30,13 @@ p {
 a {
   color: white;
   transition: color 0.1s;
-  text-decoration-color: #FF9000;
-  text-decoration-thickness: .125em;
-  text-underline-offset: .125em;
+  text-decoration-color: #ff9000;
+  text-decoration-thickness: 0.125em;
+  text-underline-offset: 0.125em;
 }
 
 a:hover {
-  color: #FF9000;
+  color: #ff9000;
 }
 
 .topDetector {
