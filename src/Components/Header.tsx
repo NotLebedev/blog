@@ -1,5 +1,5 @@
 import { Component, onCleanup, onMount } from "solid-js";
-import { Books, Image, Question } from "phosphor-solid";
+import { Books, Image, Question } from "phosphor-solid-js";
 import DualText from "./DualText";
 import styles from "./Header.module.css";
 

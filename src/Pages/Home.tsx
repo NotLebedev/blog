@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import DualText from "../Components/DualText";
-import { Warning } from "phosphor-solid";
+import { Warning } from "phosphor-solid-js";
 
 const Home: Component = () => {
   return (

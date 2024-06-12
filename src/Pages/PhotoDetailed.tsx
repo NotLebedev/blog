@@ -18,7 +18,7 @@ import {
   ArticleNyTimes,
   Camera,
   FilmStrip,
-} from "phosphor-solid";
+} from "phosphor-solid-js";
 
 const PhotoDetailed: Component = () => {
   const params = useParams();

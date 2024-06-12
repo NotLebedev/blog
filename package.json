@@ -27,7 +27,7 @@
     "@fontsource/jetbrains-mono": "^5.0.20",
     "@fontsource/roboto": "^5.0.13",
     "@solidjs/router": "^0.13.3",
-    "phosphor-solid": "^1.1.5",
+    "phosphor-solid-js": "^2.0.0",
     "solid-js": "^1.8.11"
   }
 }

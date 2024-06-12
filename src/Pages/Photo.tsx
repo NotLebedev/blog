@@ -13,7 +13,7 @@ import {
 import getDB, { Database, getPreviewURL } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
-import { ArrowUpRight } from "phosphor-solid";
+import { ArrowUpRight } from "phosphor-solid-js";
 
 type DisplayableImage = {
   id: string;
