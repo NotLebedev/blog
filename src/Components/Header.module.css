@@ -15,13 +15,11 @@
 
 .header {
   max-width: 52rem;
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   margin-left: auto;
   margin-right: auto;
-  height: 70px;
+  height: var(--header-height);
   display: flex;
   flex-direction: row;
   justify-content: space-between;

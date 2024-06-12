@@ -19,6 +19,7 @@
 :root {
   --font: 'Roboto', Arial, sans-serif;
   --monospace-font: 'JetBrains Mono', 'Courier New', monospace;
+  --header-height: 80px;
 }
 
 body {
