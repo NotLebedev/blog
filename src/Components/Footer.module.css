@@ -1,0 +1,24 @@
+.footer {
+  color: #4e4e4e;
+  text-align: center;
+  font-size: 18px;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.footer > p {
+  display: inline-block;
+}
+
+.footer > p:before {
+  content: "";
+  display: block;
+  height: 0.2rem;
+  border: 0;
+  background-color: #4e4e4e;
+  border-radius: 0.1rem;
+  padding: 0;
+  margin-left: -3rem;
+  margin-right: -3rem;
+  margin-bottom: 1rem;
+}

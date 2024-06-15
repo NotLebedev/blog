@@ -10,6 +10,7 @@ import {
 
 import styles from "./App.module.css";
 import Header from "./Components/Header";
+import Footer from "./Components/Footer";
 
 export type PageContext = { atTop: Accessor<boolean> } | undefined;
 const pageContext: Context<PageContext> = createContext();
@@ -46,6 +47,7 @@ const App: Component<{ children?: any }> = (props) => {
     <div class={styles.App}>
       <Header />
       <Content children={props.children} />
+      <Footer />
     </div>
   );
 };
