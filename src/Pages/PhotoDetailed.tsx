@@ -26,13 +26,14 @@ import {
 } from "phosphor-solid-js";
 import { usePageContext } from "../App";
 
-const AltArrow: Component<{ atTop: boolean }> = (props) => {
+const AltArrow: Component = () => {
+  const { atTop, atEnd } = usePageContext()!;
   return (
     <div class={style.altArrow}>
-      <div style={{ opacity: props.atTop ? "100%" : "0%" }}>
+      <div style={{ opacity: atTop() && !atEnd() ? "100%" : "0%" }}>
         <ArrowDown class={style.arrow} size="2rem" />
       </div>
-      <div style={{ opacity: !props.atTop ? "100%" : "0%" }}>
+      <div style={{ opacity: !atTop() ? "100%" : "0%" }}>
         <ArrowUp class={style.arrow} size="2rem" />
       </div>
     </div>
@@ -94,7 +95,6 @@ const PhotoDetailed: Component = () => {
     );
 
     const [imageURL] = createResource(imageInfo, getImageURL);
-    const { atTop } = usePageContext()!;
 
     function scrollInfo() {
       if (window.scrollY == 0) {
@@ -119,14 +119,14 @@ const PhotoDetailed: Component = () => {
           middle={<ArrowLeft size="2rem" />}
           bottom={
             <button class={style.photoInfoButton} onClick={scrollInfo}>
-              <AltArrow atTop={atTop()} />
+              <AltArrow />
             </button>
           }
         />
         <Toolbar
           id={style["toolbar-right"]}
           middle={<ArrowRight size="2rem" />}
-          bottom={<ShareNetwork size="2rem" />}
+          top={<ShareNetwork size="2rem" />}
         />
         <Switch>
           <Match when={db.error || imageInfo.error || imageInfo == undefined}>

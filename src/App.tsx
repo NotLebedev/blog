@@ -13,7 +13,9 @@ import styles from "./App.module.css";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 
-export type PageContext = { atTop: Accessor<boolean> } | undefined;
+export type PageContext =
+  | { atTop: Accessor<boolean>; atEnd: Accessor<Boolean> }
+  | undefined;
 const pageContext: Context<PageContext> = createContext();
 
 export function usePageContext(): PageContext {
@@ -21,28 +23,35 @@ export function usePageContext(): PageContext {
 }
 
 const Page: Component<{ children?: any; withHeader: boolean }> = (props) => {
-  let topDetectorRef: HTMLElement | undefined = undefined;
+  let topDetector: HTMLElement | undefined = undefined;
+  let endDetector: HTMLElement | undefined = undefined;
 
   const [atTop, setAtTop] = createSignal(true);
+  const [atEnd, setAtEnd] = createSignal(true);
 
   onMount(() => {
     new IntersectionObserver((entries) => {
       setAtTop(entries[0].isIntersecting);
-    }).observe(topDetectorRef!);
+    }).observe(topDetector!);
+    new IntersectionObserver((entries) => {
+      setAtEnd(entries[0].isIntersecting);
+    }).observe(endDetector!);
   });
 
   return (
-    <pageContext.Provider value={{ atTop: atTop }}>
+    <pageContext.Provider value={{ atTop: atTop, atEnd: atEnd }}>
       <div class={styles.App}>
         <Show when={props.withHeader}>
           <Header />
         </Show>
-        <div class={styles.positionDetector} ref={topDetectorRef} />
+        <div class={styles.positionDetector} ref={topDetector} />
         <Show when={props.withHeader}>
           <div class={styles.headerReservedSpace} />
         </Show>
-        <main class={styles.content}>{props.children}</main>
-
+        <main class={styles.content}>
+          {props.children}
+          <div class={styles.positionDetector} ref={endDetector} />
+        </main>
         <Footer />
       </div>
     </pageContext.Provider>
