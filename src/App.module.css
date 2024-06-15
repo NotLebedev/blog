@@ -2,8 +2,8 @@ main {
   min-height: 100vh;
   text-align: left;
   position: relative;
-  padding-left: 3em;
-  padding-right: 3em;
+  padding-left: 4rem;
+  padding-right: 4rem;
   color: white;
   font-size: 18px;
 }
