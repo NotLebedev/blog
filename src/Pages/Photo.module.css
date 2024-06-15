@@ -8,7 +8,13 @@
   display: table-cell;
   vertical-align: top;
   position: relative;
-  padding: 0.1rem;
+  --grid-paddings: 0.2rem;
+  padding-left: var(--grid-paddings);
+  padding-top: var(--grid-paddings);
+}
+
+.gridItem:last-child {
+  padding-right: var(--grid-paddings);
 }
 
 .gridItem img,
@@ -24,7 +30,8 @@
   background: rgba(0.3, 0.3, 0.3, 0);
   width: 100%;
   height: auto;
-  padding-top: 0.5rem;
+  padding-top: calc(var(--grid-paddings) + 0.5rem);
+  padding-left: var(--grid-paddings);
   padding-bottom: 0.5rem;
   display: flex;
   flex-direction: row;
