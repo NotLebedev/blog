@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import DualText from "../Components/DualText";
-import { Warning } from "phosphor-solid-js";
+import UnderConstruction from "../Components/UnderConstruction";
 
 const Home: Component = () => {
   return (
@@ -12,11 +12,7 @@ const Home: Component = () => {
         photographer and a person interested in many other things.
       </p>
       <p>Posting my photos and thoughts on everything here (soon).</p>
-      <h2>
-        <Warning size={32} />
-        Currently under construction
-        <Warning size={32} />
-      </h2>
+      <UnderConstruction />
     </>
   );
 };
