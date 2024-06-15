@@ -33,5 +33,10 @@
   },
   "[nix]": {
     "editor.defaultFormatter": "jnoortheen.nix-ide"
-  }
+  },
+  "conventionalCommits.scopes": [
+    "front",
+    "tools",
+    "dev"
+  ]
 }
