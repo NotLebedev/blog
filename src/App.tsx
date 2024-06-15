@@ -15,8 +15,10 @@ import Footer from "./Components/Footer";
 export type PageContext = { atTop: Accessor<boolean> } | undefined;
 const pageContext: Context<PageContext> = createContext();
 
-const Content: Component<{ children?: any }> = (props) => {
-  let topDetectorRef: HTMLElement | undefined = undefined;
+const Content: Component<{
+  children?: any;
+  topDetectorRef: HTMLElement | undefined;
+}> = (props) => {
   const [atTop, setAtTop] = createSignal(true);
 
   const topObserver = new IntersectionObserver((entries) => {
@@ -24,13 +26,11 @@ const Content: Component<{ children?: any }> = (props) => {
   });
 
   onMount(() => {
-    topObserver.observe(topDetectorRef!);
+    topObserver.observe(props.topDetectorRef!);
   });
 
   return (
     <main class={styles.content}>
-      <div class={styles.topDetector} ref={topDetectorRef} />
-      <div class={styles.headerReservedSpace} />
       <pageContext.Provider value={{ atTop: atTop }}>
         {props.children}
       </pageContext.Provider>
@@ -42,14 +42,28 @@ export function usePageContext(): PageContext {
   return useContext(pageContext);
 }
 
-const App: Component<{ children?: any }> = (props) => {
+const FullPage: Component<{ children?: any }> = (props) => {
+  let topDetectorRef: HTMLElement | undefined = undefined;
   return (
     <div class={styles.App}>
       <Header />
-      <Content children={props.children} />
+      <div class={styles.topDetector} ref={topDetectorRef} />
+      <div class={styles.headerReservedSpace} />
+      <Content children={props.children} topDetectorRef={topDetectorRef} />
       <Footer />
     </div>
   );
 };
 
-export default App;
+const NoHeaderPage: Component<{ children?: any }> = (props) => {
+  let topDetectorRef: HTMLElement | undefined = undefined;
+  return (
+    <div class={styles.App}>
+      <div class={styles.topDetector} ref={topDetectorRef} />
+      <Content children={props.children} topDetectorRef={topDetectorRef} />
+      <Footer />
+    </div>
+  );
+};
+
+export { FullPage, NoHeaderPage };

@@ -15,10 +15,14 @@ import AsyncImage from "../Components/AsyncImage";
 import {
   Aperture,
   ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   ArrowUp,
   ArticleNyTimes,
   Camera,
   FilmStrip,
+  ShareNetwork,
+  X,
 } from "phosphor-solid-js";
 import { usePageContext } from "../App";
 
@@ -26,11 +30,32 @@ const AltArrow: Component<{ atTop: boolean }> = (props) => {
   return (
     <div class={style.altArrow}>
       <div style={{ opacity: props.atTop ? "100%" : "0%" }}>
-        <ArrowDown class={style.arrow} size="3rem" />
+        <ArrowDown class={style.arrow} size="2rem" />
       </div>
       <div style={{ opacity: !props.atTop ? "100%" : "0%" }}>
-        <ArrowUp class={style.arrow} size="3rem" />
+        <ArrowUp class={style.arrow} size="2rem" />
       </div>
+    </div>
+  );
+};
+
+const Toolbar: Component<{
+  top?: JSX.Element;
+  middle?: JSX.Element;
+  bottom?: JSX.Element;
+  id: string;
+}> = (props) => {
+  return (
+    <div class={style.toolbar} id={props.id}>
+      <Show when={props.top} fallback={<div />}>
+        {props.top}
+      </Show>
+      <Show when={props.middle} fallback={<div />}>
+        {props.middle}
+      </Show>
+      <Show when={props.bottom} fallback={<div />}>
+        {props.bottom}
+      </Show>
     </div>
   );
 };
@@ -81,15 +106,34 @@ const PhotoDetailed: Component = () => {
 
     return (
       <div class={style.article}>
+        <Toolbar
+          id={style["toolbar-left"]}
+          top={
+            <button
+              class={style.photoInfoButton}
+              onClick={() => history.back()}
+            >
+              <X size="2rem" />
+            </button>
+          }
+          middle={<ArrowLeft size="2rem" />}
+          bottom={
+            <button class={style.photoInfoButton} onClick={scrollInfo}>
+              <AltArrow atTop={atTop()} />
+            </button>
+          }
+        />
+        <Toolbar
+          id={style["toolbar-right"]}
+          middle={<ArrowRight size="2rem" />}
+          bottom={<ShareNetwork size="2rem" />}
+        />
         <Switch>
           <Match when={db.error || imageInfo.error || imageInfo == undefined}>
             <p>Could not load image</p>
           </Match>
           <Match when={true}>
             <AsyncImage src={imageURL} />
-            <button class={style.photoInfoButton} onClick={scrollInfo}>
-              <AltArrow atTop={atTop()} />
-            </button>
             <div class={style.infoBlock}>
               <Show when={imageInfo()}>
                 <a ref={infoRef} />

@@ -4,7 +4,7 @@ import { lazy } from "solid-js";
 import { Router, Route } from "@solidjs/router";
 
 import "./index.css";
-import App from "./App";
+import { FullPage, NoHeaderPage } from "./App";
 
 const Home = lazy(() => import("./Pages/Home"));
 const Photo = lazy(() => import("./Pages/Photo"));
@@ -23,13 +23,33 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 render(
   () => (
-    <Router root={App}>
-      <Route path="/" component={Home} />
-      <Route path="/photo" component={Photo} />
-      <Route path="/photo/:id" component={ImageDetailed} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/about" component={About} />
-      <Route path="*" component={NotFound} />
+    <Router>
+      <Route
+        // path="/"
+        component={FullPage}
+        children={
+          <>
+            <Route path="/" component={Home} />
+            <Route path="/photo" component={Photo} />
+            <Route path="/blog" component={Blog} />
+            <Route path="/about" component={About} />
+            <Route path="*" component={NotFound} />
+          </>
+        }
+      />
+      <Route
+        // path="/"
+        component={NoHeaderPage}
+        children={
+          <>
+            <Route
+              path="/photo/:id"
+              component={ImageDetailed}
+              info={{ noHeader: true }}
+            />
+          </>
+        }
+      />
     </Router>
   ),
   root!,
