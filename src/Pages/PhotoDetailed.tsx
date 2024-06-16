@@ -27,10 +27,10 @@ import {
 import { usePageContext } from "../App";
 
 const AltArrow: Component = () => {
-  const { atTop, atEnd } = usePageContext()!;
+  const { atTop } = usePageContext()!;
   return (
     <div class={style.altArrow}>
-      <div style={{ opacity: atTop() && !atEnd() ? "100%" : "0%" }}>
+      <div style={{ opacity: atTop() ? "100%" : "0%" }}>
         <ArrowDown class={style.arrow} size="2rem" />
       </div>
       <div style={{ opacity: !atTop() ? "100%" : "0%" }}>
