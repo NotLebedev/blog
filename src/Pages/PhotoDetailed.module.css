@@ -12,36 +12,34 @@
   align-self: center;
 }
 
-.toolbar {
+.toolbar,
+.toolbar > * {
   position: fixed;
-
-  top: 0.5rem;
-  height: calc(100% - 1rem);
-  display: grid;
 }
 
-#toolbar-left {
+.toolbar > #close,
+.toolbar > #prev,
+.toolbar > #more {
   left: 1rem;
 }
 
-#toolbar-right {
+.toolbar > #share,
+.toolbar > #next {
   right: 1rem;
 }
 
-.toolbar > * {
-  grid-column: 1;
+.toolbar > #close,
+.toolbar > #share {
+  top: 0.5rem;
 }
 
-.toolbar > *:first-child {
-  align-self: begin;
+.toolbar > #prev,
+.toolbar > #next {
+  top: 50vh;
 }
 
-.toolbar > *:nth-child(2) {
-  align-self: center;
-}
-
-.toolbar > *:last-child {
-  align-self: end;
+.toolbar > #more {
+  bottom: 0.5rem;
 }
 
 .photoInfo {
@@ -75,7 +73,6 @@
 
 .photoInfoButton {
   display: grid;
-  position: relative;
   background: none;
   color: inherit;
   border: none;

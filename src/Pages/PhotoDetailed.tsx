@@ -41,22 +41,35 @@ const AltArrow: Component = () => {
 };
 
 const Toolbar: Component<{
-  top?: JSX.Element;
-  middle?: JSX.Element;
-  bottom?: JSX.Element;
-  id: string;
+  infoRef: () => HTMLElement | undefined;
 }> = (props) => {
+  function scrollInfo() {
+    if (window.scrollY == 0) {
+      props.infoRef()!.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
   return (
-    <div class={style.toolbar} id={props.id}>
-      <Show when={props.top} fallback={<div />}>
-        {props.top}
-      </Show>
-      <Show when={props.middle} fallback={<div />}>
-        {props.middle}
-      </Show>
-      <Show when={props.bottom} fallback={<div />}>
-        {props.bottom}
-      </Show>
+    <div class={style.toolbar}>
+      <button
+        class={style.photoInfoButton}
+        id={style.close}
+        onClick={() => history.back()}
+      >
+        <X size="2rem" />
+      </button>
+      <ArrowLeft size="2rem" id={style.prev} />
+      <button
+        class={style.photoInfoButton}
+        onClick={scrollInfo}
+        id={style.more}
+      >
+        <AltArrow />
+      </button>
+
+      <ShareNetwork size="2rem" id={style.share} />
+      <ArrowRight size="2rem" id={style.next} />
     </div>
   );
 };
@@ -96,38 +109,9 @@ const PhotoDetailed: Component = () => {
 
     const [imageURL] = createResource(imageInfo, getImageURL);
 
-    function scrollInfo() {
-      if (window.scrollY == 0) {
-        infoRef!.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }
-
     return (
       <div class={style.article}>
-        <Toolbar
-          id={style["toolbar-left"]}
-          top={
-            <button
-              class={style.photoInfoButton}
-              onClick={() => history.back()}
-            >
-              <X size="2rem" />
-            </button>
-          }
-          middle={<ArrowLeft size="2rem" />}
-          bottom={
-            <button class={style.photoInfoButton} onClick={scrollInfo}>
-              <AltArrow />
-            </button>
-          }
-        />
-        <Toolbar
-          id={style["toolbar-right"]}
-          middle={<ArrowRight size="2rem" />}
-          top={<ShareNetwork size="2rem" />}
-        />
+        <Toolbar infoRef={() => infoRef} />
         <Switch>
           <Match when={db.error || imageInfo.error || imageInfo == undefined}>
             <p>Could not load image</p>
