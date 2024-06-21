@@ -1,6 +1,7 @@
 import {
   Component,
   ErrorBoundary,
+  JSX,
   Match,
   Resource,
   Switch,
@@ -19,6 +20,8 @@ async function fetchImageBlob(src: string): Promise<string | undefined> {
 
 const AsyncImage: Component<{
   src: Resource<string | undefined>;
+  ref?: HTMLImageElement | undefined;
+  style?: JSX.CSSProperties;
 }> = (props) => {
   const errorMessage = <p>Failed to load image.</p>;
   const [imageBlobURL] = createResource(() => props.src(), fetchImageBlob);
@@ -30,7 +33,7 @@ const AsyncImage: Component<{
           {errorMessage}
         </Match>
         <Match when={imageBlobURL()}>
-          <img src={imageBlobURL()!} />
+          <img ref={props.ref} src={imageBlobURL()!} style={props.style} />
         </Match>
       </Switch>
     </ErrorBoundary>

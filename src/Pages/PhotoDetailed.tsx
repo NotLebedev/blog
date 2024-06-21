@@ -11,7 +11,7 @@ import { useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
 import getDB, { getImageURL } from "../Data/Database";
-import AsyncImage from "../Components/AsyncImage";
+import AsyncZoomableImage from "../Components/AsyncZoomableImage";
 import {
   Aperture,
   ArrowDown,
@@ -117,9 +117,7 @@ const PhotoDetailed: Component = () => {
             <p>Could not load image</p>
           </Match>
           <Match when={true}>
-            <div class={style.imageContainer}>
-              <AsyncImage src={imageURL} />
-            </div>
+            <AsyncZoomableImage src={imageURL} />
             <div class={style.infoBlock}>
               <Show when={imageInfo()}>
                 <a ref={infoRef} />
