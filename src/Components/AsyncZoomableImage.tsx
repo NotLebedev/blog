@@ -147,14 +147,46 @@ const AsyncZoomableImage: Component<{
     }
   }
 
-  function handlePointerDown(ev: PointerEvent) {
-    activePointers.add(ev.pointerId);
+  let lastPointerPosition: Vector | undefined = undefined;
+
+  function handlePointerDown(event: PointerEvent) {
+    event.preventDefault();
+    activePointers.add(event.pointerId);
+    if (activePointers.size === 1) {
+      lastPointerPosition = Vector.fromClient(event);
+    } else {
+      lastPointerPosition = undefined;
+    }
   }
 
-  function handlePointerUp(ev: PointerEvent) {
-    activePointers.delete(ev.pointerId);
+  function handlePointerUp(event: PointerEvent) {
+    event.preventDefault();
+    activePointers.delete(event.pointerId);
+    lastPointerPosition = undefined;
     if (activePointers.size < 2) {
       prevTouches = undefined;
+    }
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    event.preventDefault();
+    if (lastPointerPosition !== undefined) {
+      const newPointerPosition = Vector.fromClient(event);
+      const delta = newPointerPosition.sub(lastPointerPosition);
+
+      lastPointerPosition = newPointerPosition;
+      const state = zoomState();
+      setZoomState({
+        scale: state.scale,
+        position: apply_on_rows(
+          {
+            position: state.position.add(delta),
+            scale: new Vector(state.scale, state.scale),
+            size: new Vector(imageRect.width, imageRect.height),
+          },
+          clampPosition,
+        ),
+      });
     }
   }
 
@@ -173,6 +205,7 @@ const AsyncZoomableImage: Component<{
     image.addEventListener("touchmove", ifEnabled(handleTouchMove));
     image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
     image.addEventListener("pointerup", ifEnabled(handlePointerUp));
+    image.addEventListener("pointermove", ifEnabled(handlePointerMove));
   }
 
   // Wait not only for image component to mount, but also until
