@@ -28,6 +28,7 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     position: new Vector(0, 0),
     scale: 1,
   });
+  const activePointers: Set<number> = new Set();
 
   /**
    * Call this function in {@link onMount} to save original position of image
@@ -68,22 +69,20 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     }
   }
 
-  /**
-   * Note that image uses absolute positioning, thus transform is relative to center
-   */
-  function handleWheel(event: WheelEvent) {
-    event.preventDefault();
-
+  function calcNewState(
+    delta: number,
+    point: Vector,
+  ): { position: Vector; scale: number } {
+    console.log(delta);
     const state = zoomState();
 
-    const delta = event.deltaY;
-    const action = Vector.fromClient(event).sub(imageRect.center);
+    const action = point.sub(imageRect.center);
     const target = action.sub(state.position).div(state.scale);
 
     const scale = clamp(state.scale * (1 - delta * ZOOM_FACTOR), 1, zoomLimit);
     const newPosition = target.mul(-scale).add(action);
 
-    setZoomState({
+    return {
       position: apply_on_rows(
         {
           position: newPosition,
@@ -93,13 +92,68 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
         clampPosition,
       ),
       scale: scale,
-    });
+    };
+  }
+
+  /**
+   * Note that image uses absolute positioning, thus transform is relative to center
+   */
+  function handleWheel(event: WheelEvent) {
+    event.preventDefault();
+
+    setZoomState(calcNewState(event.deltaY, Vector.fromClient(event)));
+  }
+
+  let prevTouches: [Vector, Vector] | undefined = undefined;
+  function handleTouchMove(event: TouchEvent) {
+    event.preventDefault();
+
+    if (event.touches.length === 2) {
+      const touches: [Vector, Vector] = [...event.touches].map(
+        (touch) => new Vector(touch.clientX, touch.clientY),
+      ) as [Vector, Vector];
+
+      if (prevTouches !== undefined) {
+        const centerPrev = prevTouches[0].add(prevTouches[1]).div(2);
+        const centerCur = touches[0].add(touches[1]).div(2);
+        const centerMove = centerCur.sub(centerPrev);
+
+        const scale =
+          touches[0].sub(touches[1]).abs() /
+          prevTouches[0].sub(prevTouches[1]).abs();
+
+        if (Math.abs(scale - 1) > 0.00001) {
+          setZoomState(
+            calcNewState(
+              -Math.log(scale) / ZOOM_FACTOR,
+              centerPrev.add(centerMove.div(1 - scale)),
+            ),
+          );
+        }
+      }
+
+      prevTouches = touches;
+    }
+  }
+
+  function handlePointerDown(ev: PointerEvent) {
+    activePointers.add(ev.pointerId);
+  }
+
+  function handlePointerUp(ev: PointerEvent) {
+    activePointers.delete(ev.pointerId);
+    if (activePointers.size < 2) {
+      prevTouches = undefined;
+    }
   }
 
   function mountZoom() {
     saveOriginalRect();
     createZoomLimit();
     image.addEventListener("wheel", handleWheel);
+    image.addEventListener("touchmove", handleTouchMove);
+    image.addEventListener("pointerdown", handlePointerDown);
+    image.addEventListener("pointerup", handlePointerUp);
   }
 
   // Wait not only for image component to mound, but also until

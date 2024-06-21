@@ -26,6 +26,10 @@ class Vector {
   div(rhs: number): Vector {
     return new Vector(this.x / rhs, this.y / rhs);
   }
+
+  abs(): number {
+    return Math.hypot(this.x, this.y);
+  }
 }
 
 function objectMap<F, T, Obj extends { [key: string]: F }>(
