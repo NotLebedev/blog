@@ -1,6 +1,7 @@
 import {
   Accessor,
   Context,
+  JSX,
   Show,
   createContext,
   createSignal,
@@ -20,7 +21,10 @@ export function usePageContext(): PageContext {
   return useContext(pageContext)!;
 }
 
-const Page: Component<{ children?: any; withHeader: boolean }> = (props) => {
+const Page: Component<{
+  children?: JSX.Element;
+  withHeader: boolean;
+}> = (props) => {
   let topDetector!: HTMLDivElement;
   let endDetector!: HTMLDivElement;
 
@@ -52,11 +56,11 @@ const Page: Component<{ children?: any; withHeader: boolean }> = (props) => {
   );
 };
 
-const FullPage: Component<{ children?: any }> = (props) => {
+const FullPage: Component<{ children?: JSX.Element }> = (props) => {
   return <Page children={props.children} withHeader={true} />;
 };
 
-const NoHeaderPage: Component<{ children?: any }> = (props) => {
+const NoHeaderPage: Component<{ children?: JSX.Element }> = (props) => {
   return <Page children={props.children} withHeader={false} />;
 };
 

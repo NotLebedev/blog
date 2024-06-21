@@ -35,7 +35,7 @@ function fitImages(
   images: DisplayableImage[],
   screenSize: ScreenSize,
 ): ImageHandle[][] {
-  let result: ImageHandle[][] = [];
+  const result: ImageHandle[][] = [];
   const targetHeight = Math.min(screenSize.height / 2, 512);
   const resizeFactor = targetHeight / 512;
 
@@ -67,7 +67,7 @@ function fitImages(
 }
 
 function preloadImages(db: Database): DisplayableImage[] {
-  let result: DisplayableImage[] = [];
+  const result: DisplayableImage[] = [];
 
   for (const item of db.images) {
     const [imageUrl] = createResource(item, getPreviewURL);

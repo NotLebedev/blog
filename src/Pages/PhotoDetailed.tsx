@@ -78,7 +78,7 @@ const PhotoDetailed: Component = () => {
   const params = useParams();
 
   const InfoItem: Component<{
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: (props: any, ref: any) => JSX.Element;
     text: string | undefined;
   }> = (props) => {
