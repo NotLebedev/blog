@@ -4,13 +4,13 @@ import DualText from "./DualText";
 import styles from "./Header.module.css";
 
 const Header: Component = () => {
-  let wrapperRef: HTMLElement | undefined = undefined;
+  let wrapperRef!: HTMLElement;
 
   let lastScroll = 0;
   function handleScroll() {
     const currentScroll = window.scrollY;
-    const elementHeight = wrapperRef!.clientHeight;
-    wrapperRef!.style.top =
+    const elementHeight = wrapperRef.clientHeight;
+    wrapperRef.style.top =
       currentScroll > lastScroll ? `${-elementHeight}px` : "0";
     lastScroll = currentScroll;
   }
@@ -24,7 +24,7 @@ const Header: Component = () => {
   });
 
   return (
-    <section ref={wrapperRef!} class={styles.headerWrapper}>
+    <section ref={wrapperRef} class={styles.headerWrapper}>
       <header class={styles.header}>
         <a class={styles.name} href="/">
           <DualText default="@NotLebedev" alt=" Artemiy" />

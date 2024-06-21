@@ -27,7 +27,7 @@ import {
 import { usePageContext } from "../App";
 
 const AltArrow: Component = () => {
-  const { atTop } = usePageContext()!;
+  const { atTop } = usePageContext();
   return (
     <div class={style.altArrow}>
       <div style={{ opacity: atTop() ? "100%" : "0%" }}>
@@ -41,11 +41,11 @@ const AltArrow: Component = () => {
 };
 
 const Toolbar: Component<{
-  infoRef: () => HTMLElement | undefined;
+  infoRef: () => HTMLElement;
 }> = (props) => {
   function scrollInfo() {
     if (window.scrollY == 0) {
-      props.infoRef()!.scrollIntoView({ behavior: "smooth" });
+      props.infoRef().scrollIntoView({ behavior: "smooth" });
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -99,7 +99,7 @@ const PhotoDetailed: Component = () => {
   // Putting all chained resources into separate component
   // https://github.com/solidjs/solid/discussions/1015
   const Suspended = () => {
-    let infoRef: HTMLElement | undefined = undefined;
+    let infoRef!: HTMLAnchorElement;
 
     const [db] = createResource(getDB);
 

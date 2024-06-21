@@ -13,23 +13,23 @@ import styles from "./App.module.css";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 
-export type PageContext = { atTop: Accessor<boolean> } | undefined;
-const pageContext: Context<PageContext> = createContext();
+export type PageContext = { atTop: Accessor<boolean> };
+const pageContext: Context<PageContext | undefined> = createContext();
 
 export function usePageContext(): PageContext {
-  return useContext(pageContext);
+  return useContext(pageContext)!;
 }
 
 const Page: Component<{ children?: any; withHeader: boolean }> = (props) => {
-  let topDetector: HTMLElement | undefined = undefined;
-  let endDetector: HTMLElement | undefined = undefined;
+  let topDetector!: HTMLDivElement;
+  let endDetector!: HTMLDivElement;
 
   const [atTop, setAtTop] = createSignal(true);
 
   onMount(() => {
     new IntersectionObserver((entries) => {
       setAtTop(entries[0].isIntersecting);
-    }).observe(topDetector!);
+    }).observe(topDetector);
   });
 
   return (

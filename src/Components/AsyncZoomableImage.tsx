@@ -12,20 +12,18 @@ function clamp(val: number, min: number, max: number) {
 const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
   props,
 ) => {
-  let image: HTMLImageElement | undefined = undefined;
+  let image!: HTMLImageElement;
   // Initial image size
-  let imageRect:
-    | {
-        left: number;
-        top: number;
-        height: number;
-        width: number;
-        centerX: number;
-        centerY: number;
-      }
-    | undefined = undefined;
+  let imageRect!: {
+    left: number;
+    top: number;
+    height: number;
+    width: number;
+    centerX: number;
+    centerY: number;
+  };
   // Max zoom factor to limit image size too 100% (1px on image == 1px on screen)
-  let zoomLimit: number | undefined = undefined;
+  let zoomLimit!: number;
 
   const ZOOM_FACTOR = 0.001;
   const [zoomState, setZoomState] = createSignal({ x: 0, y: 0, scale: 1 });
@@ -35,7 +33,7 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
    * This way no container is needed to handle positioning of image
    */
   function saveOriginalRect() {
-    const clientRect = image!.getBoundingClientRect();
+    const clientRect = image.getBoundingClientRect();
     imageRect = {
       left: clientRect.left,
       top: clientRect.top,
@@ -44,12 +42,10 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
       centerX: clientRect.left + clientRect.width / 2,
       centerY: clientRect.top + clientRect.height / 2,
     };
-    console.log(imageRect);
   }
 
   function createZoomLimit() {
-    console.log(image!.naturalHeight);
-    zoomLimit = image!.naturalHeight / imageRect!.height;
+    zoomLimit = image.naturalHeight / imageRect.height;
   }
 
   function clampPosition(
@@ -80,17 +76,17 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     const state = zoomState();
 
     const delta = event.deltaY;
-    const actionX = event.clientX - imageRect!.centerX;
-    const actionY = event.clientY - imageRect!.centerY;
+    const actionX = event.clientX - imageRect.centerX;
+    const actionY = event.clientY - imageRect.centerY;
 
     const targetX = (actionX - state.x) / state.scale;
     const targetY = (actionY - state.y) / state.scale;
 
-    const scale = clamp(state.scale * (1 - delta * ZOOM_FACTOR), 1, zoomLimit!);
+    const scale = clamp(state.scale * (1 - delta * ZOOM_FACTOR), 1, zoomLimit);
 
     setZoomState({
-      x: clampPosition(-targetX * scale + actionX, scale, imageRect!.width),
-      y: clampPosition(-targetY * scale + actionY, scale, imageRect!.height),
+      x: clampPosition(-targetX * scale + actionX, scale, imageRect.width),
+      y: clampPosition(-targetY * scale + actionY, scale, imageRect.height),
       scale: scale,
     });
   }
@@ -98,12 +94,12 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
   function mountZoom() {
     saveOriginalRect();
     createZoomLimit();
-    image!.addEventListener("wheel", handleWheel);
+    image.addEventListener("wheel", handleWheel);
   }
 
   // Wait not only for image component to mound, but also until
   // blob is properly loaded
-  onMount(() => image!.addEventListener("load", mountZoom));
+  onMount(() => image.addEventListener("load", mountZoom));
 
   return (
     <div class={style.imageContainer}>
