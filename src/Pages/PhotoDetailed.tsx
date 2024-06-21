@@ -116,7 +116,10 @@ const PhotoDetailed: Component = () => {
             <p>Could not load image</p>
           </Match>
           <Match when={true}>
-            <AsyncZoomableImage src={imageURL} />
+            <AsyncZoomableImage
+              src={imageURL}
+              enabled={usePageContext().atTop}
+            />
             <div class={style.infoBlock}>
               <Show when={imageInfo()}>
                 <a ref={infoRef} />

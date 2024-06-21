@@ -1,4 +1,11 @@
-import { Component, Resource, createSignal, onMount } from "solid-js";
+import {
+  Accessor,
+  Component,
+  Resource,
+  createEffect,
+  createSignal,
+  onMount,
+} from "solid-js";
 import AsyncImage from "./AsyncImage";
 
 import style from "./AsyncZoomableImage.module.css";
@@ -10,9 +17,12 @@ function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
 }
 
-const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
-  props,
-) => {
+const AsyncZoomableImage: Component<{
+  src: Resource<string | undefined>;
+  enabled?: Accessor<boolean>;
+}> = (props) => {
+  const ZOOM_FACTOR = 0.001;
+
   let image!: HTMLImageElement;
   // Initial image size
   let imageRect!: {
@@ -23,12 +33,15 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
   // Max zoom factor to limit image size too 100% (1px on image == 1px on screen)
   let zoomLimit!: number;
 
-  const ZOOM_FACTOR = 0.001;
+  let prevTouches: [Vector, Vector] | undefined = undefined;
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
     scale: 1,
   });
   const activePointers: Set<number> = new Set();
+
+  // eslint-disable-next-line solid/reactivity
+  const enabled = props.enabled === undefined ? () => true : props.enabled;
 
   /**
    * Call this function in {@link onMount} to save original position of image
@@ -73,7 +86,6 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     delta: number,
     point: Vector,
   ): { position: Vector; scale: number } {
-    console.log(delta);
     const state = zoomState();
 
     const action = point.sub(imageRect.center);
@@ -104,7 +116,6 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     setZoomState(calcNewState(event.deltaY, Vector.fromClient(event)));
   }
 
-  let prevTouches: [Vector, Vector] | undefined = undefined;
   function handleTouchMove(event: TouchEvent) {
     event.preventDefault();
 
@@ -147,18 +158,35 @@ const AsyncZoomableImage: Component<{ src: Resource<string | undefined> }> = (
     }
   }
 
+  function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
+    return (event) => {
+      if (enabled()) {
+        func(event);
+      }
+    };
+  }
+
   function mountZoom() {
     saveOriginalRect();
     createZoomLimit();
-    image.addEventListener("wheel", handleWheel);
-    image.addEventListener("touchmove", handleTouchMove);
-    image.addEventListener("pointerdown", handlePointerDown);
-    image.addEventListener("pointerup", handlePointerUp);
+    image.addEventListener("wheel", ifEnabled(handleWheel));
+    image.addEventListener("touchmove", ifEnabled(handleTouchMove));
+    image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
+    image.addEventListener("pointerup", ifEnabled(handlePointerUp));
   }
 
-  // Wait not only for image component to mound, but also until
+  // Wait not only for image component to mount, but also until
   // blob is properly loaded
   onMount(() => image.addEventListener("load", mountZoom));
+
+  createEffect(() => {
+    if (!enabled()) {
+      image.style.transition = "transform 0.3s";
+      setZoomState({ position: new Vector(0, 0), scale: 1 });
+    } else {
+      image.style.transition = "";
+    }
+  });
 
   return (
     <div class={style.imageContainer}>
