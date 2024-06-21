@@ -111,7 +111,6 @@ const PhotoDetailed: Component = () => {
 
     return (
       <div class={style.article}>
-        <Toolbar infoRef={() => infoRef} />
         <Switch>
           <Match when={db.error || imageInfo.error || imageInfo == undefined}>
             <p>Could not load image</p>
@@ -133,6 +132,7 @@ const PhotoDetailed: Component = () => {
             </div>
           </Match>
         </Switch>
+        <Toolbar infoRef={() => infoRef} />
       </div>
     );
   };
