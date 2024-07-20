@@ -19,8 +19,8 @@ def _edit(content: str) -> str:
 
         os.system(f"{editor} {file.name}")
 
-        with open(file.name, mode="rb") as file:
-            return file.read().decode()
+        with open(file.name, mode="rb") as reader:
+            return reader.read().decode()
 
 
 T = TypeVar("T", bound=BaseModel)
