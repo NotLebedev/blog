@@ -27,6 +27,11 @@ def valid_id(id: str, info: ValidationInfo) -> str:
     return id
 
 
+def valid_tags(tags: list[str], info: ValidationInfo) -> list[str]:
+    # Ensure that all tags are unique in tags list
+    return list(set(tags))
+
+
 class ImageInfo(BaseModel):
     id: Annotated[str, AfterValidator(valid_id)]
     name: str
@@ -36,6 +41,7 @@ class ImageInfo(BaseModel):
     camera: Optional[str] = None
     lens: Optional[str] = None
     film: Optional[str] = None
+    tags: Annotated[list[str], AfterValidator(valid_tags)] = []
 
     def __init__(self, /, **data: Any) -> None:
         set_context(self, data)

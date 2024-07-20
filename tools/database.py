@@ -40,6 +40,7 @@ class ImageInfoPrompt(BaseModel):
     camera: Optional[str] = None
     lens: Optional[str] = None
     film: Optional[str] = None
+    tags: list[str] = []
 
     @staticmethod
     def copy_of(copy_of: ImageInfo) -> ImageInfoPrompt:
@@ -50,6 +51,7 @@ class ImageInfoPrompt(BaseModel):
             camera=copy_of.camera,
             lens=copy_of.lens,
             film=copy_of.film,
+            tags=copy_of.tags,
         )
 
     def to_image_info(self, previewWidth: int) -> ImageInfo:
@@ -61,6 +63,7 @@ class ImageInfoPrompt(BaseModel):
             camera=self.camera,
             lens=self.lens,
             film=self.film,
+            tags=self.tags,
         )
 
 

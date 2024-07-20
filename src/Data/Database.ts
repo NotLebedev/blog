@@ -7,10 +7,11 @@ type ImageInfo = {
   camera?: string;
   lens?: string;
   flim?: string;
+  tags: string[];
 };
 
 type Database = {
-  images: [ImageInfo];
+  images: ImageInfo[];
 };
 
 let db: Database | undefined = undefined;
