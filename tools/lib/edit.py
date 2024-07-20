@@ -61,9 +61,15 @@ def yaml_object_stub(obj: BaseModel) -> str:
 
         if value is None:
             result.append(f"# {field}: ")
+        elif isinstance(value, str) and "\n" in value:
+            result.append(f"{field}: |-\n" + ident_string(value) + "\n")
         else:
             result.append(f"{field}: {value}")
     return "\n".join(result) + "\n"
+
+
+def ident_string(string: str, ident_size: int = 4):
+    return "\n".join([(" " * ident_size) + line for line in string.split("\n")])
 
 
 def is_optional(annotation: Any) -> bool:
@@ -128,3 +134,17 @@ def test_yaml_object_stub_incorrect() -> None:
 
     with pytest.raises(TypeError):
         yaml_stub(BadType(a="qwe", b=10))
+
+
+def test_yaml_object_stub_multiline() -> None:
+    class TestClass(BaseModel):
+        a: str
+
+    obj = TestClass(a="qwe\nqwe")
+    expected = """a: |-
+    qwe
+    qwe
+
+"""
+
+    assert yaml_stub(obj) == expected
