@@ -29,6 +29,9 @@
                 pillow
                 pyyaml
                 pytest
+
+                types-pyyaml
+                types-pillow
               ]
             ))
 
