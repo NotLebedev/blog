@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import itertools
 import os
 import shutil
 from os import path
@@ -177,6 +178,23 @@ def image_list(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
 
     for image in db.images:
         print(image.id)
+
+
+@image_app.command("tags")
+def image_tags(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+    with init_context(ValidationContext(base_path=db_dir)):
+        try:
+            db = load_database(db_dir)
+        except ValidationError as e:
+            print(f"Validation failed: {e}")
+            exit(1)
+        except FileNotFoundError as e:
+            print(f"Could not open file {e.filename}")
+            exit(1)
+
+    tags = list(itertools.chain(*[image.tags for image in db.images]))
+    tags = list(set(tags))
+    print(sorted(tags))
 
 
 if __name__ == "__main__":
