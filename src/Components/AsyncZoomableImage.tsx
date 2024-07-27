@@ -40,9 +40,6 @@ const AsyncZoomableImage: Component<{
   });
   const activePointers: Set<number> = new Set();
 
-  // eslint-disable-next-line solid/reactivity
-  const enabled = props.enabled === undefined ? () => true : props.enabled;
-
   /**
    * Call this function in {@link onMount} to save original position of image
    * This way no container is needed to handle positioning of image
@@ -190,30 +187,39 @@ const AsyncZoomableImage: Component<{
     }
   }
 
+  let enabled = false;
+  createEffect(() => {
+    if (props.enabled !== undefined && props.enabled()) {
+      enabled = true;
+    } else {
+      enabled = false;
+    }
+  });
+
   function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
     return (event) => {
-      if (enabled()) {
+      if (enabled) {
         func(event);
       }
     };
   }
 
-  function mountZoom() {
-    saveOriginalRect();
-    createZoomLimit();
-    image.addEventListener("wheel", ifEnabled(handleWheel));
-    image.addEventListener("touchmove", ifEnabled(handleTouchMove));
-    image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
-    image.addEventListener("pointerup", ifEnabled(handlePointerUp));
-    image.addEventListener("pointermove", ifEnabled(handlePointerMove));
-  }
-
   // Wait not only for image component to mount, but also until
   // blob is properly loaded
-  onMount(() => image.addEventListener("load", mountZoom));
+  onMount(() =>
+    image.addEventListener("load", () => {
+      saveOriginalRect();
+      createZoomLimit();
+      image.addEventListener("wheel", ifEnabled(handleWheel));
+      image.addEventListener("touchmove", ifEnabled(handleTouchMove));
+      image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
+      image.addEventListener("pointerup", ifEnabled(handlePointerUp));
+      image.addEventListener("pointermove", ifEnabled(handlePointerMove));
+    }),
+  );
 
   createEffect(() => {
-    if (!enabled()) {
+    if (props.enabled === undefined || !props.enabled()) {
       image.style.transition = "transform 0.3s";
       setZoomState({ position: new Vector(0, 0), scale: 1 });
     } else {
