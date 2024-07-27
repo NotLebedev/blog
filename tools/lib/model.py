@@ -29,7 +29,8 @@ def valid_id(id: str, info: ValidationInfo) -> str:
 
 def valid_tags(tags: list[str], info: ValidationInfo) -> list[str]:
     # Ensure that all tags are unique in tags list
-    return list(set(tags))
+    # Normalize all tags to lowercase
+    return list({tag.lower() for tag in tags})
 
 
 class ImageInfo(BaseModel):
