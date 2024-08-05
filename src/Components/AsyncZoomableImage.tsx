@@ -114,7 +114,9 @@ const AsyncZoomableImage: Component<{
   }
 
   function handleTouchMove(event: TouchEvent) {
-    event.preventDefault();
+    if (zoomState().scale > 1.0 || event.touches.length === 2) {
+      event.preventDefault();
+    }
 
     if (event.touches.length === 2) {
       const touches: [Vector, Vector] = [...event.touches].map(
@@ -166,6 +168,10 @@ const AsyncZoomableImage: Component<{
   }
 
   function handlePointerMove(event: PointerEvent) {
+    if (zoomState().scale === 1.0) {
+      return;
+    }
+
     event.preventDefault();
     if (lastPointerPosition !== undefined) {
       const newPointerPosition = Vector.fromClient(event);
