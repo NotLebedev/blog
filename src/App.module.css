@@ -30,13 +30,13 @@ p {
 a {
   color: white;
   transition: color 0.1s;
-  text-decoration-color: #ff9000;
+  text-decoration-color: var(--link-focus);
   text-decoration-thickness: 0.125em;
   text-underline-offset: 0.125em;
 }
 
 a:hover {
-  color: #ff9000;
+  color: var(--link-focus);
 }
 
 .positionDetector {

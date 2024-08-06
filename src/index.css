@@ -30,6 +30,11 @@
   --font: "Roboto", Arial, sans-serif;
   --monospace-font: "JetBrains Mono", "Courier New", monospace;
   --header-height: 80px;
+
+  --link-focus: #ff9000;
+  --link-focus-light: #5e3501;
+  --tag-unfocused: #777777;
+  --tag-unfocused-light: #282828;
 }
 
 body {

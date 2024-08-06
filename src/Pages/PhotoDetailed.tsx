@@ -6,6 +6,7 @@ import {
   Switch,
   Match,
   JSX,
+  For,
 } from "solid-js";
 import { useParams } from "@solidjs/router";
 
@@ -74,13 +75,23 @@ const Toolbar: Component<{
   );
 };
 
+const Tags: Component<{ tags?: string[] }> = (props) => {
+  return (
+    <span class={style.tagInfoItem}>
+      <For each={props.tags} fallback={<></>}>
+        {(item) => <a class={style.tagLink}>{item}</a>}
+      </For>
+    </span>
+  );
+};
+
 const PhotoDetailed: Component = () => {
   const params = useParams();
 
   const InfoItem: Component<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: (props: any, ref: any) => JSX.Element;
-    text: string | undefined;
+    text: string | JSX.Element | undefined;
   }> = (props) => {
     return (
       <Show when={props.text}>
@@ -131,6 +142,10 @@ const PhotoDetailed: Component = () => {
                 <InfoItem icon={Camera} text={imageInfo()?.camera} />
                 <InfoItem icon={Aperture} text={imageInfo()?.lens} />
                 <InfoItem icon={FilmStrip} text={imageInfo()?.flim} />
+                <InfoItem
+                  icon={Spacing}
+                  text={<Tags tags={imageInfo()?.tags} />}
+                />
               </Show>
             </div>
           </Match>
