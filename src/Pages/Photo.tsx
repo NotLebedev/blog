@@ -14,6 +14,7 @@ import getDB, { Database, getPreviewURL } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
 import { ArrowUpRight } from "phosphor-solid-js";
+import Metas from "../Components/Metas";
 
 type DisplayableImage = {
   id: string;
@@ -157,16 +158,19 @@ const PhotoList: Component<{ db: Database }> = (props) => {
 const Photo: Component = () => {
   const [db] = createResource(getDB);
   return (
-    <Suspense fallback={<p>Loading ...</p>}>
-      <Switch>
-        <Match when={db.error || db() === undefined}>
-          <p>Error loading images.</p>
-        </Match>
-        <Match when={true}>
-          <PhotoList db={db()!} />
-        </Match>
-      </Switch>
-    </Suspense>
+    <>
+      <Metas title="Photos" />
+      <Suspense fallback={<p>Loading ...</p>}>
+        <Switch>
+          <Match when={db.error || db() === undefined}>
+            <p>Error loading images.</p>
+          </Match>
+          <Match when={true}>
+            <PhotoList db={db()!} />
+          </Match>
+        </Switch>
+      </Suspense>
+    </>
   );
 };
 

@@ -11,7 +11,7 @@ import {
 import { useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
-import getDB, { getImageURL } from "../Data/Database";
+import getDB, { getImageURL, getPreviewURL } from "../Data/Database";
 import AsyncZoomableImage from "../Components/AsyncZoomableImage";
 import {
   Aperture,
@@ -26,6 +26,7 @@ import {
   X,
 } from "phosphor-solid-js";
 import { usePageContext } from "../App";
+import Metas from "../Components/Metas";
 
 const AltArrow: Component = () => {
   const { atTop } = usePageContext();
@@ -119,6 +120,7 @@ const PhotoDetailed: Component = () => {
     );
 
     const [imageURL] = createResource(imageInfo, getImageURL);
+    const [previewURL] = createResource(imageInfo, getPreviewURL);
 
     return (
       <div class={style.article}>
@@ -127,6 +129,10 @@ const PhotoDetailed: Component = () => {
             <p>Could not load image</p>
           </Match>
           <Match when={true}>
+            <Metas
+              title={imageInfo()?.name}
+              preview={new URL(previewURL()!, document.baseURI).href}
+            />
             <AsyncZoomableImage
               src={imageURL}
               enabled={usePageContext().atTop}
