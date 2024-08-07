@@ -7,11 +7,7 @@ const Metas: Component<{ title?: string; preview?: string }> = (props) => {
     <>
       <Switch>
         <Match when={props.title !== undefined}>
-          <Title>
-            {titlePrefix}
-            {" | "}
-            {props.title}
-          </Title>
+          <Title>{titlePrefix + " | " + props.title}</Title>
           <Meta property="og:title" content={titlePrefix + "|" + props.title} />
         </Match>
         <Match when={true}>
