@@ -9,17 +9,18 @@ import {
   onMount,
   onCleanup,
   JSX,
+  Setter,
+  createEffect,
 } from "solid-js";
-import getDB, { Database, getPreviewURL } from "../Data/Database";
+import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
 import { ArrowUpRight } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
+import Fuzzy from "../Data/Fuzzy";
 
 type DisplayableImage = {
-  id: string;
-  name: string;
-  width: number;
+  info: ImageInfo;
   image: JSX.Element;
   type: "DisplayableImage";
 };
@@ -42,10 +43,10 @@ function fitImages(
 
   let row: ImageHandle[] = [];
   let curWidth = 0;
-  for (const info of images) {
-    const width = info.width * resizeFactor;
+  for (const image of images) {
+    const width = image.info.previewWidth * resizeFactor;
     curWidth += width;
-    row.push(info);
+    row.push(image);
 
     if (curWidth >= window.innerWidth) {
       result.push(row);
@@ -73,9 +74,7 @@ function preloadImages(db: Database): DisplayableImage[] {
   for (const item of db.images) {
     const [imageUrl] = createResource(item, getPreviewURL);
     result.push({
-      id: item.id,
-      width: item.previewWidth,
-      name: item.name,
+      info: item,
       type: "DisplayableImage",
       image: (
         <Suspense
@@ -100,6 +99,40 @@ function preloadImages(db: Database): DisplayableImage[] {
   return result;
 }
 
+const SearchBar: Component<{
+  images: DisplayableImage[];
+  displayResults: Setter<DisplayableImage[]>;
+}> = (props) => {
+  const [isFolded, setFolded] = createSignal(true);
+  let search!: Fuzzy<DisplayableImage>;
+
+  createEffect(() => {
+    search = new Fuzzy(
+      props.images,
+      (image) =>
+        image.info.name +
+        " " +
+        image.info.description +
+        " " +
+        image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
+    );
+    props.displayResults(props.images);
+  });
+
+  return (
+    <span class={style.searchBox}>
+      <input
+        type="text"
+        class={style.searchInput}
+        placeholder="Search..."
+        onInput={(input) =>
+          props.displayResults(search.find(input.target.value))
+        }
+      />
+    </span>
+  );
+};
+
 const PhotoList: Component<{ db: Database }> = (props) => {
   const [rect, setRect] = createSignal({
     height: window.innerHeight,
@@ -120,38 +153,45 @@ const PhotoList: Component<{ db: Database }> = (props) => {
 
   const [images] = createResource(() => props.db, preloadImages);
 
+  const [displayedImages, setDisplayedImages] = createSignal<
+    DisplayableImage[]
+  >([]);
+
   return (
-    <div class={style.grid}>
-      <For each={fitImages(images()!, rect())}>
-        {(item) => {
-          return (
-            <div class={style.gridRow}>
-              <For each={item}>
-                {(item) => (
-                  <Switch>
-                    <Match when={item.type == "DisplayableImage"}>
-                      <a
-                        class={style.gridItem}
-                        href={`/photo/${(item as DisplayableImage).id}`}
-                      >
-                        {item.image}
-                        <div class={style.overlay}>
-                          <p>{(item as DisplayableImage).name}</p>
-                          <ArrowUpRight size={"1.5rem"} />
-                        </div>
-                      </a>
-                    </Match>
-                    <Match when={item.type == "AlignmentPlaceholder"}>
-                      <div class={style.gridItem}>{item.image}</div>
-                    </Match>
-                  </Switch>
-                )}
-              </For>
-            </div>
-          );
-        }}
-      </For>
-    </div>
+    <>
+      <SearchBar images={images()!} displayResults={setDisplayedImages} />
+      <div class={style.grid}>
+        <For each={fitImages(displayedImages()!, rect())}>
+          {(item) => {
+            return (
+              <div class={style.gridRow}>
+                <For each={item}>
+                  {(item) => (
+                    <Switch>
+                      <Match when={item.type == "DisplayableImage"}>
+                        <a
+                          class={style.gridItem}
+                          href={`/photo/${(item as DisplayableImage).info.id}`}
+                        >
+                          {item.image}
+                          <div class={style.overlay}>
+                            <p>{(item as DisplayableImage).info.name}</p>
+                            <ArrowUpRight size={"1.5rem"} />
+                          </div>
+                        </a>
+                      </Match>
+                      <Match when={item.type == "AlignmentPlaceholder"}>
+                        <div class={style.gridItem}>{item.image}</div>
+                      </Match>
+                    </Switch>
+                  )}
+                </For>
+              </div>
+            );
+          }}
+        </For>
+      </div>
+    </>
   );
 };
 

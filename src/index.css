@@ -31,6 +31,7 @@
   --monospace-font: "JetBrains Mono", "Courier New", monospace;
   --header-height: 80px;
 
+  --background: #131418;
   --link-focus: #ff9000;
   --link-focus-light: #5e3501;
   --tag-unfocused: #777777;
@@ -43,5 +44,5 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: #131418;
+  background-color: var(--background);
 }
