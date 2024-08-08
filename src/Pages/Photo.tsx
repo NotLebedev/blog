@@ -15,9 +15,9 @@ import {
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
-import { ArrowUpRight } from "phosphor-solid-js";
+import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
-import { Filters, Fuzzy } from "../Data/Filters";
+import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { useSearchParams } from "@solidjs/router";
 
 type DisplayableImage = {
@@ -104,9 +104,10 @@ const SearchBar: Component<{
   images: DisplayableImage[];
   displayResults: Setter<DisplayableImage[]>;
 }> = (props) => {
-  const [isFolded, setFolded] = createSignal(true);
   const [searchParams, setSearchParams] = useSearchParams();
+
   let fuzzy!: Fuzzy<DisplayableImage>;
+  let tags!: Tags<DisplayableImage>;
   let search!: Filters<DisplayableImage>;
 
   createEffect(() => {
@@ -119,15 +120,31 @@ const SearchBar: Component<{
         image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
     );
 
-    search = new Filters(props.images, fuzzy);
+    tags = new Tags((image) => image.info.tags);
+
+    search = new Filters(props.images, fuzzy, tags);
 
     props.displayResults(props.images);
   });
 
   createEffect(() => {
-    fuzzy.query(searchParams.q ?? "");
+    fuzzy.query(searchParams.search ?? "");
+    tags.query(searchParams.tags?.split(",") ?? []);
+
     props.displayResults(search.filter());
   });
+
+  function addTag(tag: string) {
+    const currentTags = new Set(searchParams.tags?.split(",") ?? []);
+    currentTags.add(tag);
+    setSearchParams({ tags: [...currentTags].join(",") });
+  }
+
+  function removeTag(tag: string) {
+    const currentTags = new Set(searchParams.tags?.split(",") ?? []);
+    currentTags.delete(tag);
+    setSearchParams({ tags: [...currentTags].join(",") });
+  }
 
   return (
     <span class={style.searchBox}>
@@ -136,8 +153,30 @@ const SearchBar: Component<{
         class={style.searchInput}
         placeholder="Search..."
         value={searchParams.q ?? ""}
-        onInput={(input) => setSearchParams({ q: input.target.value })}
+        onInput={(event) => setSearchParams({ search: event.target.value })}
       />
+      <ul class={style.tagsList}>
+        <For
+          each={[...new Set(props.images.flatMap((image) => image.info.tags))]}
+        >
+          {(tag) => (
+            <li class={style.tagInList}>
+              <input
+                id={`inputTag${tag}`}
+                type="checkbox"
+                checked={searchParams.tags?.split(",").includes(tag)}
+                onChange={(event) =>
+                  event.target.checked ? addTag(tag) : removeTag(tag)
+                }
+              />
+              <label for={`inputTag${tag}`}>
+                {tag}
+                <CheckCircle />
+              </label>
+            </li>
+          )}
+        </For>
+      </ul>
     </span>
   );
 };

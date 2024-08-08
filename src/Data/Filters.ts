@@ -31,7 +31,7 @@ class Filters<T> {
   }
 
   private checkMask(filterMasks: boolean[][], i: number): boolean {
-    return filterMasks.find((mask) => mask[i]) !== undefined;
+    return filterMasks.find((mask) => !mask[i]) === undefined;
   }
 }
 
@@ -95,4 +95,28 @@ class Fuzzy<T> implements Filter<T> {
   }
 }
 
-export { Filters, Fuzzy };
+class Tags<T> implements Filter<T> {
+  currentQuery: Set<string>;
+  index: Set<string>[];
+  keySelector: (item: T) => string[];
+
+  constructor(keySelector: (item: T) => string[]) {
+    this.currentQuery = new Set();
+    this.index = [];
+    this.keySelector = keySelector;
+  }
+
+  query(query: string[]): void {
+    this.currentQuery = new Set(query);
+  }
+
+  createIndex(data: T[]): void {
+    this.index = data.map(this.keySelector).map((list) => new Set(list));
+  }
+
+  find(): boolean[] {
+    return this.index.map((set) => set.isSupersetOf(this.currentQuery));
+  }
+}
+
+export { Filters, Fuzzy, Tags };
