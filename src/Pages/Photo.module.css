@@ -11,17 +11,26 @@
   --grid-paddings: 0.2rem;
   padding-left: var(--grid-paddings);
   padding-top: var(--grid-paddings);
-}
 
-.gridItem:last-child {
-  padding-right: var(--grid-paddings);
-}
+  &:last-child {
+    padding-right: var(--grid-paddings);
+  }
 
-.gridItem img,
-.gridItem svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
+  img,
+  svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  &:hover .overlay {
+    background: rgba(0.3, 0.3, 0.3, 0.3);
+    color: white;
+
+    p {
+      opacity: 100%;
+    }
+  }
 }
 
 .overlay {
@@ -40,35 +49,26 @@
   transition:
     opacity,
     background 0.1s;
-}
 
-.gridItem:hover .overlay {
-  background: rgba(0.3, 0.3, 0.3, 0.3);
-  color: white;
-}
+  p {
+    margin-top: 0;
+    padding-left: 1rem;
+    font-size: 1.5rem;
+    opacity: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.gridItem:hover .overlay p {
-  opacity: 100%;
-}
-
-.overlay p {
-  margin-top: 0;
-  padding-left: 1rem;
-  font-size: 1.5rem;
-  opacity: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.overlay svg {
-  padding-right: 1rem;
-  color: white;
+  svg {
+    padding-right: 1rem;
+    color: white;
+  }
 }
 
 .searchBox {
   display: block;
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
   margin-bottom: 0.5rem;
 }
 
@@ -77,8 +77,6 @@
   background-color: var(--background);
   padding: 0.2rem 0.5rem 0.2rem 0.5rem;
   font-size: 0.8em;
-
-  margin-left: 1rem;
 
   border-radius: 10rem;
   border: 0.15rem solid;
@@ -99,7 +97,7 @@
   display: inline;
 
   padding-left: 0;
-  margin-left: 3rem;
+  margin-left: 1rem;
 }
 
 .tagInList {
@@ -114,6 +112,7 @@
 
     padding: 0.2rem 0.5rem 0.2rem 0.5rem;
     margin-right: 0.5rem;
+    margin-top: 0.6rem;
 
     color: var(--tag-unfocused);
     border-color: var(--tag-unfocused);
