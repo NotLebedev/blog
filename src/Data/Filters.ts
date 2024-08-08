@@ -64,7 +64,7 @@ class Fuzzy<T> implements Filter<T> {
     indexLoop: for (let i = 0; i < indexSize; i++) {
       const element = this.index[i];
       for (let j = 0; j < currentQueryLength; j++) {
-        if (!contains(currentQuery[j], element)) {
+        if (!Fuzzy.contains(currentQuery[j], element)) {
           result.push(false);
           continue indexLoop;
         }
@@ -75,24 +75,24 @@ class Fuzzy<T> implements Filter<T> {
 
     return result;
   }
-}
 
-function contains(needle: string, haystack: string): boolean {
-  const needleLength = needle.length;
-  const haystackLength = haystack.length;
+  private static contains(needle: string, haystack: string): boolean {
+    const needleLength = needle.length;
+    const haystackLength = haystack.length;
 
-  needleLoop: for (let i = 0, j = 0; i < needleLength; i++) {
-    const nextChar = needle.charCodeAt(i);
-    while (j < haystackLength) {
-      if (haystack.charCodeAt(j++) === nextChar) {
-        continue needleLoop;
+    needleLoop: for (let i = 0, j = 0; i < needleLength; i++) {
+      const nextChar = needle.charCodeAt(i);
+      while (j < haystackLength) {
+        if (haystack.charCodeAt(j++) === nextChar) {
+          continue needleLoop;
+        }
       }
+
+      return false;
     }
 
-    return false;
+    return true;
   }
-
-  return true;
 }
 
 export { Filters, Fuzzy };
