@@ -1,3 +1,9 @@
+.grid {
+  /* Override padding around main */
+  margin-left: calc(0px - var(--page-padding));
+  margin-right: calc(0px - var(--page-padding));
+}
+
 .gridRow {
   width: 100%;
   display: table;

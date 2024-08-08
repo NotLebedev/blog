@@ -1,10 +1,6 @@
 .headerWrapper {
   width: 100vw;
   position: fixed;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: 50vw;
   background: #960018;
   z-index: 100;
 
@@ -13,9 +9,8 @@
 }
 
 .header {
-  max-width: 52rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: var(--page-padding);
+  padding-right: var(--page-padding);
   margin-left: auto;
   margin-right: auto;
   height: var(--header-height);

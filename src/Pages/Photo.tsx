@@ -62,7 +62,7 @@ function fitImages(
     // the rest of space
     row.push({
       type: "AlignmentPlaceholder",
-      image: <svg width={window.innerWidth - curWidth} height={512} />,
+      image: <svg width={screenSize.width - curWidth} height={512} />,
     });
     result.push(row);
   }

@@ -2,8 +2,8 @@ main {
   min-height: 100vh;
   text-align: left;
   position: relative;
-  padding-left: 4rem;
-  padding-right: 4rem;
+  padding-left: var(--page-padding);
+  padding-right: var(--page-padding);
   color: white;
   font-size: 18px;
 }
