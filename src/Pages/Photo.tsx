@@ -17,6 +17,7 @@ import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
 import { ArrowUpRight } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
+import { Filters, Fuzzy } from "../Data/Filters";
 import { useSearchParams } from "@solidjs/router";
 
 type DisplayableImage = {
@@ -105,11 +106,11 @@ const SearchBar: Component<{
 }> = (props) => {
   const [isFolded, setFolded] = createSignal(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  let search!: Fuzzy<DisplayableImage>;
+  let fuzzy!: Fuzzy<DisplayableImage>;
+  let search!: Filters<DisplayableImage>;
 
   createEffect(() => {
-    search = new Fuzzy(
-      props.images,
+    fuzzy = new Fuzzy(
       (image) =>
         image.info.name +
         " " +
@@ -117,11 +118,15 @@ const SearchBar: Component<{
         " " +
         image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
     );
+
+    search = new Filters(props.images, fuzzy);
+
     props.displayResults(props.images);
   });
 
   createEffect(() => {
-    props.displayResults(search.find(searchParams.q ?? ""));
+    fuzzy.query(searchParams.q ?? "");
+    props.displayResults(search.filter());
   });
 
   return (
