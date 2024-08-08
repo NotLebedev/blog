@@ -11,6 +11,10 @@ class Vector {
     return new Vector(obj.clientX, obj.clientY);
   }
 
+  static zero(): Vector {
+    return new Vector(0, 0);
+  }
+
   add(rhs: Vector): Vector {
     return new Vector(this.x + rhs.x, this.y + rhs.y);
   }

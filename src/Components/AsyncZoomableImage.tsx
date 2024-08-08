@@ -4,6 +4,7 @@ import {
   Resource,
   createEffect,
   createSignal,
+  onCleanup,
   onMount,
 } from "solid-js";
 import AsyncImage from "./AsyncImage";
@@ -11,7 +12,7 @@ import AsyncImage from "./AsyncImage";
 import style from "./AsyncZoomableImage.module.css";
 import { Vector, apply_on_rows } from "../Data/Vector";
 
-// based on https://github.com/willnguyen1312/zoom-image/blob/main/packages/core/src/createZoomImageWheel.ts
+// Based on https://github.com/willnguyen1312/zoom-image/blob/main/packages/core/src/createZoomImageWheel.ts
 
 function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
@@ -19,45 +20,69 @@ function clamp(val: number, min: number, max: number) {
 
 const AsyncZoomableImage: Component<{
   src: Resource<string | undefined>;
-  enabled?: Accessor<boolean>;
+  enabled: Accessor<boolean>;
 }> = (props) => {
   const ZOOM_FACTOR = 0.001;
 
   let image!: HTMLImageElement;
-  // Initial image size
-  let imageRect!: {
+  let container!: HTMLDivElement;
+
+  // Dimensions of image when it is not resized
+  let neutralImageDimensions!: {
     height: number;
     width: number;
     center: Vector;
+    // Max zoom factor to limit image size too 100% (1px on image == 1px on screen)
+    zoomLimit: number;
   };
-  // Max zoom factor to limit image size too 100% (1px on image == 1px on screen)
-  let zoomLimit!: number;
 
-  let prevTouches: [Vector, Vector] | undefined = undefined;
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
     scale: 1,
   });
+
+  let prevTouches: [Vector, Vector] | undefined = undefined;
   const activePointers: Set<number> = new Set();
+  let lastPointerPosition: Vector | undefined = undefined;
 
   /**
-   * Call this function in {@link onMount} to save original position of image
-   * This way no container is needed to handle positioning of image
+   * Call this function in {@link onMount} and on resize to calculate
+   * original (non-resized) dimensions and position of image
    */
-  function saveOriginalRect() {
-    const clientRect = image.getBoundingClientRect();
-    imageRect = {
-      height: clientRect.height,
-      width: clientRect.width,
-      center: new Vector(
-        clientRect.left + clientRect.width / 2,
-        clientRect.top + clientRect.height / 2,
-      ),
-    };
-  }
+  function updateNeutralImageDimensions() {
+    const containerRect = container.getBoundingClientRect();
 
-  function createZoomLimit() {
-    zoomLimit = image.naturalHeight / imageRect.height;
+    let height!: number;
+    let width!: number;
+
+    // Image is fited inside container
+    // It can be limited by either height of container or width of container which
+    // is checked in this if-else and depending on this images original (non-resized)
+    // width or height is equal to that of container and other can be derived from
+    // image dimensions ratio
+    // Because container is adapting to screen size and is not resized with image
+    // recalculating imageRect this way works nicely
+    if (
+      image.naturalWidth / image.naturalHeight >
+      containerRect.width / containerRect.height
+    ) {
+      width = containerRect.width;
+      height = image.naturalHeight * (containerRect.width / image.naturalWidth);
+    } else {
+      height = containerRect.height;
+      width = image.naturalWidth * (containerRect.height / image.naturalHeight);
+    }
+
+    neutralImageDimensions = {
+      height: height,
+      width: width,
+      // Center is calculated based an container too
+      center: new Vector(
+        containerRect.left + containerRect.width / 2,
+        containerRect.top + containerRect.height / 2,
+      ),
+      zoomLimit: image.naturalHeight / height,
+    };
   }
 
   function clampPosition(args: {
@@ -85,10 +110,14 @@ const AsyncZoomableImage: Component<{
   ): { position: Vector; scale: number } {
     const state = zoomState();
 
-    const action = point.sub(imageRect.center);
+    const action = point.sub(neutralImageDimensions.center);
     const target = action.sub(state.position).div(state.scale);
 
-    const scale = clamp(state.scale * (1 - delta * ZOOM_FACTOR), 1, zoomLimit);
+    const scale = clamp(
+      state.scale * (1 - delta * ZOOM_FACTOR),
+      1,
+      neutralImageDimensions.zoomLimit,
+    );
     const newPosition = target.mul(-scale).add(action);
 
     return {
@@ -96,7 +125,10 @@ const AsyncZoomableImage: Component<{
         {
           position: newPosition,
           scale: new Vector(scale, scale),
-          size: new Vector(imageRect.width, imageRect.height),
+          size: new Vector(
+            neutralImageDimensions.width,
+            neutralImageDimensions.height,
+          ),
         },
         clampPosition,
       ),
@@ -146,8 +178,6 @@ const AsyncZoomableImage: Component<{
     }
   }
 
-  let lastPointerPosition: Vector | undefined = undefined;
-
   function handlePointerDown(event: PointerEvent) {
     event.preventDefault();
     activePointers.add(event.pointerId);
@@ -185,7 +215,10 @@ const AsyncZoomableImage: Component<{
           {
             position: state.position.add(delta),
             scale: new Vector(state.scale, state.scale),
-            size: new Vector(imageRect.width, imageRect.height),
+            size: new Vector(
+              neutralImageDimensions.width,
+              neutralImageDimensions.height,
+            ),
           },
           clampPosition,
         ),
@@ -193,14 +226,10 @@ const AsyncZoomableImage: Component<{
     }
   }
 
+  // Wrapping props.enabled with createEffect to make captured variable
+  // in ifEnabled work properly
   let enabled = false;
-  createEffect(() => {
-    if (props.enabled !== undefined && props.enabled()) {
-      enabled = true;
-    } else {
-      enabled = false;
-    }
-  });
+  createEffect(() => (enabled = props.enabled()));
 
   function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
     return (event) => {
@@ -214,8 +243,15 @@ const AsyncZoomableImage: Component<{
   // blob is properly loaded
   onMount(() =>
     image.addEventListener("load", () => {
-      saveOriginalRect();
-      createZoomLimit();
+      updateNeutralImageDimensions();
+
+      window.addEventListener("resize", updateNeutralImageDimensions);
+      // After calculating new neutral dimensions update zoom to
+      // prevent zooming beyond 100% when resizing "up"
+      window.addEventListener("resize", () =>
+        setZoomState(calcNewState(0, Vector.zero())),
+      );
+
       image.addEventListener("wheel", ifEnabled(handleWheel));
       image.addEventListener("touchmove", ifEnabled(handleTouchMove));
       image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
@@ -223,6 +259,10 @@ const AsyncZoomableImage: Component<{
       image.addEventListener("pointermove", ifEnabled(handlePointerMove));
     }),
   );
+
+  onCleanup(() => {
+    window.removeEventListener("resize", updateNeutralImageDimensions);
+  });
 
   createEffect(() => {
     if (props.enabled === undefined || !props.enabled()) {
@@ -234,7 +274,7 @@ const AsyncZoomableImage: Component<{
   });
 
   return (
-    <div class={style.imageContainer}>
+    <div class={style.imageContainer} ref={container}>
       <AsyncImage
         src={props.src}
         ref={image}
