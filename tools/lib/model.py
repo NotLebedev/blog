@@ -28,6 +28,12 @@ def valid_id(id: str, info: ValidationInfo) -> str:
 
 
 def valid_tags(tags: list[str], info: ValidationInfo) -> list[str]:
+    def no_commas(tag: str) -> bool:
+        return "," in tag
+
+    if tag := next(filter(no_commas, tags), None):
+        raise ValueError(f"Tag '{tag}' contains ',' (comma) in it's name")
+
     # Ensure that all tags are unique in tags list
     # Normalize all tags to lowercase
     return list({tag.lower() for tag in tags})
