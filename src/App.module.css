@@ -4,6 +4,9 @@ main {
   position: relative;
   padding-left: var(--page-padding);
   padding-right: var(--page-padding);
+  transition:
+    padding-left 0.5s,
+    padding-right 0.5s;
   color: white;
   font-size: 18px;
 }

@@ -11,6 +11,9 @@
 .header {
   padding-left: var(--page-padding);
   padding-right: var(--page-padding);
+  transition:
+    padding-left 0.5s,
+    padding-right 0.5s;
   margin-left: auto;
   margin-right: auto;
   height: var(--header-height);
