@@ -11,6 +11,7 @@ import {
   JSX,
   Setter,
   createEffect,
+  createMemo,
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import AsyncImage from "../Components/AsyncImage";
@@ -106,32 +107,22 @@ const SearchBar: Component<{
 }> = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  let fuzzy!: Fuzzy<DisplayableImage>;
-  let tags!: Tags<DisplayableImage>;
-  let search!: Filters<DisplayableImage>;
-
-  createEffect(() => {
-    fuzzy = new Fuzzy(
-      (image) =>
-        image.info.name +
-        " " +
-        image.info.description +
-        " " +
-        image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
-    );
-
-    tags = new Tags((image) => image.info.tags);
-
-    search = new Filters(props.images, fuzzy, tags);
-
-    props.displayResults(props.images);
-  });
+  const fuzzy = new Fuzzy<DisplayableImage>(
+    (image) =>
+      image.info.name +
+      " " +
+      image.info.description +
+      " " +
+      image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
+  );
+  const tags = new Tags<DisplayableImage>((image) => image.info.tags);
+  const search = createMemo(() => new Filters(props.images, fuzzy, tags));
 
   createEffect(() => {
     fuzzy.query(searchParams.search ?? "");
     tags.query(searchParams.tags?.split(",") ?? []);
 
-    props.displayResults(search.filter());
+    props.displayResults(search().filter());
   });
 
   function addTag(tag: string) {
