@@ -86,87 +86,90 @@ const Tags: Component<{ tags?: string[] }> = (props) => {
   );
 };
 
+const InfoItem: Component<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: (props: any, ref: any) => JSX.Element;
+  text: string | JSX.Element | undefined;
+}> = (props) => {
+  return (
+    <Show when={props.text}>
+      <span class={style.photoInfo}>
+        <props.icon size="1.5rem" />
+        <p>{props.text}</p>
+      </span>
+    </Show>
+  );
+};
+
+const Spacing: Component<{ size: string }> = (props) => {
+  return <span style={{ width: props.size }} />;
+};
+
 const PhotoDetailed: Component = () => {
   const params = useParams();
 
-  const InfoItem: Component<{
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    icon: (props: any, ref: any) => JSX.Element;
-    text: string | JSX.Element | undefined;
-  }> = (props) => {
-    return (
-      <Show when={props.text}>
-        <span class={style.photoInfo}>
-          <props.icon size="1.5rem" />
-          <p>{props.text}</p>
-        </span>
-      </Show>
-    );
-  };
+  let infoRef!: HTMLAnchorElement;
 
-  const Spacing: Component<{ size: string }> = (props) => {
-    return <span style={{ width: props.size }} />;
-  };
+  const [info] = createResource(async () => {
+    const imageInfo = (await getDB())?.images?.find((el) => el.id == params.id);
 
-  // Putting all chained resources into separate component
-  // https://github.com/solidjs/solid/discussions/1015
-  const Suspended = () => {
-    let infoRef!: HTMLAnchorElement;
+    if (imageInfo === undefined) {
+      return undefined;
+    }
 
-    const [db] = createResource(getDB);
+    const imageURL = getImageURL(imageInfo);
+    const previewURL = getPreviewURL(imageInfo);
 
-    const [imageInfo] = createResource(db, (db) =>
-      db?.images?.find((el) => el.id == params.id),
-    );
+    return {
+      imageInfo,
+      imageURL,
+      previewURL,
+    };
+  });
 
-    const [imageURL] = createResource(imageInfo, getImageURL);
-    const [previewURL] = createResource(imageInfo, getPreviewURL);
-
-    return (
-      <div class={style.article}>
+  return (
+    <div class={style.article}>
+      <Suspense fallback={<p>Loading...</p>}>
+        <Show
+          when={!(info.error || info() == undefined)}
+          fallback={<p>Could not load image</p>}
+        >
+          <AsyncZoomableImage
+            src={info()!.imageURL}
+            enabled={usePageContext().atTop}
+          />
+        </Show>
+      </Suspense>
+      <Suspense fallback={<p>Loading...</p>}>
         <Switch>
-          <Match when={db.error || imageInfo.error || imageInfo == undefined}>
+          <Match when={info.error || info() == undefined}>
             <p>Could not load image</p>
           </Match>
           <Match when={true}>
             <Metas
-              title={imageInfo()?.name}
-              preview={new URL(previewURL()!, document.baseURI).href}
-            />
-            <AsyncZoomableImage
-              src={imageURL}
-              enabled={usePageContext().atTop}
+              title={info()!.imageInfo.name}
+              preview={new URL(info()!.previewURL, document.baseURI).href}
             />
             <div class={style.infoBlock}>
-              <Show when={imageInfo()}>
-                <a ref={infoRef} />
-                <InfoItem icon={Spacing} text={imageInfo()?.name} />
-                <InfoItem
-                  icon={ArticleNyTimes}
-                  text={imageInfo()?.description}
-                />
-                <InfoItem icon={Camera} text={imageInfo()?.camera} />
-                <InfoItem icon={Aperture} text={imageInfo()?.lens} />
-                <InfoItem icon={FilmStrip} text={imageInfo()?.flim} />
-                <InfoItem
-                  icon={Spacing}
-                  text={<Tags tags={imageInfo()?.tags} />}
-                />
-              </Show>
+              <a ref={infoRef} />
+              <InfoItem icon={Spacing} text={info()!.imageInfo.name} />
+              <InfoItem
+                icon={ArticleNyTimes}
+                text={info()!.imageInfo.description}
+              />
+              <InfoItem icon={Camera} text={info()!.imageInfo.camera} />
+              <InfoItem icon={Aperture} text={info()!.imageInfo?.lens} />
+              <InfoItem icon={FilmStrip} text={info()!.imageInfo.flim} />
+              <InfoItem
+                icon={Spacing}
+                text={<Tags tags={info()!.imageInfo.tags} />}
+              />
             </div>
           </Match>
         </Switch>
-        <Toolbar infoRef={() => infoRef} />
-      </div>
-    );
-  };
-
-  return (
-    <>
-      <Suspense fallback={<p>Loading</p>}>
-        <Suspended />
       </Suspense>
-    </>
+      <Toolbar infoRef={() => infoRef} />
+    </div>
   );
 };
 

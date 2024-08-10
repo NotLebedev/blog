@@ -3,7 +3,6 @@ import {
   ErrorBoundary,
   JSX,
   Match,
-  Resource,
   Switch,
   createResource,
 } from "solid-js";
@@ -19,12 +18,12 @@ async function fetchImageBlob(src: string): Promise<string | undefined> {
 }
 
 const AsyncImage: Component<{
-  src: Resource<string | undefined>;
+  src: string;
   ref?: HTMLImageElement | undefined;
   style?: JSX.CSSProperties;
 }> = (props) => {
   const errorMessage = <p>Failed to load image.</p>;
-  const [imageBlobURL] = createResource(() => props.src(), fetchImageBlob);
+  const [imageBlobURL] = createResource(() => props.src, fetchImageBlob);
 
   return (
     <ErrorBoundary fallback={() => errorMessage}>

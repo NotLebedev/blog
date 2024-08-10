@@ -1,7 +1,6 @@
 import {
   Accessor,
   Component,
-  Resource,
   createEffect,
   createSignal,
   onCleanup,
@@ -19,7 +18,7 @@ function clamp(val: number, min: number, max: number) {
 }
 
 const AsyncZoomableImage: Component<{
-  src: Resource<string | undefined>;
+  src: string;
   enabled: Accessor<boolean>;
 }> = (props) => {
   const ZOOM_FACTOR = 0.001;

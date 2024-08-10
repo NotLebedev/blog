@@ -74,7 +74,6 @@ function preloadImages(db: Database): DisplayableImage[] {
   const result: DisplayableImage[] = [];
 
   for (const item of db.images) {
-    const [imageUrl] = createResource(item, getPreviewURL);
     result.push({
       info: item,
       type: "DisplayableImage",
@@ -92,7 +91,7 @@ function preloadImages(db: Database): DisplayableImage[] {
             />
           }
         >
-          <AsyncImage src={imageUrl} />
+          <AsyncImage src={getPreviewURL(item)} />
         </Suspense>
       ),
     });
