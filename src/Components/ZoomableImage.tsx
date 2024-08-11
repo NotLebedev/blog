@@ -6,9 +6,8 @@ import {
   onCleanup,
   onMount,
 } from "solid-js";
-import AsyncImage from "./AsyncImage";
 
-import style from "./AsyncZoomableImage.module.css";
+import style from "./ZoomableImage.module.css";
 import { Vector, apply_on_rows } from "../Data/Vector";
 
 // Based on https://github.com/willnguyen1312/zoom-image/blob/main/packages/core/src/createZoomImageWheel.ts
@@ -17,10 +16,11 @@ function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
 }
 
-const AsyncZoomableImage: Component<{
+const ZoomableImage: Component<{
   src: string;
   class?: string;
   enabled: Accessor<boolean>;
+  onLoad?: () => void;
 }> = (props) => {
   const ZOOM_FACTOR = 0.001;
 
@@ -257,6 +257,10 @@ const AsyncZoomableImage: Component<{
       image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
       image.addEventListener("pointerup", ifEnabled(handlePointerUp));
       image.addEventListener("pointermove", ifEnabled(handlePointerMove));
+
+      if (props.onLoad !== undefined) {
+        props.onLoad();
+      }
     }),
   );
 
@@ -282,7 +286,7 @@ const AsyncZoomableImage: Component<{
       }
       ref={container}
     >
-      <AsyncImage
+      <img
         src={props.src}
         ref={image}
         style={{
@@ -293,4 +297,4 @@ const AsyncZoomableImage: Component<{
   );
 };
 
-export default AsyncZoomableImage;
+export default ZoomableImage;

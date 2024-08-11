@@ -39,11 +39,16 @@
 }
 
 .loading {
-  align-content: center;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 
   > svg {
     display: block;
-    margin: auto;
+    margin: 0 auto;
+    z-index: 10;
   }
 }
 

@@ -3,16 +3,16 @@ import {
   createResource,
   Show,
   Suspense,
-  Switch,
-  Match,
   JSX,
   For,
+  createSignal,
+  onMount,
 } from "solid-js";
 import { useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
 import getDB, { getImageURL, getPreviewURL } from "../Data/Database";
-import AsyncZoomableImage from "../Components/AsyncZoomableImage";
+import ZoomableImage from "../Components/ZoomableImage";
 import {
   Aperture,
   ArrowDown,
@@ -28,6 +28,7 @@ import {
 import { usePageContext } from "../App";
 import Metas from "../Components/Metas";
 import Loading from "../Components/Loading";
+import { debounce } from "../Util/debounce";
 
 const AltArrow: Component = () => {
   const { atTop } = usePageContext();
@@ -128,53 +129,58 @@ const PhotoDetailed: Component = () => {
     };
   });
 
+  const [showLoading, setShowLoading] = createSignal(false);
+
+  // Display spinner after slight delay to prevent it blinking
+  // even when image is already loaded
+  const displayLoading = debounce(() => setShowLoading(true), 100);
+  onMount(() => displayLoading());
+
   return (
     <div class={style.article}>
-      <Suspense
-        fallback={
-          <div class={`${style.photoContainer} ${style.loading}`}>
+      <div class={style.photoContainer}>
+        <Show when={info.loading || showLoading()}>
+          <div class={style.loading}>
             <Loading />
           </div>
-        }
-      >
-        <Show
-          when={!(info.error || info() == undefined)}
-          fallback={<p>Could not load image</p>}
-        >
-          <AsyncZoomableImage
+        </Show>
+        <Show when={info.state == "ready"}>
+          <ZoomableImage
             src={info()!.imageURL}
             class={style.photoContainer}
             enabled={usePageContext().atTop}
+            onLoad={() => {
+              displayLoading.cancel();
+              setShowLoading(false);
+            }}
           />
         </Show>
-      </Suspense>
+      </div>
       <Suspense fallback={<p>Loading...</p>}>
-        <Switch>
-          <Match when={info.error || info() == undefined}>
-            <p>Could not load image</p>
-          </Match>
-          <Match when={true}>
-            <Metas
-              title={info()!.imageInfo.name}
-              preview={new URL(info()!.previewURL, document.baseURI).href}
+        <Show
+          when={!(info.error || info() == undefined)}
+          fallback={<p>Could not load image info</p>}
+        >
+          <Metas
+            title={info()!.imageInfo.name}
+            preview={new URL(info()!.previewURL, document.baseURI).href}
+          />
+          <div class={style.infoBlock}>
+            <a ref={infoRef} />
+            <InfoItem icon={Spacing} text={info()!.imageInfo.name} />
+            <InfoItem
+              icon={ArticleNyTimes}
+              text={info()!.imageInfo.description}
             />
-            <div class={style.infoBlock}>
-              <a ref={infoRef} />
-              <InfoItem icon={Spacing} text={info()!.imageInfo.name} />
-              <InfoItem
-                icon={ArticleNyTimes}
-                text={info()!.imageInfo.description}
-              />
-              <InfoItem icon={Camera} text={info()!.imageInfo.camera} />
-              <InfoItem icon={Aperture} text={info()!.imageInfo?.lens} />
-              <InfoItem icon={FilmStrip} text={info()!.imageInfo.flim} />
-              <InfoItem
-                icon={Spacing}
-                text={<Tags tags={info()!.imageInfo.tags} />}
-              />
-            </div>
-          </Match>
-        </Switch>
+            <InfoItem icon={Camera} text={info()!.imageInfo.camera} />
+            <InfoItem icon={Aperture} text={info()!.imageInfo?.lens} />
+            <InfoItem icon={FilmStrip} text={info()!.imageInfo.flim} />
+            <InfoItem
+              icon={Spacing}
+              text={<Tags tags={info()!.imageInfo.tags} />}
+            />
+          </div>
+        </Show>
       </Suspense>
       <Toolbar infoRef={() => infoRef} />
     </div>
