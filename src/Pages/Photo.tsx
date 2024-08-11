@@ -20,6 +20,7 @@ import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { useSearchParams } from "@solidjs/router";
+import Loading from "../Components/Loading";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -80,15 +81,10 @@ function preloadImages(db: Database): DisplayableImage[] {
       image: (
         <Suspense
           fallback={
-            <svg
-              width={item.previewWidth}
-              height={512}
-              style={{
-                "max-width": "100%",
-                height: "auto",
-                display: "block",
-              }}
-            />
+            <div class={style.gridFallback}>
+              <svg width={item.previewWidth} height={512} />
+              <Loading />
+            </div>
           }
         >
           <AsyncImage src={getPreviewURL(item)} />
