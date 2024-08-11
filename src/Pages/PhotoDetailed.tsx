@@ -27,6 +27,7 @@ import {
 } from "phosphor-solid-js";
 import { usePageContext } from "../App";
 import Metas from "../Components/Metas";
+import Loading from "../Components/Loading";
 
 const AltArrow: Component = () => {
   const { atTop } = usePageContext();
@@ -129,7 +130,13 @@ const PhotoDetailed: Component = () => {
 
   return (
     <div class={style.article}>
-      <Suspense fallback={<div class={style.photoContainer}>Loading...</div>}>
+      <Suspense
+        fallback={
+          <div class={`${style.photoContainer} ${style.loading}`}>
+            <Loading />
+          </div>
+        }
+      >
         <Show
           when={!(info.error || info() == undefined)}
           fallback={<p>Could not load image</p>}

@@ -38,6 +38,15 @@
   }
 }
 
+.loading {
+  align-content: center;
+
+  > svg {
+    display: block;
+    margin: auto;
+  }
+}
+
 .photoContainer {
   position: relative;
   width: 100%;
@@ -110,9 +119,9 @@
 
   padding: 0.2rem 0.5rem 0.2rem 0.5rem;
   margin-right: 0.5rem;
-}
 
-.tagLink:hover {
-  border-color: var(--link-focus);
-  background-color: var(--link-focus-light);
+  &:hover {
+    border-color: var(--link-focus);
+    background-color: var(--link-focus-light);
+  }
 }
