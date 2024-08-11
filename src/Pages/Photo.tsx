@@ -8,36 +8,35 @@ import {
   createSignal,
   onMount,
   onCleanup,
-  JSX,
   Setter,
   createEffect,
   createMemo,
+  Show,
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
-import AsyncImage from "../Components/AsyncImage";
 import style from "./Photo.module.css";
 import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { useSearchParams } from "@solidjs/router";
 import Loading from "../Components/Loading";
+import { debounce } from "../Util/debounce";
 
 type DisplayableImage = {
   info: ImageInfo;
-  image: JSX.Element;
   type: "DisplayableImage";
 };
 
 type AlignmentPlaceholder = {
+  width: number;
   type: "AlignmentPlaceholder";
-  image: JSX.Element;
 };
 
 type ImageHandle = DisplayableImage | AlignmentPlaceholder;
 type ScreenSize = { height: number; width: number };
 
 function fitImages(
-  images: DisplayableImage[],
+  images: ImageInfo[],
   screenSize: ScreenSize,
 ): ImageHandle[][] {
   const result: ImageHandle[][] = [];
@@ -47,9 +46,12 @@ function fitImages(
   let row: ImageHandle[] = [];
   let curWidth = 0;
   for (const image of images) {
-    const width = image.info.previewWidth * resizeFactor;
+    const width = image.previewWidth * resizeFactor;
     curWidth += width;
-    row.push(image);
+    row.push({
+      info: image,
+      type: "DisplayableImage",
+    });
 
     if (curWidth >= window.innerWidth) {
       result.push(row);
@@ -62,8 +64,8 @@ function fitImages(
     // If last row has free space add an svg placeholder taking up
     // the rest of space
     row.push({
+      width: screenSize.width - curWidth,
       type: "AlignmentPlaceholder",
-      image: <svg width={screenSize.width - curWidth} height={512} />,
     });
     result.push(row);
   }
@@ -71,46 +73,61 @@ function fitImages(
   return result;
 }
 
-function preloadImages(db: Database): DisplayableImage[] {
-  const result: DisplayableImage[] = [];
+const GridImage: Component<{ info: ImageInfo }> = (props) => {
+  const [showLoading, setShowLoading] = createSignal(false);
 
-  for (const item of db.images) {
-    result.push({
-      info: item,
-      type: "DisplayableImage",
-      image: (
-        <Suspense
-          fallback={
-            <div class={style.gridFallback}>
-              <svg width={item.previewWidth} height={512} />
-              <Loading />
-            </div>
-          }
-        >
-          <AsyncImage src={getPreviewURL(item)} />
-        </Suspense>
-      ),
-    });
-  }
+  // Display spinner after slight delay to prevent it blinking
+  // even when image is already loaded
+  const displayLoading = debounce(() => setShowLoading(true), 100);
+  onMount(() => displayLoading());
 
-  return result;
-}
+  return (
+    <a class={style.gridItem} href={`/photo/${props.info.id}`}>
+      <Show when={showLoading()}>
+        <div class={style.loading}>
+          <Loading />
+        </div>
+      </Show>
+      <img
+        width={props.info.previewWidth}
+        height={512}
+        src={getPreviewURL(props.info)}
+        onLoad={() => {
+          setShowLoading(false);
+          displayLoading.cancel();
+        }}
+      />
+      <div class={style.overlay}>
+        <p>{props.info.name}</p>
+        <ArrowUpRight size={"1.5rem"} />
+      </div>
+    </a>
+  );
+};
+
+const GridPlaceholder: Component<{ width: number }> = (props) => {
+  return (
+    <div class={style.gridItem}>
+      <svg width={props.width} height={512} />
+    </div>
+  );
+};
 
 const SearchBar: Component<{
-  images: DisplayableImage[];
-  displayResults: Setter<DisplayableImage[]>;
+  images: ImageInfo[];
+  displayResults: Setter<ImageInfo[]>;
 }> = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const fuzzy = new Fuzzy<DisplayableImage>(
+  const fuzzy = new Fuzzy<ImageInfo>(
     (image) =>
-      image.info.name +
+      image.name +
       " " +
-      image.info.description +
+      image.description +
       " " +
-      image.info.tags.reduce((prev, curr) => prev + " " + curr, ""),
+      image.tags.reduce((prev, curr) => prev + " " + curr, ""),
   );
-  const tags = new Tags<DisplayableImage>((image) => image.info.tags);
+  const tags = new Tags<ImageInfo>((image) => image.tags);
   const search = createMemo(() => new Filters(props.images, fuzzy, tags));
 
   createEffect(() => {
@@ -132,6 +149,10 @@ const SearchBar: Component<{
     setSearchParams({ tags: [...currentTags].join(",") });
   }
 
+  function hasTag(tag: string): boolean {
+    return searchParams.tags?.split(",")?.includes(tag) ?? false;
+  }
+
   return (
     <span class={style.searchBox}>
       <input
@@ -142,15 +163,13 @@ const SearchBar: Component<{
         onInput={(event) => setSearchParams({ search: event.target.value })}
       />
       <ul class={style.tagsList}>
-        <For
-          each={[...new Set(props.images.flatMap((image) => image.info.tags))]}
-        >
+        <For each={[...new Set(props.images.flatMap((image) => image.tags))]}>
           {(tag) => (
             <li class={style.tagInList}>
               <input
                 id={`inputTag${tag}`}
                 type="checkbox"
-                checked={searchParams.tags?.split(",").includes(tag)}
+                checked={hasTag(tag)}
                 onChange={(event) =>
                   event.target.checked ? addTag(tag) : removeTag(tag)
                 }
@@ -168,61 +187,48 @@ const SearchBar: Component<{
 };
 
 const PhotoList: Component<{ db: Database }> = (props) => {
-  const [rect, setRect] = createSignal({
+  const [rect, setRect] = createSignal<ScreenSize>({
     height: window.innerHeight,
     width: window.innerWidth,
   });
 
-  const handler = () => {
+  function onResize(): void {
     setRect({ height: window.innerHeight, width: window.innerWidth });
-  };
+  }
 
   onMount(() => {
-    window.addEventListener("resize", handler);
+    window.addEventListener("resize", onResize);
   });
 
   onCleanup(() => {
-    window.removeEventListener("resize", handler);
+    window.removeEventListener("resize", onResize);
   });
 
-  const [images] = createResource(() => props.db, preloadImages);
-
-  const [displayedImages, setDisplayedImages] = createSignal<
-    DisplayableImage[]
-  >([]);
+  const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
 
   return (
     <>
-      <SearchBar images={images()!} displayResults={setDisplayedImages} />
+      <SearchBar images={props.db.images} displayResults={setDisplayedImages} />
       <div class={style.grid}>
-        <For each={fitImages(displayedImages()!, rect())}>
-          {(item) => {
-            return (
-              <div class={style.gridRow}>
-                <For each={item}>
-                  {(item) => (
-                    <Switch>
-                      <Match when={item.type == "DisplayableImage"}>
-                        <a
-                          class={style.gridItem}
-                          href={`/photo/${(item as DisplayableImage).info.id}`}
-                        >
-                          {item.image}
-                          <div class={style.overlay}>
-                            <p>{(item as DisplayableImage).info.name}</p>
-                            <ArrowUpRight size={"1.5rem"} />
-                          </div>
-                        </a>
-                      </Match>
-                      <Match when={item.type == "AlignmentPlaceholder"}>
-                        <div class={style.gridItem}>{item.image}</div>
-                      </Match>
-                    </Switch>
-                  )}
-                </For>
-              </div>
-            );
-          }}
+        <For each={fitImages(displayedImages(), rect())}>
+          {(item) => (
+            <div class={style.gridRow}>
+              <For each={item}>
+                {(item) => (
+                  <Switch>
+                    <Match when={item.type == "DisplayableImage"}>
+                      <GridImage info={(item as DisplayableImage).info} />
+                    </Match>
+                    <Match when={item.type == "AlignmentPlaceholder"}>
+                      <GridPlaceholder
+                        width={(item as AlignmentPlaceholder).width}
+                      />
+                    </Match>
+                  </Switch>
+                )}
+              </For>
+            </div>
+          )}
         </For>
       </div>
     </>
