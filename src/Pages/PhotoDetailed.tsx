@@ -129,13 +129,14 @@ const PhotoDetailed: Component = () => {
 
   return (
     <div class={style.article}>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<div class={style.photoContainer}>Loading...</div>}>
         <Show
           when={!(info.error || info() == undefined)}
           fallback={<p>Could not load image</p>}
         >
           <AsyncZoomableImage
             src={info()!.imageURL}
+            class={style.photoContainer}
             enabled={usePageContext().atTop}
           />
         </Show>

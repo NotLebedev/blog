@@ -19,6 +19,7 @@ function clamp(val: number, min: number, max: number) {
 
 const AsyncZoomableImage: Component<{
   src: string;
+  class?: string;
   enabled: Accessor<boolean>;
 }> = (props) => {
   const ZOOM_FACTOR = 0.001;
@@ -273,7 +274,14 @@ const AsyncZoomableImage: Component<{
   });
 
   return (
-    <div class={style.imageContainer} ref={container}>
+    <div
+      class={
+        props.class == undefined
+          ? style.imageContainer
+          : `${props.class} ${style.imageContainer}`
+      }
+      ref={container}
+    >
       <AsyncImage
         src={props.src}
         ref={image}

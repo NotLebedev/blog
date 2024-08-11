@@ -6,34 +6,42 @@
   align-items: start;
 }
 
-.toolbar,
-.toolbar > * {
-  position: fixed;
+.toolbar {
+  &,
+  > * {
+    position: fixed;
+  }
+
+  > #close {
+    left: 1rem;
+    top: 0.5rem;
+  }
+
+  > #prev {
+    left: 1rem;
+    top: 50vh;
+  }
+
+  > #more {
+    left: 1rem;
+    bottom: 0.5rem;
+  }
+
+  > #share {
+    right: 1rem;
+    top: 0.5rem;
+  }
+
+  > #next {
+    right: 1rem;
+    top: 50vh;
+  }
 }
 
-.toolbar > #close,
-.toolbar > #prev,
-.toolbar > #more {
-  left: 1rem;
-}
-
-.toolbar > #share,
-.toolbar > #next {
-  right: 1rem;
-}
-
-.toolbar > #close,
-.toolbar > #share {
-  top: 0.5rem;
-}
-
-.toolbar > #prev,
-.toolbar > #next {
-  top: 50vh;
-}
-
-.toolbar > #more {
-  bottom: 0.5rem;
+.photoContainer {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 1rem);
 }
 
 .photoInfo {
@@ -41,28 +49,28 @@
   align-items: top;
   font-size: 1.5rem;
   margin-top: 0.5rem;
-}
 
-.photoInfo svg {
-  margin-top: 0.2rem;
-  flex-basis: 1.5rem;
-  min-width: 1.5rem;
-}
+  svg {
+    margin-top: 0.2rem;
+    flex-basis: 1.5rem;
+    min-width: 1.5rem;
+  }
 
-.photoInfo p {
-  margin-left: 0.5rem;
-  margin-top: 0;
-  margin-bottom: 0;
+  p {
+    margin-left: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }
 
 .altArrow {
   display: inline-grid;
-}
 
-.altArrow div {
-  grid-row: 1;
-  grid-column: 1;
-  transition: opacity 0.3s ease-in;
+  div {
+    grid-row: 1;
+    grid-column: 1;
+    transition: opacity 0.3s ease-in;
+  }
 }
 
 .photoInfoButton {
