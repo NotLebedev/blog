@@ -222,6 +222,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
   });
 
   const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
+  const [gridHidden, setGridHidden] = createSignal(false);
 
   let grid!: HTMLDivElement;
 
@@ -242,19 +243,22 @@ const PhotoList: Component<{ db: Database }> = (props) => {
 
       setDisplayedImages(newImages);
 
-      grid.className = style.grid;
+      setGridHidden(false);
       grid.ontransitionend = null;
     });
 
     grid.ontransitionend = transitionend;
 
-    grid.className = `${style.grid} ${style.hidden}`;
+    setGridHidden(true);
   }
 
   return (
     <>
       <SearchBar images={props.db.images} displayResults={setUpImageChnage} />
-      <div class={style.grid} ref={grid}>
+      <div
+        classList={{ [style.grid]: true, [style.hidden]: gridHidden() }}
+        ref={grid}
+      >
         <For each={fitImages(displayedImages(), rect())}>
           {(item) => (
             <div class={style.gridRow}>
