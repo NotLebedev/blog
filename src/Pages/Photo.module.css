@@ -2,6 +2,13 @@
   /* Override padding around main */
   margin-left: calc(0px - var(--page-padding));
   margin-right: calc(0px - var(--page-padding));
+
+  &.hidden img,
+  &.hidden a.gridItem,
+  img.hidden,
+  div.loading.hidden {
+    opacity: 0;
+  }
 }
 
 .gridRow {
@@ -18,6 +25,8 @@
   padding-left: var(--grid-paddings);
   padding-top: var(--grid-paddings);
 
+  transition: opacity 0.3s ease-in-out;
+
   &:last-child {
     padding-right: var(--grid-paddings);
   }
@@ -26,6 +35,7 @@
     max-width: 100%;
     height: auto;
     display: block;
+    transition: opacity 0.3s ease-in-out;
   }
 
   > div.loading {
@@ -34,6 +44,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
+    transition: opacity 0.3s ease-in-out;
 
     > svg {
       display: block;

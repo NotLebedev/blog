@@ -8,10 +8,8 @@ import {
   createSignal,
   onMount,
   onCleanup,
-  Setter,
   createEffect,
   createMemo,
-  Show,
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
@@ -20,7 +18,9 @@ import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { useSearchParams } from "@solidjs/router";
 import Loading from "../Components/Loading";
-import { debounce } from "../Util/debounce";
+import debounce from "../Util/Debounce";
+import Arrays from "../Util/Arrays";
+import once from "../Util/OnceFunction";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -73,7 +73,9 @@ function fitImages(
   return result;
 }
 
-const GridImage: Component<{ info: ImageInfo }> = (props) => {
+const GridImage: Component<{
+  info: ImageInfo;
+}> = (props) => {
   const [showLoading, setShowLoading] = createSignal(false);
 
   // Display spinner after slight delay to prevent it blinking
@@ -81,20 +83,25 @@ const GridImage: Component<{ info: ImageInfo }> = (props) => {
   const displayLoading = debounce(() => setShowLoading(true), 100);
   onMount(() => displayLoading());
 
+  let imageRef!: HTMLImageElement;
+
   return (
     <a class={style.gridItem} href={`/photo/${props.info.id}`}>
-      <Show when={showLoading()}>
-        <div class={style.loading}>
-          <Loading />
-        </div>
-      </Show>
+      <div
+        classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
+      >
+        <Loading />
+      </div>
       <img
         width={props.info.previewWidth}
         height={512}
         src={getPreviewURL(props.info)}
+        ref={imageRef}
+        class={style.hidden}
         onLoad={() => {
           setShowLoading(false);
           displayLoading.cancel();
+          imageRef.className = "";
         }}
       />
       <div class={style.overlay}>
@@ -115,7 +122,7 @@ const GridPlaceholder: Component<{ width: number }> = (props) => {
 
 const SearchBar: Component<{
   images: ImageInfo[];
-  displayResults: Setter<ImageInfo[]>;
+  displayResults: (result: ImageInfo[]) => void;
 }> = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -130,12 +137,22 @@ const SearchBar: Component<{
   const tags = new Tags<ImageInfo>((image) => image.tags);
   const search = createMemo(() => new Filters(props.images, fuzzy, tags));
 
-  createEffect(() => {
+  createEffect<ImageInfo[] | undefined>((prevResult) => {
     fuzzy.query(searchParams.search ?? "");
     tags.query(searchParams.tags?.split(",") ?? []);
 
-    props.displayResults(search().filter());
-  });
+    const result = search().filter();
+
+    // Prevent calling displayResults if results did not actually change
+    // This avoids infinite recursion when result is empty
+    // and fixes issues with rerendering when result did not actually
+    // change but
+    if (prevResult === undefined || !Arrays.equal(prevResult, result)) {
+      props.displayResults(result);
+    }
+
+    return result;
+  }, undefined);
 
   function addTag(tag: string) {
     const currentTags = new Set(searchParams.tags?.split(",") ?? []);
@@ -206,10 +223,38 @@ const PhotoList: Component<{ db: Database }> = (props) => {
 
   const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
 
+  let grid!: HTMLDivElement;
+
+  function setUpImageChnage(newImages: ImageInfo[]): void {
+    if (displayedImages().length === 0) {
+      setDisplayedImages(newImages);
+      return;
+    }
+
+    const transitionend = once(function (ev: TransitionEvent): void {
+      // For some reason addEventListener type does not know that ev.target
+      // is HTMLElement (but onTransitionEnd JSX attribute does?)
+      const tagName = (ev.target as HTMLElement).tagName.toLowerCase();
+      if (tagName !== "a") {
+        transitionend.reset();
+        return;
+      }
+
+      setDisplayedImages(newImages);
+
+      grid.className = style.grid;
+      grid.ontransitionend = null;
+    });
+
+    grid.ontransitionend = transitionend;
+
+    grid.className = `${style.grid} ${style.hidden}`;
+  }
+
   return (
     <>
-      <SearchBar images={props.db.images} displayResults={setDisplayedImages} />
-      <div class={style.grid}>
+      <SearchBar images={props.db.images} displayResults={setUpImageChnage} />
+      <div class={style.grid} ref={grid}>
         <For each={fitImages(displayedImages(), rect())}>
           {(item) => (
             <div class={style.gridRow}>
