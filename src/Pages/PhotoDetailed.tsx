@@ -28,7 +28,7 @@ import {
 import { usePageContext } from "../App";
 import Metas from "../Components/Metas";
 import Loading from "../Components/Loading";
-import { debounce } from "../Util/debounce";
+import debounce from "../Util/Debounce";
 
 const AltArrow: Component = () => {
   const { atTop } = usePageContext();
