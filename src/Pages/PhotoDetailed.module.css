@@ -103,6 +103,10 @@
   font: inherit;
   cursor: pointer;
   outline: inherit;
+
+  &:hover {
+    color: white;
+  }
 }
 
 .infoBlock {

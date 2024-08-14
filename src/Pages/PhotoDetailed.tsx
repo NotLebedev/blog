@@ -8,7 +8,7 @@ import {
   createSignal,
   onMount,
 } from "solid-js";
-import { useParams } from "@solidjs/router";
+import { useLocation, useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
 import getDB, { getImageURL, getPreviewURL } from "../Data/Database";
@@ -47,6 +47,8 @@ const AltArrow: Component = () => {
 const Toolbar: Component<{
   infoRef: () => HTMLElement;
 }> = (props) => {
+  const location = useLocation();
+
   function scrollInfo() {
     if (window.scrollY == 0) {
       props.infoRef().scrollIntoView({ behavior: "smooth" });
@@ -54,15 +56,16 @@ const Toolbar: Component<{
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
+
   return (
     <div class={style.toolbar}>
-      <button
+      <a
         class={style.photoInfoButton}
         id={style.close}
-        onClick={() => history.back()}
+        href={`/photo${location.search}`}
       >
         <X size="2rem" />
-      </button>
+      </a>
       <ArrowLeft size="2rem" id={style.prev} />
       <button
         class={style.photoInfoButton}

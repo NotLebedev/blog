@@ -16,7 +16,7 @@ import style from "./Photo.module.css";
 import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
-import { useSearchParams } from "@solidjs/router";
+import { useLocation, useSearchParams } from "@solidjs/router";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
@@ -76,6 +76,8 @@ function fitImages(
 const GridImage: Component<{
   info: ImageInfo;
 }> = (props) => {
+  const location = useLocation();
+
   const [showLoading, setShowLoading] = createSignal(false);
 
   // Display spinner after slight delay to prevent it blinking
@@ -86,7 +88,10 @@ const GridImage: Component<{
   let imageRef!: HTMLImageElement;
 
   return (
-    <a class={style.gridItem} href={`/photo/${props.info.id}`}>
+    <a
+      class={style.gridItem}
+      href={`/photo/${props.info.id}${location.search}`}
+    >
       <div
         classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
       >
@@ -176,7 +181,7 @@ const SearchBar: Component<{
         type="text"
         class={style.searchInput}
         placeholder="Search..."
-        value={searchParams.q ?? ""}
+        value={searchParams.search ?? ""}
         onInput={(event) => setSearchParams({ search: event.target.value })}
       />
       <ul class={style.tagsList}>
