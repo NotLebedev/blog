@@ -20,7 +20,7 @@ import { useSearchParams } from "@solidjs/router";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
-import once from "../Util/OnceFunction";
+import UniqueEventListener from "../Util/UniqueEventListener";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -213,35 +213,41 @@ const PhotoList: Component<{ db: Database }> = (props) => {
   const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
   const [gridHidden, setGridHidden] = createSignal(false);
 
-  let onResizeTransitionEnd: (() => void) | undefined = undefined;
+  let onResizeTransitionEnd!: UniqueEventListener<
+    HTMLDivElement,
+    "transitionend"
+  >;
+
+  let setUpImageTransitionEnd!: UniqueEventListener<
+    HTMLDivElement,
+    "transitionend"
+  >;
+
   function onResize(): void {
     if (displayedImages().length === 0) {
       return;
     }
 
-    if (onResizeTransitionEnd !== undefined) {
-      grid.removeEventListener("transitionend", onResizeTransitionEnd);
-    }
-
-    onResizeTransitionEnd = once(() => {
+    onResizeTransitionEnd.setListener(() => {
       setRect({ height: window.innerHeight, width: window.innerWidth });
       setGridHidden(false);
 
-      if (onResizeTransitionEnd !== undefined) {
-        grid.removeEventListener("transitionend", onResizeTransitionEnd);
-      }
+      onResizeTransitionEnd.removeListener();
     });
 
-    grid.addEventListener("transitionend", onResizeTransitionEnd);
     setGridHidden(true);
   }
 
   onMount(() => {
     window.addEventListener("resize", onResize);
+    onResizeTransitionEnd = new UniqueEventListener(grid, "transitionend");
+    setUpImageTransitionEnd = new UniqueEventListener(grid, "transitionend");
   });
 
   onCleanup(() => {
     window.removeEventListener("resize", onResize);
+    onResizeTransitionEnd.removeListener();
+    setUpImageTransitionEnd.removeListener();
   });
 
   function setUpImageChnage(newImages: ImageInfo[]): void {
@@ -250,22 +256,20 @@ const PhotoList: Component<{ db: Database }> = (props) => {
       return;
     }
 
-    const transitionend = once((ev: TransitionEvent) => {
+    setUpImageTransitionEnd.setListener((ev: TransitionEvent) => {
       // For some reason addEventListener type does not know that ev.target
       // is HTMLElement (but onTransitionEnd JSX attribute does?)
       const tagName = (ev.target as HTMLElement).tagName.toLowerCase();
       if (tagName !== "a") {
-        transitionend.reset();
+        // Only events from grid unloading are expected
         return;
       }
 
       setDisplayedImages(newImages);
 
       setGridHidden(false);
-      grid.removeEventListener("transitionend", transitionend);
+      setUpImageTransitionEnd.removeListener();
     });
-
-    grid.addEventListener("transitionend", transitionend);
 
     setGridHidden(true);
   }
