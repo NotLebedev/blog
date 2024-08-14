@@ -204,13 +204,36 @@ const SearchBar: Component<{
 };
 
 const PhotoList: Component<{ db: Database }> = (props) => {
+  let grid!: HTMLDivElement;
+
   const [rect, setRect] = createSignal<ScreenSize>({
     height: window.innerHeight,
     width: window.innerWidth,
   });
+  const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
+  const [gridHidden, setGridHidden] = createSignal(false);
 
+  let onResizeTransitionEnd: (() => void) | undefined = undefined;
   function onResize(): void {
-    setRect({ height: window.innerHeight, width: window.innerWidth });
+    if (displayedImages().length === 0) {
+      return;
+    }
+
+    if (onResizeTransitionEnd !== undefined) {
+      grid.removeEventListener("transitionend", onResizeTransitionEnd);
+    }
+
+    onResizeTransitionEnd = once(() => {
+      setRect({ height: window.innerHeight, width: window.innerWidth });
+      setGridHidden(false);
+
+      if (onResizeTransitionEnd !== undefined) {
+        grid.removeEventListener("transitionend", onResizeTransitionEnd);
+      }
+    });
+
+    grid.addEventListener("transitionend", onResizeTransitionEnd);
+    setGridHidden(true);
   }
 
   onMount(() => {
@@ -221,18 +244,13 @@ const PhotoList: Component<{ db: Database }> = (props) => {
     window.removeEventListener("resize", onResize);
   });
 
-  const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
-  const [gridHidden, setGridHidden] = createSignal(false);
-
-  let grid!: HTMLDivElement;
-
   function setUpImageChnage(newImages: ImageInfo[]): void {
     if (displayedImages().length === 0) {
       setDisplayedImages(newImages);
       return;
     }
 
-    const transitionend = once(function (ev: TransitionEvent): void {
+    const transitionend = once((ev: TransitionEvent) => {
       // For some reason addEventListener type does not know that ev.target
       // is HTMLElement (but onTransitionEnd JSX attribute does?)
       const tagName = (ev.target as HTMLElement).tagName.toLowerCase();
@@ -244,10 +262,10 @@ const PhotoList: Component<{ db: Database }> = (props) => {
       setDisplayedImages(newImages);
 
       setGridHidden(false);
-      grid.ontransitionend = null;
+      grid.removeEventListener("transitionend", transitionend);
     });
 
-    grid.ontransitionend = transitionend;
+    grid.addEventListener("transitionend", transitionend);
 
     setGridHidden(true);
   }
