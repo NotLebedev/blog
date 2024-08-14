@@ -85,7 +85,11 @@ const Tags: Component<{ tags?: string[] }> = (props) => {
   return (
     <span class={style.tagInfoItem}>
       <For each={props.tags} fallback={<></>}>
-        {(item) => <a class={style.tagLink}>{item}</a>}
+        {(item) => (
+          <a class={style.tagLink} href={`/photo?tags=${item}`}>
+            {item}
+          </a>
+        )}
       </For>
     </span>
   );

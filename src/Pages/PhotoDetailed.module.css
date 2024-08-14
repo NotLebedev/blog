@@ -120,6 +120,7 @@
 
 .tagLink {
   font-size: 0.8em;
+  text-decoration: none;
 
   border-radius: 10rem;
   border: 0.15rem solid;
