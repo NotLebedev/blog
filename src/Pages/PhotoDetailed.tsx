@@ -130,6 +130,7 @@ const PhotoDetailed: Component = () => {
   });
 
   const [showLoading, setShowLoading] = createSignal(false);
+  const [showImage, setShowImage] = createSignal(false);
 
   // Display spinner after slight delay to prevent it blinking
   // even when image is already loaded
@@ -139,19 +140,23 @@ const PhotoDetailed: Component = () => {
   return (
     <div class={style.article}>
       <div class={style.photoContainer}>
-        <Show when={info.loading || showLoading()}>
-          <div class={style.loading}>
-            <Loading />
-          </div>
-        </Show>
+        <div
+          classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
+        >
+          <Loading />
+        </div>
         <Show when={info.state == "ready"}>
           <ZoomableImage
             src={info()!.imageURL}
-            class={style.photoContainer}
+            classList={{
+              [style.photoContainer]: true,
+              [style.hidden]: !showImage(),
+            }}
             enabled={usePageContext().atTop}
             onLoad={() => {
               displayLoading.cancel();
               setShowLoading(false);
+              setShowImage(true);
             }}
           />
         </Show>

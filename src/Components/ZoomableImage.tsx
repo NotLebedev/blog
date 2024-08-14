@@ -18,7 +18,9 @@ function clamp(val: number, min: number, max: number) {
 
 const ZoomableImage: Component<{
   src: string;
-  class?: string;
+  classList?: {
+    [k: string]: boolean | undefined;
+  };
   enabled: Accessor<boolean>;
   onLoad?: () => void;
 }> = (props) => {
@@ -279,11 +281,10 @@ const ZoomableImage: Component<{
 
   return (
     <div
-      class={
-        props.class == undefined
-          ? style.imageContainer
-          : `${props.class} ${style.imageContainer}`
-      }
+      classList={{
+        [style.imageContainer]: true,
+        ...(props.classList === undefined ? {} : props.classList),
+      }}
       ref={container}
     >
       <img
