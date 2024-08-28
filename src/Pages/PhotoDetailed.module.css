@@ -55,10 +55,11 @@
 }
 
 .photoContainer {
-  position: relative;
   width: 100%;
-  height: calc(100vh - 1rem);
+  margin: auto;
+  height: calc(100vh - 10rem);
   transition: opacity 0.3s ease-in-out;
+  position: relative;
 }
 
 .photoInfo {

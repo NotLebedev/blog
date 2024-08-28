@@ -159,7 +159,6 @@ const PhotoDetailed: Component = () => {
               [style.photoContainer]: true,
               [style.hidden]: !showImage(),
             }}
-            enabled={usePageContext().atTop}
             onLoad={() => {
               displayLoading.cancel();
               setShowLoading(false);

@@ -1,11 +1,4 @@
-import {
-  Accessor,
-  Component,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { Component, createSignal, onCleanup, onMount } from "solid-js";
 
 import style from "./ZoomableImage.module.css";
 import { Vector, apply_on_rows } from "../Data/Vector";
@@ -21,13 +14,13 @@ const ZoomableImage: Component<{
   classList?: {
     [k: string]: boolean | undefined;
   };
-  enabled: Accessor<boolean>;
   onLoad?: () => void;
 }> = (props) => {
   const ZOOM_FACTOR = 0.001;
 
   let image!: HTMLImageElement;
   let container!: HTMLDivElement;
+  let wrapper!: HTMLDivElement;
 
   // Dimensions of image when it is not resized
   let neutralImageDimensions!: {
@@ -38,6 +31,9 @@ const ZoomableImage: Component<{
     zoomLimit: number;
   };
 
+  let enabled = false;
+  const [active, setActive] = createSignal(false);
+  const [noTransition, setNoTransition] = createSignal(false);
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
     scale: 1,
@@ -228,17 +224,54 @@ const ZoomableImage: Component<{
     }
   }
 
-  // Wrapping props.enabled with createEffect to make captured variable
-  // in ifEnabled work properly
-  let enabled = false;
-  createEffect(() => (enabled = props.enabled()));
-
   function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
     return (event) => {
       if (enabled) {
         func(event);
       }
     };
+  }
+
+  function clickActivate(): void {
+    if (!enabled) {
+      setNoTransition(false);
+      container.style.width = "100vw";
+      container.style.height = "100vh";
+      container.style.left = `${-container.getBoundingClientRect().left}px`;
+      container.style.top = `${-container.getBoundingClientRect().top}px`;
+
+      container.ontransitionend = () => {
+        container.style.width = "";
+        container.style.height = "";
+        container.style.left = "";
+        container.style.top = "";
+
+        container.ontransitionend = null;
+
+        setActive(true);
+        setNoTransition(true);
+      };
+      enabled = true;
+    } else {
+      setNoTransition(false);
+      setZoomState({ position: new Vector(0, 0), scale: 1 });
+      container.style.width = `${wrapper.getBoundingClientRect().width}px`;
+      container.style.height = `${wrapper.getBoundingClientRect().height}px`;
+      container.style.left = `${wrapper.getBoundingClientRect().left}px`;
+      container.style.top = `${wrapper.getBoundingClientRect().top}px`;
+
+      container.ontransitionend = () => {
+        setNoTransition(true);
+        setActive(false);
+        container.style.width = "";
+        container.style.height = "";
+        container.style.left = "";
+        container.style.top = "";
+
+        container.ontransitionend = null;
+      };
+      enabled = false;
+    }
   }
 
   // Wait not only for image component to mount, but also until
@@ -254,11 +287,13 @@ const ZoomableImage: Component<{
         setZoomState(calcNewState(0, Vector.zero())),
       );
 
-      image.addEventListener("wheel", ifEnabled(handleWheel));
-      image.addEventListener("touchmove", ifEnabled(handleTouchMove));
-      image.addEventListener("pointerdown", ifEnabled(handlePointerDown));
-      image.addEventListener("pointerup", ifEnabled(handlePointerUp));
-      image.addEventListener("pointermove", ifEnabled(handlePointerMove));
+      container.addEventListener("wheel", ifEnabled(handleWheel));
+      container.addEventListener("touchmove", ifEnabled(handleTouchMove));
+      container.addEventListener("pointerdown", ifEnabled(handlePointerDown));
+      container.addEventListener("pointerup", ifEnabled(handlePointerUp));
+      container.addEventListener("pointermove", ifEnabled(handlePointerMove));
+
+      container.addEventListener("click", clickActivate);
 
       if (props.onLoad !== undefined) {
         props.onLoad();
@@ -270,30 +305,27 @@ const ZoomableImage: Component<{
     window.removeEventListener("resize", updateNeutralImageDimensions);
   });
 
-  createEffect(() => {
-    if (props.enabled === undefined || !props.enabled()) {
-      image.style.transition = "transform 0.3s";
-      setZoomState({ position: new Vector(0, 0), scale: 1 });
-    } else {
-      image.style.transition = "";
-    }
-  });
-
   return (
     <div
-      classList={{
-        [style.imageContainer]: true,
-        ...(props.classList === undefined ? {} : props.classList),
-      }}
-      ref={container}
+      classList={props.classList === undefined ? {} : props.classList}
+      ref={wrapper}
     >
-      <img
-        src={props.src}
-        ref={image}
-        style={{
-          transform: `translate(${zoomState().position.x}px, ${zoomState().position.y}px) scale(${zoomState().scale})`,
+      <div
+        classList={{
+          [style.imageContainer]: true,
+          [style.active]: active(),
+          [style.noTransition]: noTransition(),
         }}
-      />
+        ref={container}
+      >
+        <img
+          src={props.src}
+          ref={image}
+          style={{
+            transform: `translate(${zoomState().position.x}px, ${zoomState().position.y}px) scale(${zoomState().scale})`,
+          }}
+        />
+      </div>
     </div>
   );
 };
