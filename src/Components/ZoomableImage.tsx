@@ -33,6 +33,7 @@ const ZoomableImage: Component<{
 
   let enabled = false;
   const [active, setActive] = createSignal(false);
+  const [tinted, setTinted] = createSignal(false);
   const [noTransition, setNoTransition] = createSignal(false);
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
@@ -235,6 +236,7 @@ const ZoomableImage: Component<{
   function clickActivate(): void {
     if (!enabled) {
       setNoTransition(false);
+      setTinted(true);
       container.style.width = "100vw";
       container.style.height = "100vh";
       container.style.left = `${-container.getBoundingClientRect().left}px`;
@@ -254,6 +256,7 @@ const ZoomableImage: Component<{
       enabled = true;
     } else {
       setNoTransition(false);
+      setTinted(false);
       setZoomState({ position: new Vector(0, 0), scale: 1 });
       container.style.width = `${wrapper.getBoundingClientRect().width}px`;
       container.style.height = `${wrapper.getBoundingClientRect().height}px`;
@@ -310,6 +313,12 @@ const ZoomableImage: Component<{
       classList={props.classList === undefined ? {} : props.classList}
       ref={wrapper}
     >
+      <div
+        classList={{
+          [style.screenShadow]: true,
+          [style.active]: tinted(),
+        }}
+      />
       <div
         classList={{
           [style.imageContainer]: true,

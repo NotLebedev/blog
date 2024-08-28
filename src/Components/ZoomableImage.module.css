@@ -39,3 +39,19 @@
   right: 0;
   transition: transform 0.3s ease-in;
 }
+
+.screenShadow {
+  background-color: transparent;
+  position: fixed;
+
+  transition: background-color 0.3s ease-in;
+
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+
+  &.active {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+}
