@@ -33,14 +33,10 @@ type AlignmentPlaceholder = {
 };
 
 type ImageHandle = DisplayableImage | AlignmentPlaceholder;
-type ScreenSize = { height: number; width: number };
 
-function fitImages(
-  images: ImageInfo[],
-  screenSize: ScreenSize,
-): ImageHandle[][] {
+function fitImages(images: ImageInfo[]): ImageHandle[][] {
   const result: ImageHandle[][] = [];
-  const targetHeight = Math.min(screenSize.height / 2, 512);
+  const targetHeight = Math.min(window.innerHeight / 2, 512);
   const resizeFactor = targetHeight / 512;
 
   let row: ImageHandle[] = [];
@@ -64,7 +60,7 @@ function fitImages(
     // If last row has free space add an svg placeholder taking up
     // the rest of space
     row.push({
-      width: screenSize.width - curWidth,
+      width: window.innerWidth - curWidth,
       type: "AlignmentPlaceholder",
     });
     result.push(row);
@@ -211,12 +207,9 @@ const SearchBar: Component<{
 const PhotoList: Component<{ db: Database }> = (props) => {
   let grid!: HTMLDivElement;
 
-  const [rect, setRect] = createSignal<ScreenSize>({
-    height: window.innerHeight,
-    width: window.innerWidth,
-  });
-  const [displayedImages, setDisplayedImages] = createSignal<ImageInfo[]>([]);
+  let displayedImages: ImageInfo[] = [];
   const [gridHidden, setGridHidden] = createSignal(false);
+  const [layout, setLayout] = createSignal(fitImages(displayedImages));
 
   let onResizeTransitionEnd!: UniqueEventListener<
     HTMLDivElement,
@@ -228,13 +221,36 @@ const PhotoList: Component<{ db: Database }> = (props) => {
     "transitionend"
   >;
 
+  function layoutsEqual(lhs: ImageHandle[][], rhs: ImageHandle[][]): boolean {
+    return Arrays.equal(lhs, rhs, (lhs, rhs) =>
+      Arrays.equal(lhs, rhs, (lhs, rhs) => {
+        switch (true) {
+          case lhs.type === "AlignmentPlaceholder" &&
+            rhs.type === "AlignmentPlaceholder":
+            return true;
+          case lhs.type === "DisplayableImage" &&
+            rhs.type === "DisplayableImage":
+            return lhs.info === (rhs as DisplayableImage).info;
+          default:
+            return false;
+        }
+      }),
+    );
+  }
+
   function onResize(): void {
-    if (displayedImages().length === 0) {
+    if (displayedImages.length === 0) {
+      return;
+    }
+
+    const newLayout = fitImages(displayedImages);
+
+    if (layoutsEqual(layout(), newLayout)) {
       return;
     }
 
     onResizeTransitionEnd.setListener(() => {
-      setRect({ height: window.innerHeight, width: window.innerWidth });
+      setLayout(newLayout);
       setGridHidden(false);
 
       onResizeTransitionEnd.removeListener();
@@ -256,8 +272,15 @@ const PhotoList: Component<{ db: Database }> = (props) => {
   });
 
   function setUpImageChnage(newImages: ImageInfo[]): void {
-    if (displayedImages().length === 0) {
-      setDisplayedImages(newImages);
+    const newLayout = fitImages(newImages);
+
+    if (layoutsEqual(layout(), newLayout)) {
+      return;
+    }
+
+    if (displayedImages.length === 0) {
+      displayedImages = newImages;
+      setLayout(newLayout);
       return;
     }
 
@@ -270,7 +293,8 @@ const PhotoList: Component<{ db: Database }> = (props) => {
         return;
       }
 
-      setDisplayedImages(newImages);
+      displayedImages = newImages;
+      setLayout(newLayout);
 
       setGridHidden(false);
       setUpImageTransitionEnd.removeListener();
@@ -286,7 +310,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
         classList={{ [style.grid]: true, [style.hidden]: gridHidden() }}
         ref={grid}
       >
-        <For each={fitImages(displayedImages(), rect())}>
+        <For each={layout()}>
           {(item) => (
             <div class={style.gridRow}>
               <For each={item}>
