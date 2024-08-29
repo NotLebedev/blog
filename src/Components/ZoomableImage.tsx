@@ -32,9 +32,12 @@ const ZoomableImage: Component<{
   };
 
   let enabled = false;
+
+  // Styles
   const [active, setActive] = createSignal(false);
   const [tinted, setTinted] = createSignal(false);
   const [noTransition, setNoTransition] = createSignal(false);
+
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
     scale: 1,
@@ -43,6 +46,7 @@ const ZoomableImage: Component<{
   let prevTouches: [Vector, Vector] | undefined = undefined;
   const activePointers: Set<number> = new Set();
   let lastPointerPosition: Vector | undefined = undefined;
+  let movedDuringClick = false;
 
   /**
    * Call this function in {@link onMount} and on resize to calculate
@@ -179,6 +183,7 @@ const ZoomableImage: Component<{
 
   function handlePointerDown(event: PointerEvent) {
     event.preventDefault();
+    movedDuringClick = false;
     activePointers.add(event.pointerId);
     if (activePointers.size === 1) {
       lastPointerPosition = Vector.fromClient(event);
@@ -197,11 +202,14 @@ const ZoomableImage: Component<{
   }
 
   function handlePointerMove(event: PointerEvent) {
+    movedDuringClick = true;
+
     if (zoomState().scale === 1.0) {
       return;
     }
 
     event.preventDefault();
+
     if (lastPointerPosition !== undefined) {
       const newPointerPosition = Vector.fromClient(event);
       const delta = newPointerPosition.sub(lastPointerPosition);
@@ -234,46 +242,59 @@ const ZoomableImage: Component<{
   }
 
   function clickActivate(): void {
-    if (!enabled) {
-      setNoTransition(false);
-      setTinted(true);
-      container.style.width = "100vw";
-      container.style.height = "100vh";
-      container.style.left = `${-container.getBoundingClientRect().left}px`;
-      container.style.top = `${-container.getBoundingClientRect().top}px`;
+    setNoTransition(false);
+    setTinted(true);
+    container.style.width = "100vw";
+    container.style.height = "100vh";
+    container.style.left = `${-container.getBoundingClientRect().left}px`;
+    container.style.top = `${-container.getBoundingClientRect().top}px`;
 
-      container.ontransitionend = () => {
-        container.style.width = "";
-        container.style.height = "";
-        container.style.left = "";
-        container.style.top = "";
+    container.ontransitionend = () => {
+      container.style.width = "";
+      container.style.height = "";
+      container.style.left = "";
+      container.style.top = "";
 
-        container.ontransitionend = null;
+      container.ontransitionend = null;
 
-        setActive(true);
-        setNoTransition(true);
-      };
+      setActive(true);
+      setNoTransition(true);
       enabled = true;
+    };
+  }
+
+  function clickDeactivate(): void {
+    setNoTransition(false);
+    setTinted(false);
+    setZoomState({ position: new Vector(0, 0), scale: 1 });
+    container.style.width = `${wrapper.getBoundingClientRect().width}px`;
+    container.style.height = `${wrapper.getBoundingClientRect().height}px`;
+    container.style.left = `${wrapper.getBoundingClientRect().left}px`;
+    container.style.top = `${wrapper.getBoundingClientRect().top}px`;
+
+    enabled = false;
+
+    container.ontransitionend = () => {
+      setNoTransition(true);
+      setActive(false);
+      container.style.width = "";
+      container.style.height = "";
+      container.style.left = "";
+      container.style.top = "";
+
+      container.ontransitionend = null;
+    };
+  }
+
+  function onClick() {
+    if (movedDuringClick) {
+      return;
+    }
+
+    if (enabled) {
+      clickDeactivate();
     } else {
-      setNoTransition(false);
-      setTinted(false);
-      setZoomState({ position: new Vector(0, 0), scale: 1 });
-      container.style.width = `${wrapper.getBoundingClientRect().width}px`;
-      container.style.height = `${wrapper.getBoundingClientRect().height}px`;
-      container.style.left = `${wrapper.getBoundingClientRect().left}px`;
-      container.style.top = `${wrapper.getBoundingClientRect().top}px`;
-
-      container.ontransitionend = () => {
-        setNoTransition(true);
-        setActive(false);
-        container.style.width = "";
-        container.style.height = "";
-        container.style.left = "";
-        container.style.top = "";
-
-        container.ontransitionend = null;
-      };
-      enabled = false;
+      clickActivate();
     }
   }
 
@@ -290,13 +311,13 @@ const ZoomableImage: Component<{
         setZoomState(calcNewState(0, Vector.zero())),
       );
 
+      image.addEventListener("click", onClick);
+
       container.addEventListener("wheel", ifEnabled(handleWheel));
       container.addEventListener("touchmove", ifEnabled(handleTouchMove));
       container.addEventListener("pointerdown", ifEnabled(handlePointerDown));
       container.addEventListener("pointerup", ifEnabled(handlePointerUp));
       container.addEventListener("pointermove", ifEnabled(handlePointerMove));
-
-      container.addEventListener("click", clickActivate);
 
       if (props.onLoad !== undefined) {
         props.onLoad();
