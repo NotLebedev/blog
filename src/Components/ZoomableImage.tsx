@@ -86,6 +86,10 @@ const ZoomableImage: Component<{
       ),
       zoomLimit: image.naturalHeight / height,
     };
+
+    // After calculating new neutral dimensions update zoom to
+    // prevent zooming beyond 100% when resizing "up"
+    setZoomState(calcNewState(0, Vector.zero()));
   }
 
   function clampPosition(args: {
@@ -305,11 +309,6 @@ const ZoomableImage: Component<{
       updateNeutralImageDimensions();
 
       window.addEventListener("resize", updateNeutralImageDimensions);
-      // After calculating new neutral dimensions update zoom to
-      // prevent zooming beyond 100% when resizing "up"
-      window.addEventListener("resize", () =>
-        setZoomState(calcNewState(0, Vector.zero())),
-      );
 
       image.addEventListener("click", onClick);
 
