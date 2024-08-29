@@ -44,14 +44,27 @@
   background-color: transparent;
   position: fixed;
 
-  transition: background-color 0.3s ease-in;
-
-  width: 100vw;
-  height: 100vh;
   left: 0;
   top: 0;
+  /* Set size to zero to avoid interference
+   * with content of page */
+  width: 0;
+  height: 0;
+
+  /* Set transitionto instant, but delay it by 0.3s
+   * to transition only after full fade out */
+  transition:
+    background-color 0.3s ease-in,
+    width 0s ease 0.3s,
+    height 0s ease 0.3s;
 
   &.active {
     background-color: rgba(0, 0, 0, 0.9);
+    width: 100vw;
+    height: 100vh;
+
+    /* Transition background-color but don't delay width
+     * and height (resize at start of transition) */
+    transition: background-color 0.3s ease-in;
   }
 }
