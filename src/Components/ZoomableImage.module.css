@@ -20,24 +20,30 @@
     height: 100vh;
     left: 0;
     top: 0;
+
+    img {
+      cursor: grab;
+    }
   }
 
   &.noTransition,
   &.noTransition img {
     transition: none;
   }
-}
 
-.imageContainer img {
-  position: absolute;
-  max-width: 100%;
-  max-height: 100%;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transition: transform 0.3s ease-in;
+  img {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: transform 0.3s ease-in;
+
+    cursor: zoom-in;
+  }
 }
 
 .screenShadow {

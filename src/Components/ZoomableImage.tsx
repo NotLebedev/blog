@@ -189,6 +189,7 @@ const ZoomableImage: Component<{
     event.preventDefault();
     movedDuringClick = false;
     activePointers.add(event.pointerId);
+    image.style.cursor = "grabbing";
     if (activePointers.size === 1) {
       lastPointerPosition = Vector.fromClient(event);
     } else {
@@ -200,6 +201,7 @@ const ZoomableImage: Component<{
     event.preventDefault();
     activePointers.delete(event.pointerId);
     lastPointerPosition = undefined;
+    image.style.cursor = "";
     if (activePointers.size < 2) {
       prevTouches = undefined;
     }
