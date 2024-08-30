@@ -151,6 +151,8 @@
     display: inline-flex;
     flex-direction: row;
 
+    cursor: pointer;
+
     border-radius: 10rem;
     border: 0.15rem solid;
 
