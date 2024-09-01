@@ -13,6 +13,10 @@
     left 0.3s ease-in,
     top 0.3s ease-in;
 
+  &.onTop {
+    z-index: 1001;
+  }
+
   &.active {
     position: fixed;
 
@@ -63,6 +67,10 @@
     background-color 0.3s ease-in,
     width 0s ease 0.3s,
     height 0s ease 0.3s;
+
+  &.onTop {
+    z-index: 1001;
+  }
 
   &.active {
     background-color: rgba(0, 0, 0, 0.9);

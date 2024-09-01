@@ -37,6 +37,7 @@ const ZoomableImage: Component<{
   const [active, setActive] = createSignal(false);
   const [tinted, setTinted] = createSignal(false);
   const [noTransition, setNoTransition] = createSignal(false);
+  const [onTop, setOnTop] = createSignal(false);
 
   const [zoomState, setZoomState] = createSignal({
     position: new Vector(0, 0),
@@ -250,6 +251,7 @@ const ZoomableImage: Component<{
   function clickActivate(): void {
     setNoTransition(false);
     setTinted(true);
+    setOnTop(true);
     container.style.width = "100vw";
     container.style.height = "100vh";
     container.style.left = `${-container.getBoundingClientRect().left}px`;
@@ -283,6 +285,7 @@ const ZoomableImage: Component<{
     container.ontransitionend = () => {
       setNoTransition(true);
       setActive(false);
+      setOnTop(false);
       container.style.width = "";
       container.style.height = "";
       container.style.left = "";
@@ -339,6 +342,7 @@ const ZoomableImage: Component<{
         classList={{
           [style.screenShadow]: true,
           [style.active]: tinted(),
+          [style.onTop]: onTop(),
         }}
       />
       <div
@@ -346,6 +350,7 @@ const ZoomableImage: Component<{
           [style.imageContainer]: true,
           [style.active]: active(),
           [style.noTransition]: noTransition(),
+          [style.onTop]: onTop(),
         }}
         ref={container}
       >
