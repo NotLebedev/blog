@@ -34,3 +34,8 @@ def create_resized(id: str, original_file: str) -> int:
         image.save(path.join(dirname, "image.jpg"))
 
         return preview.width
+
+
+def get_width(filename: str) -> int:
+    with image_open(filename) as file:
+        return file.width
