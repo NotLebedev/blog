@@ -1,200 +1,82 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import itertools
-import os
-import shutil
-from os import path
-from typing import Final, Optional
+from pathlib import Path
+from typing import Annotated, Final
 
 import typer
-from lib.edit import edit
-from lib.image import create_resized
-from lib.model import ImageInfo, load_database
-from lib.validation_context import ValidationContext, init_context
-from pydantic import BaseModel, ValidationError
+from lib.content import (
+    add_image,
+    make_database,
+    parse_images,
+)
 
-app = typer.Typer()
-image_app = typer.Typer()
+app = typer.Typer(
+    help="Manage content database", no_args_is_help=True, add_completion=False
+)
+image_app = typer.Typer(help="Manipulate images in database", no_args_is_help=True)
 app.add_typer(image_app, name="image")
 
-DATABASE_DEFAULT_PATH: Final[str] = "public"
+CONTENT_DEFAULT_PATH: Final[str] = "content"
+DATABASE_DEFAULT_PATH: Final[str] = "dist"
 
 
-@app.command()
-def validate(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
-
-
-class ImageInfoPrompt(BaseModel):
-    id: str
-    name: str
-    description: Optional[str] = None
-    camera: Optional[str] = None
-    lens: Optional[str] = None
-    film: Optional[str] = None
-    tags: list[str] = []
-
-    @staticmethod
-    def copy_of(copy_of: ImageInfo) -> ImageInfoPrompt:
-        return ImageInfoPrompt(
-            id=copy_of.id,
-            name=copy_of.name,
-            description=copy_of.description,
-            camera=copy_of.camera,
-            lens=copy_of.lens,
-            film=copy_of.film,
-            tags=copy_of.tags,
-        )
-
-    def to_image_info(self, previewWidth: int) -> ImageInfo:
-        return ImageInfo(
-            id=self.id,
-            name=self.name,
-            previewWidth=previewWidth,
-            description=self.description,
-            camera=self.camera,
-            lens=self.lens,
-            film=self.film,
-            tags=self.tags,
-        )
+@app.command("build")
+def build(
+    content_root: Annotated[
+        str, typer.Option(help="Path to content directory")
+    ] = CONTENT_DEFAULT_PATH,
+    database_root: Annotated[
+        str, typer.Option(help="Path to directory where database should be created")
+    ] = DATABASE_DEFAULT_PATH,
+) -> None:
+    """
+    Create database from content directory
+    """
+    try:
+        make_database(Path(content_root).resolve(), Path(database_root).resolve())
+    except Exception as e:
+        print(f"Problem occurred when creating database: {e}")
+        exit(1)
 
 
 @image_app.command("add")
-def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            db = load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
-
-        info = edit(ImageInfoPrompt)
-
-        previewWidth = create_resized(info.id, image)
-
-        if any(image.id == info.id for image in db.images):
-            raise ValueError(f"Image with id {id} already exists in database")
-
-        db.add_image(info.to_image_info(previewWidth))
-
-        with open(path.join(db_dir, "db.json"), "w") as file:
-            file.write(db.model_dump_json())
-
-
-@image_app.command("edit")
-def image_edit(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            db = load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
-
-        try:
-            info = next(filter(lambda el: el.id == image, db.images))
-        except StopIteration:
-            print(f"Image {image} not found")
-            exit(1)
-
-        prompt = ImageInfoPrompt.copy_of(info)
-
-        prompt = edit(prompt)
-
-        if prompt.id != info.id:
-            os.rename(
-                path.join(db_dir, "images", info.id),
-                path.join(db_dir, "images", prompt.id),
-            )
-
-        try:
-            db.images[db.images.index(info)] = prompt.to_image_info(info.previewWidth)
-        except Exception as e:
-            if prompt.id != info.id:
-                # If editing database failed rollback filesystem change
-                os.rename(
-                    path.join(db_dir, "images", prompt.id),
-                    path.join(db_dir, "images", info.id),
-                )
-            raise e
-
-        with open(path.join(db_dir, "db.json"), "w") as file:
-            file.write(db.model_dump_json())
-
-
-@image_app.command("remove")
-def image_remove(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            db = load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
-
-        try:
-            info = next(filter(lambda el: el.id == image, db.images))
-        except StopIteration:
-            print(f"Image {image} not found")
-            exit(1)
-
-        db.images.remove(info)
-
-        with open(path.join(db_dir, "db.json"), "w") as file:
-            file.write(db.model_dump_json())
-
-        shutil.rmtree(
-            path.join(db_dir, "images", info.id),
-        )
-
-
-@image_app.command("list")
-def image_list(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            db = load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
-
-    for image in db.images:
-        print(image.id)
+def image_add(
+    image: str,
+    id: str,
+    content_root: Annotated[
+        str, typer.Option(help="Path to content directory")
+    ] = CONTENT_DEFAULT_PATH,
+) -> None:
+    """
+    Add or replace existing image
+    """
+    try:
+        add_image(Path(image).resolve(), id, Path(content_root).resolve())
+    except Exception as e:
+        print(f"Problem occurred when adding image {e}")
+        exit(1)
 
 
 @image_app.command("tags")
-def image_tags(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
-    with init_context(ValidationContext(base_path=db_dir)):
-        try:
-            db = load_database(db_dir)
-        except ValidationError as e:
-            print(f"Validation failed: {e}")
-            exit(1)
-        except FileNotFoundError as e:
-            print(f"Could not open file {e.filename}")
-            exit(1)
+def image_tags(
+    content_root: Annotated[
+        str, typer.Option(help="Path to content directory")
+    ] = CONTENT_DEFAULT_PATH,
+) -> None:
+    """
+    List all tags used in images
+    """
+    try:
+        images = parse_images(Path(content_root).resolve())
+        tags = list(set(tag.lower() for image in images for tag in image.tags))
+        tags.sort()
 
-    tags = list(itertools.chain(*[image.tags for image in db.images]))
-    tags = list(set(tags))
-    print(sorted(tags))
+        for tag in tags:
+            print(tag)
+    except Exception as e:
+        print(f"Problem occurred when reading tags {e}")
+        exit(1)
 
 
 if __name__ == "__main__":

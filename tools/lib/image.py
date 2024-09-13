@@ -1,5 +1,4 @@
-import os
-from os import path
+from pathlib import Path
 from typing import Final
 
 from PIL import ImageOps
@@ -22,15 +21,19 @@ def make_image(original: Image) -> Image:
     return ImageOps.cover(original, minimal_size, method=Resampling.LANCZOS)
 
 
-def create_resized(id: str, original_file: str) -> int:
+def create_resized(dir: Path, original_file: Path) -> int:
     with image_open(original_file) as original:
         preview = make_preview(original)
         image = make_image(original)
 
-        dirname = path.join("public", "images", id)
-        os.mkdir(dirname)
+        dir.mkdir(parents=True, exist_ok=True)
 
-        preview.save(path.join(dirname, "preview.jpg"))
-        image.save(path.join(dirname, "image.jpg"))
+        preview.save(dir.joinpath("preview.jpg"))
+        image.save(dir.joinpath("image.jpg"))
 
         return preview.width
+
+
+def get_width(filename: Path) -> int:
+    with image_open(filename) as file:
+        return file.width
