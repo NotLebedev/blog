@@ -1,39 +1,39 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Final
 
 import typer
 from lib.content import make_database
-from pydantic import ValidationError
 
 app = typer.Typer()
 image_app = typer.Typer()
 app.add_typer(image_app, name="image")
 
-DATABASE_DEFAULT_PATH: Final[str] = "content"
+CONTENT_DEFAULT_PATH: Final[str] = "content"
+DATABASE_DEFAULT_PATH: Final[str] = "dist"
 
 
-@app.command()
-def validate(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+@app.command("build")
+def build(
+    content_root: str = CONTENT_DEFAULT_PATH, database_root: str = DATABASE_DEFAULT_PATH
+) -> None:
     try:
-        make_database(db_dir)
-    except ValidationError as e:
-        print(f"Validation failed: {e}")
-        exit(1)
-    except FileNotFoundError as e:
-        print(f"File {e.filename} not found")
+        make_database(Path(content_root), Path(database_root))
+    except Exception as e:
+        print(f"problem {e}")
         exit(1)
 
 
 @image_app.command("add")
-def image_add(image: str, db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+def image_add(image: str, db_dir: str = CONTENT_DEFAULT_PATH) -> None:
     print("Unimplemented")
     exit(1)
 
 
 @image_app.command("tags")
-def image_tags(db_dir: str = DATABASE_DEFAULT_PATH) -> None:
+def image_tags(db_dir: str = CONTENT_DEFAULT_PATH) -> None:
     print("Unimplemented")
     exit(1)
 

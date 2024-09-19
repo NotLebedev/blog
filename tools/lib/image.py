@@ -1,5 +1,6 @@
 import os
 from os import path
+from pathlib import Path
 from typing import Final
 
 from PIL import ImageOps
@@ -36,6 +37,6 @@ def create_resized(id: str, original_file: str) -> int:
         return preview.width
 
 
-def get_width(filename: str) -> int:
+def get_width(filename: Path) -> int:
     with image_open(filename) as file:
         return file.width
