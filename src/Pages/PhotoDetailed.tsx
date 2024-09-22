@@ -52,7 +52,7 @@ const Toolbar: Component<{
 
 const Tags: Component<{ tags?: string[] }> = (props) => {
   return (
-    <span class={style.tagInfoItem}>
+    <span>
       <For each={props.tags} fallback={<></>}>
         {(item) => (
           <a class={style.tagLink} href={`/photo?tags=${item}`}>
