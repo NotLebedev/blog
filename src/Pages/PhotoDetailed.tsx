@@ -15,48 +15,23 @@ import getDB, { getImageURL, getPreviewURL } from "../Data/Database";
 import ZoomableImage from "../Components/ZoomableImage";
 import {
   Aperture,
-  ArrowDown,
   ArrowLeft,
   ArrowRight,
-  ArrowUp,
   ArticleNyTimes,
   Camera,
   FilmStrip,
   ShareNetwork,
   X,
 } from "phosphor-solid-js";
-import { usePageContext } from "../App";
 import Metas from "../Components/Metas";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
-
-const AltArrow: Component = () => {
-  const { atTop } = usePageContext();
-  return (
-    <div class={style.altArrow}>
-      <div style={{ opacity: atTop() ? "100%" : "0%" }}>
-        <ArrowDown class={style.arrow} size="2rem" />
-      </div>
-      <div style={{ opacity: !atTop() ? "100%" : "0%" }}>
-        <ArrowUp class={style.arrow} size="2rem" />
-      </div>
-    </div>
-  );
-};
 
 const Toolbar: Component<{
   infoRef: () => HTMLElement;
   selfId: string;
 }> = (props) => {
   const location = useLocation();
-
-  function scrollInfo() {
-    if (window.scrollY == 0) {
-      props.infoRef().scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
 
   return (
     <div class={style.toolbar}>
@@ -68,13 +43,6 @@ const Toolbar: Component<{
         <X size="2rem" />
       </a>
       <ArrowLeft size="2rem" id={style.prev} />
-      <button
-        class={style.photoInfoButton}
-        onClick={scrollInfo}
-        id={style.more}
-      >
-        <AltArrow />
-      </button>
 
       <ShareNetwork size="2rem" id={style.share} />
       <ArrowRight size="2rem" id={style.next} />
