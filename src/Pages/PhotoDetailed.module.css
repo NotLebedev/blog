@@ -81,16 +81,6 @@
   }
 }
 
-.altArrow {
-  display: inline-grid;
-
-  div {
-    grid-row: 1;
-    grid-column: 1;
-    transition: opacity 0.3s ease-in;
-  }
-}
-
 .hidden {
   opacity: 0;
 }
@@ -112,11 +102,6 @@
 
 .infoBlock {
   max-width: 80rem;
-}
-
-.tagInfoItem {
-  display: block;
-  margin-top: 0.3rem;
 }
 
 .tagLink {
