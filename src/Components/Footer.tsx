@@ -13,7 +13,11 @@ const Footer: Component = () => {
 
   return (
     <footer class={style.footer}>
-      <p>&copy;{copyrightYear}, @NotLebedev, All Rights Reserved</p>
+      <p>
+        &copy;{copyrightYear}, @NotLebedev
+        <br />
+        All Rights Reserved
+      </p>
     </footer>
   );
 };
