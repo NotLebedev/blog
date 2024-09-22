@@ -10,13 +10,14 @@ import {
   onCleanup,
   createEffect,
   createMemo,
+  untrack,
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
 import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
-import { useLocation, useSearchParams } from "@solidjs/router";
+import { SetParams, useLocation, useNavigate } from "@solidjs/router";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
@@ -133,7 +134,33 @@ const SearchBar: Component<{
   images: ImageInfo[];
   displayResults: (result: ImageInfo[]) => void;
 }> = (props) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useLocation().query;
+  const navigate = useNavigate();
+
+  /**
+   * Custom setSearchParams method of `useSearchParams` that
+   * strips the fragment identifier (aka hash) from url
+   * @see https://github.com/solidjs/solid-router/blob/24dbf2c80bc9c73e5bffae621a4634cc9f46fa51/src/routing.ts#L106
+   */
+  function setSearchParams(params: SetParams) {
+    untrack(() => {
+      const searchParams = new URLSearchParams(location.search);
+      Object.entries(params).forEach(([key, value]) => {
+        if (value == null || value === "") {
+          searchParams.delete(key);
+        } else {
+          searchParams.set(key, String(value));
+        }
+      });
+
+      const s = searchParams.toString();
+      navigate(s ? `?${s}` : "", {
+        resolve: true,
+        scroll: false,
+        replace: true,
+      });
+    });
+  }
 
   const fuzzy = new Fuzzy<ImageInfo>(
     (image) =>
