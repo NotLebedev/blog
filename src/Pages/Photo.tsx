@@ -88,6 +88,13 @@ const GridImage: Component<{
       class={style.gridItem}
       href={`/photo/${props.info.id}${location.search}`}
     >
+      {/* Fake element used to center image properly when
+          using fragment identifier. scroll-margin-top is calculated from top
+          of element and image will appear below center. This element is in 
+          center of image (and is zero height) so it is centered fine */}
+      <div class={style.fragmentIdentifier}>
+        <div id={props.info.id} />
+      </div>
       <div
         classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
       >
