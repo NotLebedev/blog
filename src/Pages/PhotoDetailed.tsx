@@ -46,6 +46,7 @@ const AltArrow: Component = () => {
 
 const Toolbar: Component<{
   infoRef: () => HTMLElement;
+  selfId: string;
 }> = (props) => {
   const location = useLocation();
 
@@ -62,7 +63,7 @@ const Toolbar: Component<{
       <a
         class={style.photoInfoButton}
         id={style.close}
-        href={`/photo${location.search}`}
+        href={`/photo${location.search}#${props.selfId}`}
       >
         <X size="2rem" />
       </a>
@@ -191,9 +192,9 @@ const PhotoDetailed: Component = () => {
               text={<Tags tags={info()!.imageInfo.tags} />}
             />
           </div>
+          <Toolbar infoRef={() => infoRef} selfId={info()!.imageInfo.id} />
         </Show>
       </Suspense>
-      <Toolbar infoRef={() => infoRef} />
     </div>
   );
 };
