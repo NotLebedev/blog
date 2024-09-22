@@ -28,7 +28,6 @@ import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 
 const Toolbar: Component<{
-  infoRef: () => HTMLElement;
   selfId: string;
 }> = (props) => {
   const location = useLocation();
@@ -86,8 +85,6 @@ const Spacing: Component<{ size: string }> = (props) => {
 const PhotoDetailed: Component = () => {
   const params = useParams();
 
-  let infoRef!: HTMLAnchorElement;
-
   const [info] = createResource(async () => {
     const imageInfo = (await getDB())?.images?.find((el) => el.id == params.id);
 
@@ -115,7 +112,12 @@ const PhotoDetailed: Component = () => {
 
   return (
     <div class={style.article}>
-      <div class={style.photoContainer}>
+      <div
+        style={{
+          "aspect-ratio": (info()?.imageInfo?.previewWidth ?? 512) / 512,
+        }}
+        class={style.photoTop}
+      >
         <div
           classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
         >
@@ -146,7 +148,6 @@ const PhotoDetailed: Component = () => {
             preview={new URL(info()!.previewURL, document.baseURI).href}
           />
           <div class={style.infoBlock}>
-            <a ref={infoRef} />
             <InfoItem icon={Spacing} text={info()!.imageInfo.name} />
             <InfoItem
               icon={ArticleNyTimes}
@@ -160,7 +161,7 @@ const PhotoDetailed: Component = () => {
               text={<Tags tags={info()!.imageInfo.tags} />}
             />
           </div>
-          <Toolbar infoRef={() => infoRef} selfId={info()!.imageInfo.id} />
+          <Toolbar selfId={info()!.imageInfo.id} />
         </Show>
       </Suspense>
     </div>
