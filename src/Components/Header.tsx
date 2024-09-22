@@ -1,55 +1,76 @@
-import { Component, onCleanup, onMount } from "solid-js";
-import { Books, Image, Question } from "phosphor-solid-js";
+import { Component, createSignal, onMount } from "solid-js";
+import { Books, Image, List, Question } from "phosphor-solid-js";
 import DualText from "./DualText";
 import styles from "./Header.module.css";
 
 const Header: Component = () => {
-  let wrapperRef!: HTMLElement;
+  const [showDropDown, setShowDropDown] = createSignal(false);
 
-  let lastScroll = 0;
-  function handleScroll() {
-    const currentScroll = window.scrollY;
-    const elementHeight = wrapperRef.clientHeight;
-    wrapperRef.style.top =
-      currentScroll > lastScroll ? `${-elementHeight}px` : "0";
-    lastScroll = currentScroll;
+  function hideDropDown() {
+    setShowDropDown(false);
   }
 
   onMount(() => {
-    document.addEventListener("scroll", handleScroll);
-  });
-
-  onCleanup(() => {
-    document.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", hideDropDown);
+    document.addEventListener("scroll", hideDropDown);
   });
 
   return (
-    <section ref={wrapperRef} class={styles.headerWrapper}>
-      <header class={styles.header}>
-        <a class={styles.name} href="/">
-          <DualText default="@NotLebedev" alt=" Artemiy" />
-        </a>
-        <nav class={styles.headerNav} role="navigation">
-          <ul>
-            <li>
-              <a href="/blog">
-                <Books size={32} />
-                <DualText default="Blog" alt="Read" />
-              </a>
-            </li>
-            <li>
-              <a href="/photo">
-                <Image size={32} />
-                <DualText default="Photo" alt="Watch" />
-              </a>
-            </li>
-            <li>
-              <a href="/about">
-                <Question size={32} />
-                <DualText default="About" alt="Learn" />
-              </a>
-            </li>
-          </ul>
+    <section class={styles.headerWrapper}>
+      <header>
+        <span class={styles.header}>
+          <a class={styles.name} href="/">
+            <DualText default="@NotLebedev" alt=" Artemiy" />
+          </a>
+          <div class={styles.altNav}>
+            <nav class={styles.headerNav} role="navigation">
+              <ul>
+                <li>
+                  <a class={styles.navLink} href="/blog">
+                    <Books size={32} />
+                    <DualText default="Blog" alt="Read" />
+                  </a>
+                </li>
+                <li>
+                  <a class={styles.navLink} href="/photo">
+                    <Image size={32} />
+                    <DualText default="Photo" alt="Watch" />
+                  </a>
+                </li>
+                <li>
+                  <a class={styles.navLink} href="/about">
+                    <Question size={32} />
+                    <DualText default="About" alt="Learn" />
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div class={styles.hamburgerMenu}>
+              <button onClick={() => setShowDropDown(!showDropDown())}>
+                <List size="32" />
+              </button>
+            </div>
+          </div>
+        </span>
+        <nav
+          classList={{ [styles.dropDown]: true, [styles.show]: showDropDown() }}
+          role="navigation"
+          onClick={() => setShowDropDown(false)}
+        >
+          <div>
+            <a class={styles.navLink} href="/blog">
+              <Books size={32} />
+              <DualText default="Blog" alt="Read" />
+            </a>
+            <a class={styles.navLink} href="/photo">
+              <Image size={32} />
+              <DualText default="Photo" alt="Watch" />
+            </a>
+            <a class={styles.navLink} href="/about">
+              <Question size={32} />
+              <DualText default="About" alt="Learn" />
+            </a>
+          </div>
         </nav>
       </header>
     </section>

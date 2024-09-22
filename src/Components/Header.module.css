@@ -1,11 +1,24 @@
 .headerWrapper {
   width: 100vw;
-  position: fixed;
+  position: absolute;
   background: #960018;
   z-index: 100;
+  box-shadow: 0 0.3rem 0.3rem rgba(0, 0, 0, 0.3);
 
   top: 0px;
   transition: top 0.3s;
+
+  .navLink {
+    color: white;
+    font-family: var(--monospace-font);
+    font-weight: bold;
+    font-style: normal;
+    text-decoration: none;
+    font-size: 1.5em;
+    transition: color 0.1s ease-in;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .header {
@@ -22,36 +35,79 @@
   justify-content: space-between;
   align-items: center;
   color: #fff;
+
+  a {
+    color: white;
+  }
+
+  .altNav {
+    display: grid;
+
+    .headerNav,
+    .hamburgerMenu {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    @media screen and (min-width: 50rem) {
+      .headerNav {
+        display: block;
+      }
+
+      .hamburgerMenu {
+        display: none;
+      }
+    }
+  }
+
+  .headerNav {
+    display: none;
+    overflow: hidden;
+
+    ul {
+      display: flex;
+      align-items: center;
+      li {
+        list-style: none;
+        margin-left: 1.5em;
+        &:first-of-type {
+          margin-left: 0px;
+        }
+      }
+    }
+  }
+
+  .hamburgerMenu {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    button {
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      outline: inherit;
+      cursor: pointer;
+    }
+  }
 }
 
-.header a {
-  color: white;
-}
+.dropDown {
+  max-height: 0;
+  transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+  overflow: hidden;
 
-.headerNav ul {
-  display: flex;
-  align-items: center;
-}
+  &.show {
+    max-height: 100vh;
+    transition: max-height 0.5s ease-in-out;
+  }
 
-.headerNav li {
-  list-style: none;
-  margin-left: 1.5em;
-}
-
-.headerNav li:first-of-type {
-  margin-left: 0px;
-}
-
-.headerNav a {
-  color: white;
-  font-family: var(--monospace-font);
-  font-weight: bold;
-  font-style: normal;
-  text-decoration: none;
-  font-size: 1.5em;
-  transition: color 0.1s ease-in;
-  display: flex;
-  align-items: center;
+  .navLink {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: var(--page-padding);
+  }
 }
 
 .name {

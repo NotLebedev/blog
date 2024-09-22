@@ -42,7 +42,7 @@
   --tag-unfocused-light: #282828;
 }
 
-@media screen and (min-width: 40rem) {
+@media screen and (min-width: 50rem) {
   :root {
     --page-padding: var(--page-padding-large);
   }
