@@ -106,6 +106,7 @@ const GridImage: Component<{
         src={getPreviewURL(props.info)}
         ref={imageRef}
         class={style.hidden}
+        loading="lazy"
         onLoad={() => {
           setShowLoading(false);
           displayLoading.cancel();
