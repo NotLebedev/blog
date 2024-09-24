@@ -114,7 +114,11 @@
 
 .infoBlock {
   margin-top: 2rem;
-  max-width: 80rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 3rem;
+  background-color: #222;
+  border-radius: 1rem;
 }
 
 .tagLink {

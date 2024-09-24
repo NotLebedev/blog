@@ -256,12 +256,14 @@ const ZoomableImage: Component<{
     container.style.height = "100vh";
     container.style.left = `${-container.getBoundingClientRect().left}px`;
     container.style.top = `${-container.getBoundingClientRect().top}px`;
+    image.style.borderRadius = "0";
 
     container.ontransitionend = () => {
       container.style.width = "";
       container.style.height = "";
       container.style.left = "";
       container.style.top = "";
+      image.style.borderRadius = "";
 
       container.ontransitionend = null;
 
@@ -279,6 +281,7 @@ const ZoomableImage: Component<{
     container.style.height = `${wrapper.getBoundingClientRect().height}px`;
     container.style.left = `${wrapper.getBoundingClientRect().left}px`;
     container.style.top = `${wrapper.getBoundingClientRect().top}px`;
+    image.style.borderRadius = "1rem";
 
     enabled = false;
 
@@ -290,6 +293,7 @@ const ZoomableImage: Component<{
       container.style.height = "";
       container.style.left = "";
       container.style.top = "";
+      image.style.borderRadius = "";
 
       container.ontransitionend = null;
     };

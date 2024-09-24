@@ -1,8 +1,4 @@
 .grid {
-  /* Override padding around main */
-  margin-left: calc(0px - var(--page-padding));
-  margin-right: calc(0px - var(--page-padding));
-
   &.hidden img,
   &.hidden a.gridItem,
   img.hidden,
@@ -21,14 +17,14 @@
   display: table-cell;
   vertical-align: top;
   position: relative;
-  --grid-paddings: 0.2rem;
+  --grid-paddings: 0.5rem;
   padding-left: var(--grid-paddings);
   padding-top: var(--grid-paddings);
 
   transition: opacity 0.3s ease-in-out;
 
-  &:last-child {
-    padding-right: var(--grid-paddings);
+  &:first-child {
+    padding-left: 0;
   }
 
   > img {
@@ -36,6 +32,7 @@
     height: auto;
     display: block;
     transition: opacity 0.3s ease-in-out;
+    border-radius: 1rem;
   }
 
   > div.loading {
@@ -92,12 +89,12 @@
 
 .overlay {
   position: absolute;
-  top: 0;
+  top: var(--grid-paddings);
   background: rgba(0.3, 0.3, 0.3, 0);
-  width: 100%;
+  width: calc(100% - var(--grid-paddings));
+  box-sizing: border-box;
   height: auto;
-  padding-top: calc(var(--grid-paddings) + 0.5rem);
-  padding-left: var(--grid-paddings);
+  padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   display: flex;
   flex-direction: row;
@@ -117,8 +114,13 @@
     text-overflow: ellipsis;
   }
 
+  /* First .gridItem in each row has no padding-left */
+  :first-child > & {
+    width: 100%;
+  }
+
   svg {
-    padding-right: 1rem;
+    margin-right: 1rem;
     color: white;
   }
 }

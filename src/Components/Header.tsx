@@ -24,26 +24,18 @@ const Header: Component = () => {
           </a>
           <div class={styles.altNav}>
             <nav class={styles.headerNav} role="navigation">
-              <ul>
-                <li>
-                  <a class={styles.navLink} href="/blog">
-                    <Books size={32} />
-                    <DualText default="Blog" alt="Read" />
-                  </a>
-                </li>
-                <li>
-                  <a class={styles.navLink} href="/photo">
-                    <Image size={32} />
-                    <DualText default="Photo" alt="Watch" />
-                  </a>
-                </li>
-                <li>
-                  <a class={styles.navLink} href="/about">
-                    <Question size={32} />
-                    <DualText default="About" alt="Learn" />
-                  </a>
-                </li>
-              </ul>
+              <a class={styles.navLink} href="/blog">
+                <Books size={32} />
+                <DualText default="Blog" alt="Read" />
+              </a>
+              <a class={styles.navLink} href="/photo">
+                <Image size={32} />
+                <DualText default="Photo" alt="Watch" />
+              </a>
+              <a class={styles.navLink} href="/about">
+                <Question size={32} />
+                <DualText default="About" alt="Learn" />
+              </a>
             </nav>
             <div class={styles.hamburgerMenu}>
               <button onClick={() => setShowDropDown(!showDropDown())}>
@@ -57,20 +49,18 @@ const Header: Component = () => {
           role="navigation"
           onClick={() => setShowDropDown(false)}
         >
-          <div>
-            <a class={styles.navLink} href="/blog">
-              <Books size={32} />
-              <DualText default="Blog" alt="Read" />
-            </a>
-            <a class={styles.navLink} href="/photo">
-              <Image size={32} />
-              <DualText default="Photo" alt="Watch" />
-            </a>
-            <a class={styles.navLink} href="/about">
-              <Question size={32} />
-              <DualText default="About" alt="Learn" />
-            </a>
-          </div>
+          <a class={styles.navLink} href="/blog">
+            <Books size={32} />
+            <DualText default="Blog" alt="Read" />
+          </a>
+          <a class={styles.navLink} href="/photo">
+            <Image size={32} />
+            <DualText default="Photo" alt="Watch" />
+          </a>
+          <a class={styles.navLink} href="/about">
+            <Question size={32} />
+            <DualText default="About" alt="Learn" />
+          </a>
         </nav>
       </header>
     </section>
