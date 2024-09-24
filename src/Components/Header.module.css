@@ -1,6 +1,18 @@
 .headerWrapper {
-  width: 100vw;
-  position: absolute;
+  transition:
+    margin-left 0.5s,
+    margin-right 0.5s;
+  width: calc(100vw - 2 * var(--page-padding));
+  box-sizing: border-box;
+  margin-left: var(--page-padding);
+  margin-right: var(--page-padding);
+  margin-top: var(--page-padding-small);
+
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 1rem;
   background: #960018;
   z-index: 100;
   box-shadow: 0 0.3rem 0.3rem rgba(0, 0, 0, 0.3);
@@ -22,14 +34,8 @@
 }
 
 .header {
-  padding-left: var(--page-padding);
-  padding-right: var(--page-padding);
-  transition:
-    padding-left 0.5s,
-    padding-right 0.5s;
   margin-left: auto;
   margin-right: auto;
-  height: var(--header-height);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -43,15 +49,18 @@
   .altNav {
     display: grid;
 
+    /* Position both elements in the same place */
     .headerNav,
     .hamburgerMenu {
       grid-row: 1;
       grid-column: 1;
     }
 
+    /* On wide screens disable hamburger menu and show
+       all nav menu buttons in header */
     @media screen and (min-width: 50rem) {
       .headerNav {
-        display: block;
+        display: flex;
       }
 
       .hamburgerMenu {
@@ -64,15 +73,12 @@
     display: none;
     overflow: hidden;
 
-    ul {
-      display: flex;
-      align-items: center;
-      li {
-        list-style: none;
-        margin-left: 1.5em;
-        &:first-of-type {
-          margin-left: 0px;
-        }
+    align-items: center;
+    a {
+      list-style: none;
+      margin-left: 1.5em;
+      &:first-of-type {
+        margin-left: 0px;
       }
     }
   }
@@ -106,7 +112,6 @@
   .navLink {
     margin-top: 1rem;
     margin-bottom: 1rem;
-    padding-left: var(--page-padding);
   }
 }
 

@@ -41,12 +41,9 @@ const Page: Component<{
     <MetaProvider>
       <pageContext.Provider value={{ atTop: atTop }}>
         <div class={styles.App}>
-          <Show when={props.withHeader}>
-            <Header />
-          </Show>
           <div class={styles.positionDetector} ref={topDetector} />
           <Show when={props.withHeader}>
-            <div class={styles.headerReservedSpace} />
+            <Header />
           </Show>
           <main class={styles.content}>
             {props.children}
