@@ -1,23 +1,30 @@
 import { Meta, Title } from "@solidjs/meta";
-import { Component, Match, Show, Switch } from "solid-js";
+import { useLocation } from "@solidjs/router";
+import { Component, Show } from "solid-js";
 
 const Metas: Component<{ title?: string; preview?: string }> = (props) => {
   const titlePrefix = "@NotLebedev";
+
+  const url = useLocation().pathname;
+  const title = () =>
+    titlePrefix + (props.title !== undefined ? "|" + props.title : "");
+
   return (
     <>
-      <Switch>
-        <Match when={props.title !== undefined}>
-          <Title>{titlePrefix + " | " + props.title}</Title>
-          <Meta property="og:title" content={titlePrefix + "|" + props.title} />
-        </Match>
-        <Match when={true}>
-          <Title>{titlePrefix}</Title>
-          <Meta property="og:title" content={titlePrefix} />
-        </Match>
-      </Switch>
+      <Title>{title()}</Title>
+      <Meta property="og:title" content={title()} />
+      <Meta property="twitter:title" content={title()} />
+
       <Show when={props.preview !== undefined}>
         <Meta property="og:image" content={props.preview} />
+        <Meta property="twiter:image" content={props.preview} />
+        <Meta name="twitter:card" content="summary_large_image" />
       </Show>
+
+      <Meta property="og:type" content="website" />
+
+      <Meta property="og:url" content={url} />
+      <Meta property="twitter:url" content={url} />
     </>
   );
 };
