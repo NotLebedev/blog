@@ -14,7 +14,7 @@ import {
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
-import { ArrowUpRight, CheckCircle } from "phosphor-solid-js";
+import { ArrowUpRight, CaretCircleDown, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { SetParams, useLocation, useNavigate } from "@solidjs/router";
@@ -136,6 +136,7 @@ const SearchBar: Component<{
 }> = (props) => {
   const searchParams = useLocation().query;
   const navigate = useNavigate();
+  const [expand, setExpand] = createSignal(false);
 
   /**
    * Custom setSearchParams method of `useSearchParams` that
@@ -207,15 +208,24 @@ const SearchBar: Component<{
   }
 
   return (
-    <span class={style.searchBox}>
-      <input
-        type="text"
-        class={style.searchInput}
-        placeholder="Search..."
-        value={searchParams.search ?? ""}
-        onInput={(event) => setSearchParams({ search: event.target.value })}
-      />
-      <ul class={style.tagsList}>
+    <div class={style.searchBox}>
+      <span class={style.alwaysShow}>
+        <input
+          type="text"
+          class={style.searchInput}
+          placeholder="Search..."
+          value={searchParams.search ?? ""}
+          onInput={(event) => setSearchParams({ search: event.target.value })}
+        />
+        <button
+          classList={{ [style.foldButton]: true, [style.expand]: expand() }}
+          onClick={() => setExpand(!expand())}
+        >
+          <CaretCircleDown size="1.5rem" />
+        </button>
+      </span>
+
+      <ul classList={{ [style.tagsList]: true, [style.expand]: expand() }}>
         <For each={[...new Set(props.images.flatMap((image) => image.tags))]}>
           {(tag) => (
             <li class={style.tagInList}>
@@ -235,7 +245,7 @@ const SearchBar: Component<{
           )}
         </For>
       </ul>
-    </span>
+    </div>
   );
 };
 
