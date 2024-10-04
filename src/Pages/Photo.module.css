@@ -126,9 +126,22 @@
 }
 
 .searchBox {
-  display: block;
+  display: flex;
+  flex-direction: column;
   margin-top: 0.6rem;
   margin-bottom: 0.5rem;
+
+  padding: 1rem;
+  width: 100%;
+  background-color: #222;
+  border-radius: 1rem;
+  box-sizing: border-box;
+
+  .alwaysShow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 
 .searchInput {
@@ -152,11 +165,44 @@
   }
 }
 
+.foldButton {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  outline: inherit;
+  cursor: pointer;
+
+  > svg {
+    rotate: 0deg;
+    transition: rotate 0.5s cubic-bezier(0, 1, 0, 1);
+
+    /* Center svg inside button */
+    height: 100%;
+  }
+
+  &.expand > svg {
+    rotate: 180deg;
+    transition: rotate 0.5s ease-in-out;
+  }
+}
+
 .tagsList {
   display: inline;
+  overflow: hidden;
 
   padding-left: 0;
-  margin-left: 1rem;
+  margin-top: 0rem;
+  margin-bottom: 0;
+
+  max-height: 0;
+  transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+
+  &.expand {
+    max-height: 100vh;
+    transition: max-height 0.5s ease-in-out;
+  }
 }
 
 .tagInList {
