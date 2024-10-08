@@ -41,10 +41,11 @@ const Toolbar: Component<{
       >
         <X size="2rem" />
       </a>
+
       <ArrowLeft size="2rem" id={style.prev} />
+      <ArrowRight size="2rem" id={style.next} />
 
       <ShareNetwork size="2rem" id={style.share} />
-      <ArrowRight size="2rem" id={style.next} />
     </div>
   );
 };
@@ -112,6 +113,7 @@ const PhotoDetailed: Component = () => {
 
   return (
     <div class={style.article}>
+      <Toolbar selfId={params.id} />
       <div
         style={{
           "aspect-ratio": (info()?.imageInfo?.previewWidth ?? 512) / 512,
@@ -161,7 +163,6 @@ const PhotoDetailed: Component = () => {
               text={<Tags tags={info()!.imageInfo.tags} />}
             />
           </div>
-          <Toolbar selfId={info()!.imageInfo.id} />
         </Show>
       </Suspense>
     </div>
