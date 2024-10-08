@@ -208,7 +208,12 @@ const SearchBar: Component<{
   }
 
   return (
-    <div class={style.searchBox}>
+    <div
+      classList={{ [style.searchBox]: true, [style.expand]: expand() }}
+      onClick={() => {
+        setExpand(!expand());
+      }}
+    >
       <span class={style.alwaysShow}>
         <input
           type="text"
@@ -216,13 +221,14 @@ const SearchBar: Component<{
           placeholder="Search..."
           value={searchParams.search ?? ""}
           onInput={(event) => setSearchParams({ search: event.target.value })}
+          onClick={(ev) => {
+            setExpand(true);
+            ev.stopPropagation();
+          }}
         />
-        <button
-          classList={{ [style.foldButton]: true, [style.expand]: expand() }}
-          onClick={() => setExpand(!expand())}
-        >
+        <div classList={{ [style.foldButton]: true, [style.expand]: expand() }}>
           <CaretCircleDown size="1.5rem" />
-        </button>
+        </div>
       </span>
 
       <ul classList={{ [style.tagsList]: true, [style.expand]: expand() }}>
