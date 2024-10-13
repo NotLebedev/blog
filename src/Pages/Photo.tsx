@@ -22,6 +22,7 @@ import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
+import createDropDown from "../Util/DropDown";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -136,7 +137,8 @@ const SearchBar: Component<{
 }> = (props) => {
   const searchParams = useLocation().query;
   const navigate = useNavigate();
-  const [expand, setExpand] = createSignal(false);
+  const [collapsible, setCollapsible] = createSignal<HTMLUListElement>();
+  const [expand, setExpand] = createDropDown(collapsible);
 
   /**
    * Custom setSearchParams method of `useSearchParams` that
@@ -209,7 +211,7 @@ const SearchBar: Component<{
 
   return (
     <div
-      classList={{ [style.searchBox]: true, [style.expand]: expand() }}
+      class={style.searchBox}
       onClick={() => {
         setExpand(!expand());
       }}
@@ -231,7 +233,7 @@ const SearchBar: Component<{
         </div>
       </span>
 
-      <ul classList={{ [style.tagsList]: true, [style.expand]: expand() }}>
+      <ul class={style.tagsList} ref={setCollapsible}>
         <For each={[...new Set(props.images.flatMap((image) => image.tags))]}>
           {(tag) => (
             <li class={style.tagInList}>

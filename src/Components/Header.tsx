@@ -2,9 +2,11 @@ import { Component, createSignal, onMount } from "solid-js";
 import { Books, Image, List, Question } from "phosphor-solid-js";
 import DualText from "./DualText";
 import styles from "./Header.module.css";
+import createDropDown from "../Util/DropDown";
 
 const Header: Component = () => {
-  const [showDropDown, setShowDropDown] = createSignal(false);
+  const [navList, setNavList] = createSignal<HTMLElement>();
+  const [showDropDown, setShowDropDown] = createDropDown(navList);
 
   function hideDropDown() {
     setShowDropDown(false);
@@ -45,7 +47,8 @@ const Header: Component = () => {
           </div>
         </span>
         <nav
-          classList={{ [styles.dropDown]: true, [styles.show]: showDropDown() }}
+          classList={{ [styles.dropDown]: true }}
+          ref={setNavList}
           role="navigation"
           onClick={() => setShowDropDown(false)}
         >
