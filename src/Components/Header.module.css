@@ -2,7 +2,6 @@
   transition:
     margin-left 0.5s,
     margin-right 0.5s;
-  width: calc(100vw - 2 * var(--page-padding));
   box-sizing: border-box;
   margin-left: var(--page-padding);
   margin-right: var(--page-padding);
@@ -101,17 +100,11 @@
 
 .dropDown {
   max-height: 0;
-  transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+  transition: max-height 0.3s ease-in-out;
   overflow: hidden;
-
-  &.show {
-    max-height: 100vh;
-    transition: max-height 0.5s ease-in-out;
-  }
 
   .navLink {
     margin-top: 1rem;
-    margin-bottom: 1rem;
   }
 }
 
