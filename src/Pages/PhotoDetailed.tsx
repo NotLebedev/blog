@@ -3,7 +3,6 @@ import {
   createResource,
   Show,
   Suspense,
-  JSX,
   For,
   createSignal,
   onMount,
@@ -50,9 +49,9 @@ const Toolbar: Component<{
   );
 };
 
-const Tags: Component<{ tags?: string[] }> = (props) => {
+const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
   return (
-    <span>
+    <p class={props.class}>
       <For each={props.tags} fallback={<></>}>
         {(item) => (
           <a class={style.tagLink} href={`/photo?tags=${item}`}>
@@ -60,27 +59,8 @@ const Tags: Component<{ tags?: string[] }> = (props) => {
           </a>
         )}
       </For>
-    </span>
+    </p>
   );
-};
-
-const InfoItem: Component<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: (props: any, ref: any) => JSX.Element;
-  text: string | JSX.Element | undefined;
-}> = (props) => {
-  return (
-    <Show when={props.text}>
-      <span class={style.photoInfo}>
-        <props.icon size="1.5rem" />
-        <p>{props.text}</p>
-      </span>
-    </Show>
-  );
-};
-
-const Spacing: Component<{ size: string }> = (props) => {
-  return <span style={{ width: props.size }} />;
 };
 
 const PhotoDetailed: Component = () => {
@@ -150,18 +130,29 @@ const PhotoDetailed: Component = () => {
             preview={new URL(info()!.previewURL, document.baseURI).href}
           />
           <div class={style.infoBlock}>
-            <InfoItem icon={Spacing} text={info()!.imageInfo.name} />
-            <InfoItem
-              icon={ArticleNyTimes}
-              text={info()!.imageInfo.description}
-            />
-            <InfoItem icon={Camera} text={info()!.imageInfo.camera} />
-            <InfoItem icon={Aperture} text={info()!.imageInfo?.lens} />
-            <InfoItem icon={FilmStrip} text={info()!.imageInfo.flim} />
-            <InfoItem
-              icon={Spacing}
-              text={<Tags tags={info()!.imageInfo.tags} />}
-            />
+            <h2 class={style.text}>{info()!.imageInfo.name}</h2>
+
+            <Show when={info()!.imageInfo.description !== undefined}>
+              <ArticleNyTimes class={style.icon} />
+              <p class={style.text}>{info()!.imageInfo.description}</p>
+            </Show>
+
+            <Show when={info()!.imageInfo.camera !== undefined}>
+              <Camera class={style.icon} />
+              <p class={style.text}>{info()!.imageInfo.camera}</p>
+            </Show>
+
+            <Show when={info()!.imageInfo.lens !== undefined}>
+              <Aperture class={style.icon} />
+              <p class={style.text}>{info()!.imageInfo?.lens}</p>
+            </Show>
+
+            <Show when={info()!.imageInfo.flim !== undefined}>
+              <FilmStrip class={style.icon} />
+              <p class={style.text}>{info()!.imageInfo.flim}</p>
+            </Show>
+
+            <Tags class={style.text} tags={info()!.imageInfo.tags} />
           </div>
         </Show>
       </Suspense>
