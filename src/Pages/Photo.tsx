@@ -140,6 +140,8 @@ const SearchBar: Component<{
   const [collapsible, setCollapsible] = createSignal<HTMLUListElement>();
   const [expand, setExpand] = createDropDown(collapsible);
 
+  setExpand(searchParams.tags !== undefined && searchParams.tags !== "");
+
   /**
    * Custom setSearchParams method of `useSearchParams` that
    * strips the fragment identifier (aka hash) from url
