@@ -14,11 +14,20 @@ def make_preview(original: Image) -> Image:
 
 
 def make_image(original: Image) -> Image:
-    LANDSCAPE_SIZE: Final[tuple[int, int]] = (1920, 1080)
-    PORTRAIT_SIZE: Final[tuple[int, int]] = (1080, 1920)
+    WIDE_SIZE_PREFFERED: Final[int] = 2560
+    NARROW_SIZE_PREFFERED: Final[int] = 1440
 
-    minimal_size = LANDSCAPE_SIZE if original.width > original.height else PORTRAIT_SIZE
-    return ImageOps.cover(original, minimal_size, method=Resampling.LANCZOS)
+    minimal_size = (
+        (WIDE_SIZE_PREFFERED, NARROW_SIZE_PREFFERED)
+        if original.width > original.height
+        else (NARROW_SIZE_PREFFERED, WIDE_SIZE_PREFFERED)
+    )
+
+    if original.width <= minimal_size[0] or original.height <= minimal_size[1]:
+        # Don't upscale small images
+        return original.copy()
+    else:
+        return ImageOps.cover(original, minimal_size, method=Resampling.LANCZOS)
 
 
 def create_resized(dir: Path, original_file: Path) -> int:
