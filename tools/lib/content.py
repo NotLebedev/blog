@@ -124,14 +124,14 @@ def add_image(image: Path, id: str, content_root: Path):
     images = [
         parse_image_dir_name(Path(img))
         for img in os.listdir(Path(content_root).joinpath("images"))
+        if Path(content_root, "images", img).is_dir()
     ]
 
-    next_idx = max((tup[0] for tup in images), default=0) + 1
+    next_idx = max((tup[0] for tup in images), default=-1) + 1
 
     if tup := next((tup for tup in images if tup[1] == id), None):
         # Images already exists, use existing idx
         next_idx = tup[0]
-    print(next_idx)
 
     image_dir = Path(content_root, "images", f"{next_idx:04d}-{id}")
     create_resized(image_dir, image)
