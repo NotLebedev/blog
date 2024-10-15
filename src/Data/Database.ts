@@ -6,7 +6,7 @@ type ImageInfo = {
   description?: string;
   camera?: string;
   lens?: string;
-  flim?: string;
+  film?: string;
   tags: string[];
 };
 

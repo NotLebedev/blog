@@ -147,9 +147,9 @@ const PhotoDetailed: Component = () => {
               <p class={style.text}>{info()!.imageInfo?.lens}</p>
             </Show>
 
-            <Show when={info()!.imageInfo.flim !== undefined}>
+            <Show when={info()!.imageInfo.film !== undefined}>
               <FilmStrip class={style.icon} />
-              <p class={style.text}>{info()!.imageInfo.flim}</p>
+              <p class={style.text}>{info()!.imageInfo.film}</p>
             </Show>
 
             <Tags class={style.text} tags={info()!.imageInfo.tags} />
