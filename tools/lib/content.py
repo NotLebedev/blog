@@ -120,6 +120,25 @@ def make_database(content_root: Path, result_root: Path) -> None:
     copy_images(content_root, result_root)
 
 
+INFO_YAML_DEFAULT: Final[str] = """# yaml-language-server: $schema=../.schema.yaml
+
+name:
+description:
+camera:
+lens:
+tags: []
+"""
+
+
+def touch_info(image_dir: Path):
+    info = image_dir.joinpath("info.yaml")
+    if info.exists():
+        return
+
+    with open(info, "w") as file:
+        file.write(INFO_YAML_DEFAULT)
+
+
 def add_image(image: Path, id: str, content_root: Path):
     images = [
         parse_image_dir_name(Path(img))
@@ -135,4 +154,4 @@ def add_image(image: Path, id: str, content_root: Path):
 
     image_dir = Path(content_root, "images", f"{next_idx:04d}-{id}")
     create_resized(image_dir, image)
-    image_dir.joinpath("info.yaml").touch()
+    touch_info(image_dir)
