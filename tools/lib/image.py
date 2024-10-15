@@ -37,8 +37,8 @@ def create_resized(dir: Path, original_file: Path) -> int:
 
         dir.mkdir(parents=True, exist_ok=True)
 
-        preview.save(dir.joinpath("preview.jpg"))
-        image.save(dir.joinpath("image.jpg"))
+        preview.save(dir.joinpath("preview.jpg"), optimize=True, progressive=True)
+        image.save(dir.joinpath("image.jpg"), optimize=True, progressive=True)
 
         return preview.width
 
