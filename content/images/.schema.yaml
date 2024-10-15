@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=http://json-schema.org/draft-07/schema#
+%YAML 1.1
+---
+$schema: http://json-schema.org/draft-07/schema#
+id: photo-info-schema
+title:
+    info.yaml schema
+description: |
+    Schema for individual info.yaml description for individual photos
+type: object
+required:
+    - name
+    - tags
+properties:
+    name: 
+        type: string
+    tags:
+        type: array
+        items:
+            type: string
+    description: 
+        type: string
+    camera: 
+        type: string
+    lens: 
+        type: string
+    film:
+        type: string
+    
