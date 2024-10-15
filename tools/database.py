@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import traceback
 from pathlib import Path
 from typing import Annotated, Final
 
@@ -35,8 +36,9 @@ def build(
     """
     try:
         make_database(Path(content_root).resolve(), Path(database_root).resolve())
-    except Exception as e:
-        print(f"Problem occurred when creating database: {e}")
+    except Exception:
+        traceback.print_exc()
+        print("Problem occurred when creating database")
         exit(1)
 
 
@@ -53,8 +55,9 @@ def image_add(
     """
     try:
         add_image(Path(image).resolve(), id, Path(content_root).resolve())
-    except Exception as e:
-        print(f"Problem occurred when adding image {e}")
+    except Exception:
+        traceback.print_exc()
+        print("Problem occurred when adding image")
         exit(1)
 
 
@@ -74,8 +77,9 @@ def image_tags(
 
         for tag in tags:
             print(tag)
-    except Exception as e:
-        print(f"Problem occurred when reading tags {e}")
+    except Exception:
+        traceback.print_exc()
+        print("Problem occurred when reading tags")
         exit(1)
 
 
