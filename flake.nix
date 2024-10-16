@@ -9,35 +9,61 @@
   };
 
   outputs =
-    { flake-utils, nixpkgs, ... }:
+    {
+      self,
+      flake-utils,
+      nixpkgs,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+        nativeBuildInputs = with pkgs; [
+          nodejs
+          nodePackages.typescript
+          nodePackages.typescript-language-server
+
+          (python312.withPackages (
+            python-pkgs: with python-pkgs; [
+              pydantic
+              typer
+              pillow
+              pyyaml
+              pytest
+
+              types-pyyaml
+              types-pillow
+            ]
+          ))
+
+          mypy
+          ruff
+        ];
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            nodejs
-            nodePackages.typescript
-            nodePackages.typescript-language-server
+          inherit nativeBuildInputs;
+        };
 
-            (python312.withPackages (
-              python-pkgs: with python-pkgs; [
-                pydantic
-                typer
-                pillow
-                pyyaml
-                pytest
+        packages.default = pkgs.buildNpmPackage {
+          name = "blog";
 
-                types-pyyaml
-                types-pillow
-              ]
-            ))
+          src = self;
+          npmDepsHash = "sha256-8FQeFkDSgbbZmczGIAjMP5u/lPLd87olvWb8DV0YvOA=";
 
-            mypy
-            ruff
-          ];
+          buildPhase = ''
+            npm run build
+            python3 tools/database.py build
+          '';
+
+          installPhase = ''
+            mkdir $out
+            cp -r dist/* $out
+            cp netlify.toml $out
+          '';
+
+          inherit nativeBuildInputs;
         };
       }
     );
