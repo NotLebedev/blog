@@ -11,6 +11,7 @@ import {
   createEffect,
   createMemo,
   untrack,
+  Show,
 } from "solid-js";
 import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
@@ -97,11 +98,11 @@ const GridImage: Component<{
       <div class={style.fragmentIdentifier}>
         <div id={props.info.id} />
       </div>
-      <div
-        classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
-      >
-        <Loading />
-      </div>
+      <Show when={showLoading()}>
+        <div class={style.loading}>
+          <Loading />
+        </div>
+      </Show>
       <img
         width={props.info.previewWidth}
         height={512}
@@ -173,7 +174,7 @@ const SearchBar: Component<{
       " " +
       image.description +
       " " +
-      image.tags.reduce((prev, curr) => prev + " " + curr, ""),
+      image.tags.reduce((prev, curr) => prev + " " + curr, "")
   );
   const tags = new Tags<ImageInfo>((image) => image.tags);
   const search = createMemo(() => new Filters(props.images, fuzzy, tags));
@@ -289,7 +290,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
           default:
             return false;
         }
-      }),
+      })
     );
   }
 

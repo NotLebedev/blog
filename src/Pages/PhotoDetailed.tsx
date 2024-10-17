@@ -100,11 +100,11 @@ const PhotoDetailed: Component = () => {
         }}
         class={style.photoTop}
       >
-        <div
-          classList={{ [style.loading]: true, [style.hidden]: !showLoading() }}
-        >
-          <Loading />
-        </div>
+        <Show when={showLoading()}>
+          <div class={style.loading}>
+            <Loading />
+          </div>
+        </Show>
         <Show when={info.state == "ready"}>
           <ZoomableImage
             src={info()!.imageURL}
