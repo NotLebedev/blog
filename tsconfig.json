@@ -13,5 +13,10 @@
     ],
     "noEmit": true,
     "isolatedModules": true,
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
   },
 }
