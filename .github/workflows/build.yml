@@ -14,11 +14,14 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v27
       - name: Build
-        run: nix build
+        run: |
+          nix build
+          mkdir site
+          cp -r result/* site
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: './result'
+          publish-dir: './site'
           production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
