@@ -50,7 +50,7 @@
           name = "blog";
 
           src = self;
-          npmDepsHash = "sha256-8FQeFkDSgbbZmczGIAjMP5u/lPLd87olvWb8DV0YvOA=";
+          npmDepsHash = "sha256-wiuVKRqAfp5xB5OXMri5OC/Vz6oyw5n5rEhBt71vT00=";
 
           buildPhase = ''
             npm run build
