@@ -10,11 +10,19 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v18
       - name: Build
-        run: nix build
+        run: |
+          nix build
+          mkdir site
+          cp -r result/* site
+      - name: Check
+        run: |
+          ls -la .
+          ls -la result/
+          ls -la site/
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: './result'
+          publish-dir: './site'
           production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
