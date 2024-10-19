@@ -3,7 +3,7 @@
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   "python.languageServer": "Default",
   "python.analysis.typeCheckingMode": "strict",
   "python.analysis.autoImportCompletions": true,
