@@ -38,6 +38,7 @@
   "conventionalCommits.scopes": [
     "front",
     "tools",
-    "dev"
+    "dev",
+    "ci"
   ]
 }
