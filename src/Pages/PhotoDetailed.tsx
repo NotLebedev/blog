@@ -25,6 +25,7 @@ import {
 import Metas from "../Components/Metas";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
+import Card from "../Components/Card";
 
 const Toolbar: Component<{
   selfId: string;
@@ -129,7 +130,7 @@ const PhotoDetailed: Component = () => {
             title={info()!.imageInfo.name}
             preview={new URL(info()!.previewURL, document.baseURI).href}
           />
-          <div class={style.infoBlock}>
+          <Card classList={{ [style.infoBlock]: true }}>
             <h2 class={style.text}>{info()!.imageInfo.name}</h2>
 
             <Show when={info()!.imageInfo.description !== undefined}>
@@ -153,7 +154,7 @@ const PhotoDetailed: Component = () => {
             </Show>
 
             <Tags class={style.text} tags={info()!.imageInfo.tags} />
-          </div>
+          </Card>
         </Show>
       </Suspense>
     </div>
