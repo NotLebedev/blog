@@ -65,6 +65,53 @@
 
           inherit nativeBuildInputs;
         };
+
+        checks =
+          let
+            common = {
+              src = self;
+              buildPhase = "";
+              doCheck = true;
+              dontBuild = true;
+              installPhase = "mkdir $out";
+              inherit nativeBuildInputs;
+            };
+            mkArgs = args: (args // common);
+          in
+          {
+            eslint = pkgs.buildNpmPackage (mkArgs {
+              name = "eslint-check";
+              npmDepsHash = "sha256-wiuVKRqAfp5xB5OXMri5OC/Vz6oyw5n5rEhBt71vT00=";
+
+              checkPhase = ''
+                npx eslint src
+              '';
+            });
+
+            mypy = pkgs.stdenvNoCC.mkDerivation (mkArgs {
+              name = "mypy-check";
+
+              checkPhase = ''
+                mypy tools
+              '';
+            });
+
+            ruff = pkgs.stdenvNoCC.mkDerivation (mkArgs {
+              name = "mypy-check";
+
+              checkPhase = ''
+                ruff check tools
+              '';
+            });
+
+            ruff-format = pkgs.stdenvNoCC.mkDerivation (mkArgs {
+              name = "mypy-check";
+
+              checkPhase = ''
+                ruff format --diff tools
+              '';
+            });
+          };
       }
     );
 
