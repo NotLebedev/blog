@@ -24,6 +24,7 @@ import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
 import createDropDown from "../Util/DropDown";
+import Card from "../Components/Card";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -213,8 +214,9 @@ const SearchBar: Component<{
   }
 
   return (
-    <div
-      class={style.searchBox}
+    <Card
+      classList={{ [style.searchBox]: true }}
+      narrow={true}
       onClick={() => {
         setExpand(!expand());
       }}
@@ -256,7 +258,7 @@ const SearchBar: Component<{
           )}
         </For>
       </ul>
-    </div>
+    </Card>
   );
 };
 

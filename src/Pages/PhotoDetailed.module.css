@@ -124,9 +124,6 @@
   margin-top: 2rem;
   width: 100%;
   box-sizing: border-box;
-  padding: 2rem;
-  background-color: #222;
-  border-radius: 1rem;
 
   display: grid;
   grid-template-columns: 2.5rem auto;

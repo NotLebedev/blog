@@ -1,8 +1,9 @@
 import { Component, createSignal, onMount } from "solid-js";
 import { Books, Image, List, Question } from "phosphor-solid-js";
 import DualText from "./DualText";
-import styles from "./Header.module.css";
+import style from "./Header.module.css";
 import createDropDown from "../Util/DropDown";
+import Card from "./Card";
 
 const Header: Component = () => {
   const [navList, setNavList] = createSignal<HTMLElement>();
@@ -18,28 +19,28 @@ const Header: Component = () => {
   });
 
   return (
-    <section class={styles.headerWrapper}>
+    <Card classList={{ [style.headerWrapper]: true }} narrow={true}>
       <header>
-        <span class={styles.header}>
-          <a class={styles.name} href="/">
+        <span class={style.header}>
+          <a class={style.name} href="/">
             <DualText default="@NotLebedev" alt=" Artemiy" />
           </a>
-          <div class={styles.altNav}>
-            <nav class={styles.headerNav} role="navigation">
-              <a class={styles.navLink} href="/blog">
+          <div class={style.altNav}>
+            <nav class={style.headerNav} role="navigation">
+              <a class={style.navLink} href="/blog">
                 <Books size={32} />
                 <DualText default="Blog" alt="Read" />
               </a>
-              <a class={styles.navLink} href="/photo">
+              <a class={style.navLink} href="/photo">
                 <Image size={32} />
                 <DualText default="Photo" alt="Watch" />
               </a>
-              <a class={styles.navLink} href="/about">
+              <a class={style.navLink} href="/about">
                 <Question size={32} />
                 <DualText default="About" alt="Learn" />
               </a>
             </nav>
-            <div class={styles.hamburgerMenu}>
+            <div class={style.hamburgerMenu}>
               <button onClick={() => setShowDropDown(!showDropDown())}>
                 <List size="32" />
               </button>
@@ -47,26 +48,26 @@ const Header: Component = () => {
           </div>
         </span>
         <nav
-          classList={{ [styles.dropDown]: true }}
+          classList={{ [style.dropDown]: true }}
           ref={setNavList}
           role="navigation"
           onClick={() => setShowDropDown(false)}
         >
-          <a class={styles.navLink} href="/blog">
+          <a class={style.navLink} href="/blog">
             <Books size={32} />
             <DualText default="Blog" alt="Read" />
           </a>
-          <a class={styles.navLink} href="/photo">
+          <a class={style.navLink} href="/photo">
             <Image size={32} />
             <DualText default="Photo" alt="Watch" />
           </a>
-          <a class={styles.navLink} href="/about">
+          <a class={style.navLink} href="/about">
             <Question size={32} />
             <DualText default="About" alt="Learn" />
           </a>
         </nav>
       </header>
-    </section>
+    </Card>
   );
 };
 
