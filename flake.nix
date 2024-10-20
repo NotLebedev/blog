@@ -19,24 +19,24 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+        pythonPkgs = pkgs.python312.withPackages (
+          python-pkgs: with python-pkgs; [
+            pydantic
+            typer
+            pillow
+            pyyaml
+            pytest
+
+            types-pyyaml
+            types-pillow
+          ]
+        );
         nativeBuildInputs = with pkgs; [
           nodejs
           nodePackages.typescript
           nodePackages.typescript-language-server
 
-          (python312.withPackages (
-            python-pkgs: with python-pkgs; [
-              pydantic
-              typer
-              pillow
-              pyyaml
-              pytest
-
-              types-pyyaml
-              types-pillow
-            ]
-          ))
-
+          pythonPkgs
           mypy
           ruff
         ];
@@ -74,7 +74,6 @@
               doCheck = true;
               dontBuild = true;
               installPhase = "mkdir $out";
-              inherit nativeBuildInputs;
             };
             mkArgs = args: (args // common);
           in
@@ -86,6 +85,8 @@
               checkPhase = ''
                 npx eslint src
               '';
+
+              inherit nativeBuildInputs;
             });
 
             mypy = pkgs.stdenvNoCC.mkDerivation (mkArgs {
@@ -94,22 +95,31 @@
               checkPhase = ''
                 mypy tools
               '';
+
+              nativeBuildInputs = [
+                pkgs.mypy
+                pythonPkgs
+              ];
             });
 
             ruff = pkgs.stdenvNoCC.mkDerivation (mkArgs {
-              name = "mypy-check";
+              name = "ruff-check";
 
               checkPhase = ''
                 ruff check tools
               '';
+
+              nativeBuildInputs = [ pkgs.ruff ];
             });
 
             ruff-format = pkgs.stdenvNoCC.mkDerivation (mkArgs {
-              name = "mypy-check";
+              name = "ruff-format-check";
 
               checkPhase = ''
                 ruff format --diff tools
               '';
+
+              nativeBuildInputs = [ pkgs.ruff ];
             });
           };
       }
