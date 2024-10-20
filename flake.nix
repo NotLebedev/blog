@@ -39,6 +39,7 @@
           pythonPkgs
           mypy
           ruff
+          cocogitto
         ];
       in
       {

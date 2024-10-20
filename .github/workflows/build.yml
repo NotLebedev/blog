@@ -44,3 +44,17 @@ jobs:
       - name: Run Check
         run: |
           nix build .#checks.x86_64-linux.ruff-format --print-build-logs
+  
+  cog:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Run Check
+        run: |
+          git --no-pager log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+          nix develop . --command cog check ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
