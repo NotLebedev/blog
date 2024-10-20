@@ -58,3 +58,21 @@ jobs:
         run: |
           git --no-pager log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
           nix develop . --command cog check ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+
+  success:
+    if: always()
+    runs-on: ubuntu-latest
+
+    needs:
+      - eslint
+      - mypy
+      - ruff
+      - ruff_format
+      - cog
+
+    steps:
+      - name: Check other jovs
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: cog
+          jobs: ${{ toJSON(needs) }}
