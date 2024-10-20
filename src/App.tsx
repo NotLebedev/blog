@@ -40,17 +40,15 @@ const Page: Component<{
   return (
     <MetaProvider>
       <pageContext.Provider value={{ atTop: atTop }}>
-        <div class={styles.App}>
-          <div class={styles.positionDetector} ref={topDetector} />
-          <Show when={props.withHeader}>
-            <Header />
-          </Show>
-          <main class={styles.content}>
-            {props.children}
-            <div class={styles.positionDetector} ref={endDetector} />
-          </main>
-          <Footer />
-        </div>
+        <div class={styles.positionDetector} ref={topDetector} />
+        <Show when={props.withHeader}>
+          <Header />
+        </Show>
+        <main>
+          {props.children}
+          <div class={styles.positionDetector} ref={endDetector} />
+        </main>
+        <Footer />
       </pageContext.Provider>
     </MetaProvider>
   );
