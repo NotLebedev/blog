@@ -174,7 +174,7 @@ const SearchBar: Component<{
       " " +
       image.description +
       " " +
-      image.tags.reduce((prev, curr) => prev + " " + curr, "")
+      image.tags.reduce((prev, curr) => prev + " " + curr, ""),
   );
   const tags = new Tags<ImageInfo>((image) => image.tags);
   const search = createMemo(() => new Filters(props.images, fuzzy, tags));
@@ -290,7 +290,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
           default:
             return false;
         }
-      })
+      }),
     );
   }
 
