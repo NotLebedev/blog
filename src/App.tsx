@@ -27,7 +27,6 @@ const Page: Component<{
   withHeader: boolean;
 }> = (props) => {
   let topDetector!: HTMLDivElement;
-  let endDetector!: HTMLDivElement;
 
   const [atTop, setAtTop] = createSignal(true);
 
@@ -44,10 +43,7 @@ const Page: Component<{
         <Show when={props.withHeader}>
           <Header />
         </Show>
-        <main>
-          {props.children}
-          <div class={styles.positionDetector} ref={endDetector} />
-        </main>
+        <main>{props.children}</main>
         <Footer />
       </pageContext.Provider>
     </MetaProvider>
