@@ -1,34 +1,46 @@
-name: 'Deploy to netlify'
+name: Tests
 on:
-  workflow_dispatch:
-    braches: '**'
+  pull_request:
+  push:
+    branches:
+      - master
 jobs:
-  deploy:
+  eslint:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      deployments: write
-      statuses: write
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
         uses: cachix/install-nix-action@v27
-      - name: Build
+      - name: Run Check
         run: |
-          nix build
-          mkdir site
-          cp -r result/* site
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v3.0
-        with:
-          publish-dir: './site'
-          production-branch: master
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "GitHub Actions deployed ${{ github.sha }}"
-          enable-pull-request-comment: false
-          enable-commit-comment: false
-          overwrites-pull-request-comment: false
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 1
+          nix build .#checks.x86_64-linux.eslint --print-build-logs
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Run Check
+        run: |
+          nix build .#checks.x86_64-linux.mypy --print-build-logs
+
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Run Check
+        run: |
+          nix build .#checks.x86_64-linux.ruff --print-build-logs
+
+  ruff_format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Run Check
+        run: |
+          nix build .#checks.x86_64-linux.ruff-format --print-build-logs
