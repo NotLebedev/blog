@@ -25,6 +25,7 @@ import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
 import createDropDown from "../Util/DropDown";
 import Card from "../Components/Card";
+import classList from "../Util/Classes";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -215,7 +216,7 @@ const SearchBar: Component<{
 
   return (
     <Card
-      classList={{ [style.searchBox]: true }}
+      {...classList(style.searchBox)}
       narrow={true}
       onClick={() => {
         setExpand(!expand());
@@ -233,7 +234,7 @@ const SearchBar: Component<{
             ev.stopPropagation();
           }}
         />
-        <div classList={{ [style.foldButton]: true, [style.expand]: expand() }}>
+        <div {...classList(style.foldButton, { [style.expand]: expand() })}>
           <CaretCircleDown size="1.5rem" />
         </div>
       </span>
@@ -365,7 +366,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
     <>
       <SearchBar images={props.db.images} displayResults={setUpImageChnage} />
       <div
-        classList={{ [style.grid]: true, [style.hidden]: gridHidden() }}
+        {...classList(style.grid, { [style.hidden]: gridHidden() })}
         ref={grid}
       >
         <For each={layout()}>

@@ -4,6 +4,7 @@ import DualText from "./DualText";
 import style from "./Header.module.css";
 import createDropDown from "../Util/DropDown";
 import Card from "./Card";
+import classList from "../Util/Classes";
 
 const Header: Component = () => {
   const [navList, setNavList] = createSignal<HTMLElement>();
@@ -19,7 +20,7 @@ const Header: Component = () => {
   });
 
   return (
-    <Card classList={{ [style.headerWrapper]: true }} narrow={true}>
+    <Card {...classList(style.headerWrapper)} narrow={true}>
       <header>
         <span class={style.header}>
           <a class={style.name} href="/">
@@ -48,7 +49,7 @@ const Header: Component = () => {
           </div>
         </span>
         <nav
-          classList={{ [style.dropDown]: true }}
+          {...classList(style.dropDown)}
           ref={setNavList}
           role="navigation"
           onClick={() => setShowDropDown(false)}

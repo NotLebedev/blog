@@ -2,6 +2,7 @@ import { Component, createSignal, onCleanup, onMount } from "solid-js";
 
 import style from "./ZoomableImage.module.css";
 import { Vector, apply_on_rows } from "../Data/Vector";
+import classList from "../Util/Classes";
 
 // Based on https://github.com/willnguyen1312/zoom-image/blob/main/packages/core/src/createZoomImageWheel.ts
 
@@ -338,24 +339,19 @@ const ZoomableImage: Component<{
   });
 
   return (
-    <div
-      classList={props.classList === undefined ? {} : props.classList}
-      ref={wrapper}
-    >
+    <div classList={props.classList} ref={wrapper}>
       <div
-        classList={{
-          [style.screenShadow]: true,
+        {...classList(style.screenShadow, {
           [style.active]: tinted(),
           [style.onTop]: onTop(),
-        }}
+        })}
       />
       <div
-        classList={{
-          [style.imageContainer]: true,
+        {...classList(style.imageContainer, {
           [style.active]: active(),
           [style.noTransition]: noTransition(),
           [style.onTop]: onTop(),
-        }}
+        })}
         ref={container}
       >
         <img

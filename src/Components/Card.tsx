@@ -1,20 +1,21 @@
 import { ComponentProps, ParentComponent } from "solid-js";
 import style from "./Card.module.css";
+import classList from "../Util/Classes";
 
-const Card: ParentComponent<ComponentProps<"div"> & { narrow?: boolean }> = (
-  props,
-) => {
+const Card: ParentComponent<
+  Omit<ComponentProps<"div">, "class"> & { narrow?: boolean }
+> = (props) => {
   return (
     <div
+      // Note, children are added here through prop
       {...props}
-      classList={{
-        [style.card]: true,
-        [style.narrow]: props.narrow,
-        ...props.classList,
-      }}
-    >
-      {props.children}
-    </div>
+      // classList from props is overriden, class prop can not be used
+      {...classList(
+        style.card,
+        { [style.narrow]: props.narrow },
+        props.classList,
+      )}
+    />
   );
 };
 

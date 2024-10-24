@@ -26,6 +26,7 @@ import Metas from "../Components/Metas";
 import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Card from "../Components/Card";
+import classList from "../Util/Classes";
 
 const Toolbar: Component<{
   selfId: string;
@@ -109,10 +110,9 @@ const PhotoDetailed: Component = () => {
         <Show when={info.state == "ready"}>
           <ZoomableImage
             src={info()!.imageURL}
-            classList={{
-              [style.photoContainer]: true,
+            {...classList(style.photoContainer, {
               [style.hidden]: !showImage(),
-            }}
+            })}
             onLoad={() => {
               displayLoading.cancel();
               setShowLoading(false);
