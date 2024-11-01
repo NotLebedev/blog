@@ -1,0 +1,32 @@
+:where(.container) {
+  display: block;
+  transition: opacity 0.3s ease-in-out;
+  position: relative;
+
+  .hidden {
+    opacity: 0;
+  }
+
+  > img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 1rem;
+  }
+
+  > div.loading {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    transition: opacity 0.3s ease-in-out;
+
+    > svg {
+      display: block;
+      margin: 0 auto;
+      z-index: 10;
+    }
+  }
+}

@@ -11,21 +11,19 @@ import {
   createEffect,
   createMemo,
   untrack,
-  Show,
 } from "solid-js";
-import getDB, { Database, getPreviewURL, ImageInfo } from "../Data/Database";
+import getDB, { Database, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
 import { ArrowUpRight, CaretCircleDown, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
 import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { SetParams, useLocation, useNavigate } from "@solidjs/router";
-import Loading from "../Components/Loading";
-import debounce from "../Util/Debounce";
 import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
 import createDropDown from "../Util/DropDown";
 import Card from "../Components/Card";
 import classList from "../Util/Classes";
+import ImagePreview from "../Components/ImagePreview";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -79,50 +77,24 @@ const GridImage: Component<{
 }> = (props) => {
   const location = useLocation();
 
-  const [showLoading, setShowLoading] = createSignal(false);
-
-  // Display spinner after slight delay to prevent it blinking
-  // even when image is already loaded
-  const displayLoading = debounce(() => setShowLoading(true), 100);
-  onMount(() => displayLoading());
-
-  let imageRef!: HTMLImageElement;
-
   return (
-    <a
-      class={style.gridItem}
+    <ImagePreview
+      info={props.info}
       href={`/photo/${props.info.id}${location.search}`}
+      {...classList(style.gridItem)}
     >
       {/* Fake element used to center image properly when
-          using fragment identifier. scroll-margin-top is calculated from top
-          of element and image will appear below center. This element is in 
-          center of image (and is zero height) so it is centered fine */}
+    using fragment identifier. scroll-margin-top is calculated from top
+    of element and image will appear below center. This element is in 
+    center of image (and is zero height) so it is centered fine */}
       <div class={style.fragmentIdentifier}>
         <div id={props.info.id} />
       </div>
-      <Show when={showLoading()}>
-        <div class={style.loading}>
-          <Loading />
-        </div>
-      </Show>
-      <img
-        width={props.info.previewWidth}
-        height={512}
-        src={getPreviewURL(props.info)}
-        ref={imageRef}
-        class={style.hidden}
-        loading="lazy"
-        onLoad={() => {
-          setShowLoading(false);
-          displayLoading.cancel();
-          imageRef.className = "";
-        }}
-      />
       <div class={style.overlay}>
         <p>{props.info.name}</p>
         <ArrowUpRight size={"1.5rem"} />
       </div>
-    </a>
+    </ImagePreview>
   );
 };
 
