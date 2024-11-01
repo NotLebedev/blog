@@ -1,0 +1,32 @@
+.latestPhoto {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+
+  > .description {
+    grid-row: 1;
+    grid-column: 2;
+    margin-left: 1rem;
+
+    > :first-child {
+      margin-top: 0;
+    }
+  }
+
+  > .preview {
+    grid-row: 1;
+    grid-column: 1;
+  }
+}
+
+@media screen and (max-width: 50rem) {
+  .latestPhoto {
+    grid-template-columns: 1fr;
+
+    > .description {
+      margin-left: 0;
+      margin-top: 1rem;
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+}

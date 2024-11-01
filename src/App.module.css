@@ -4,16 +4,20 @@ main {
   position: relative;
   padding-left: var(--page-padding);
   padding-right: var(--page-padding);
+  padding-top: 1rem;
   transition:
     padding-left 0.5s,
     padding-right 0.5s;
   color: white;
-  font-size: 18px;
+
+  & > :first-child {
+    margin-top: 0;
+  }
 }
 
 h1 {
   font-size: 4rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-bottom: 0;
 }
 
@@ -21,25 +25,20 @@ h2 {
   display: flex;
   align-items: center;
   font-size: 2rem;
-  margin-top: 0.7em;
+  margin-top: 1rem;
   margin-bottom: 0;
 }
 
 p {
   margin-top: 1rem;
   margin-bottom: 0;
+  font-size: 1.2rem;
 }
 
 a {
   color: white;
   transition: color 0.1s;
-  text-decoration-color: var(--link-focus);
-  text-decoration-thickness: 0.125em;
-  text-underline-offset: 0.125em;
-}
-
-a:hover {
-  color: var(--link-focus);
+  text-decoration: none;
 }
 
 .positionDetector {

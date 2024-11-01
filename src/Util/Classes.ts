@@ -1,4 +1,4 @@
-type ClassList = {
+export type ClassList = {
   [k: string]: boolean | undefined;
 };
 
