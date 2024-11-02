@@ -249,6 +249,14 @@ const ZoomableImage: Component<{
     };
   }
 
+  function ifDisabled<T>(func: (event: T) => void): (event: T) => void {
+    return (event) => {
+      if (!enabled) {
+        func(event);
+      }
+    };
+  }
+
   function clickActivate(): void {
     setNoTransition(false);
     setTinted(true);
@@ -320,7 +328,11 @@ const ZoomableImage: Component<{
 
       window.addEventListener("resize", updateNeutralImageDimensions);
 
-      image.addEventListener("click", onClick);
+      // When image is in disabled state make only it clickable
+      // to zoom in. When enabled make entire container (whole
+      // viewport) clickable to zoom out
+      image.addEventListener("click", ifDisabled(onClick));
+      container.addEventListener("click", ifEnabled(onClick));
 
       container.addEventListener("wheel", ifEnabled(handleWheel));
       container.addEventListener("touchmove", ifEnabled(handleTouchMove));

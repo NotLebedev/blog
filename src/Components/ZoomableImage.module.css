@@ -25,6 +25,8 @@
     left: 0;
     top: 0;
 
+    cursor: zoom-out;
+
     img {
       cursor: grab;
       border-radius: 0;
