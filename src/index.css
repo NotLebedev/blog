@@ -67,3 +67,7 @@ body {
     var(--background-color)
   );
 }
+
+html {
+  overscroll-behavior: none;
+}
