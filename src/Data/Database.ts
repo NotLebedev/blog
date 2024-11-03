@@ -1,17 +1,28 @@
 import { Filters, Fuzzy, Tags } from "./Filters";
-import { ImagesSearch } from "./ImagesSearch";
 
-type ImageInfo = {
-  id: string;
-  name: string;
+class ImageInfo {
+  id!: string;
+  name!: string;
   // All previews are 512 high
-  previewWidth: number;
+  previewWidth!: number;
   description?: string;
   camera?: string;
   lens?: string;
   film?: string;
-  tags: string[];
-};
+  tags!: string[];
+
+  constructor(json: object) {
+    Object.assign(this, json);
+  }
+
+  getImageURL(): string {
+    return `/images/${this.id}/image.jpg`;
+  }
+
+  getPreviewURL(): string {
+    return `/images/${this.id}/preview.jpg`;
+  }
+}
 
 class ImagesSearch {
   fuzzy: Fuzzy<ImageInfo>;
@@ -39,6 +50,7 @@ class Database {
 
   constructor(json: object) {
     Object.assign(this, json);
+    this.images = this.images.map((raw) => new ImageInfo(raw));
   }
 
   search(search: string, tags: string[]): ImageInfo[] {
@@ -50,6 +62,38 @@ class Database {
     this.imageSearch.tags.query(tags);
 
     return this.imageSearch.filters.filter();
+  }
+
+  private shift(
+    currentId: string,
+    search: string,
+    tags: string[],
+    shift: number,
+  ) {
+    const filtered = this.search(search, tags);
+
+    const idx = filtered.findIndex((img) => currentId === img.id);
+    if (idx === -1 || idx + shift < 0 || idx + shift >= filtered.length) {
+      return undefined;
+    } else {
+      return filtered[idx + shift];
+    }
+  }
+
+  prevBefore(
+    currentId: string,
+    search: string,
+    tags: string[],
+  ): ImageInfo | undefined {
+    return this.shift(currentId, search, tags, -1);
+  }
+
+  nextAfter(
+    currentId: string,
+    search: string,
+    tags: string[],
+  ): ImageInfo | undefined {
+    return this.shift(currentId, search, tags, 1);
   }
 }
 
@@ -72,14 +116,5 @@ async function getDB(): Promise<Database | undefined> {
   return db;
 }
 
-function getImageURL(info: ImageInfo): string {
-  return `/images/${info.id}/image.jpg`;
-}
-
-function getPreviewURL(info: ImageInfo): string {
-  return `/images/${info.id}/preview.jpg`;
-}
-
 export type { Database, ImageInfo };
-export { getImageURL, getPreviewURL };
 export default getDB;

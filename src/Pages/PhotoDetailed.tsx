@@ -5,12 +5,13 @@ import {
   Suspense,
   For,
   createSignal,
-  onMount,
+  createEffect,
+  on,
 } from "solid-js";
 import { useLocation, useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
-import getDB, { getImageURL, getPreviewURL } from "../Data/Database";
+import getDB from "../Data/Database";
 import ZoomableImage from "../Components/ZoomableImage";
 import {
   Aperture,
@@ -30,6 +31,8 @@ import classList from "../Util/Classes";
 
 const Toolbar: Component<{
   selfId: string;
+  prevId: string | undefined;
+  nextId: string | undefined;
 }> = (props) => {
   const location = useLocation();
 
@@ -43,8 +46,25 @@ const Toolbar: Component<{
         <X size="2rem" />
       </a>
 
-      <ArrowLeft size="2rem" id={style.prev} />
-      <ArrowRight size="2rem" id={style.next} />
+      <Show when={props.prevId !== undefined}>
+        <a
+          class={style.photoInfoButton}
+          id={style.prev}
+          href={`/photo/${props.prevId}${location.search}`}
+        >
+          <ArrowLeft size="2rem" />
+        </a>
+      </Show>
+
+      <Show when={props.nextId !== undefined}>
+        <a
+          class={style.photoInfoButton}
+          id={style.next}
+          href={`/photo/${props.nextId}${location.search}`}
+        >
+          <ArrowRight size="2rem" />
+        </a>
+      </Show>
 
       <ShareNetwork size="2rem" id={style.share} />
     </div>
@@ -67,21 +87,41 @@ const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
 
 const PhotoDetailed: Component = () => {
   const params = useParams();
+  const searchParams = useLocation().query;
 
-  const [info] = createResource(async () => {
-    const imageInfo = (await getDB())?.images?.find((el) => el.id == params.id);
+  const [info, { refetch }] = createResource(async () => {
+    const db = await getDB();
+    if (db === undefined) {
+      return undefined;
+    }
+
+    const imageInfo = db.images.find((el) => el.id == params.id);
 
     if (imageInfo === undefined) {
       return undefined;
     }
 
-    const imageURL = getImageURL(imageInfo);
-    const previewURL = getPreviewURL(imageInfo);
+    const imageURL = imageInfo.getImageURL();
+    const previewURL = imageInfo.getPreviewURL();
+
+    const prevURL = db.prevBefore(
+      imageInfo.id,
+      searchParams.search ?? "",
+      searchParams.tags?.split(",") ?? [],
+    )?.id;
+
+    const nextURL = db.nextAfter(
+      imageInfo.id,
+      searchParams.search ?? "",
+      searchParams.tags?.split(",") ?? [],
+    )?.id;
 
     return {
       imageInfo,
       imageURL,
       previewURL,
+      prevURL,
+      nextURL,
     };
   });
 
@@ -91,11 +131,26 @@ const PhotoDetailed: Component = () => {
   // Display spinner after slight delay to prevent it blinking
   // even when image is already loaded
   const displayLoading = debounce(() => setShowLoading(true), 100);
-  onMount(() => displayLoading());
+
+  // When page changes to different photo refetch info
+  // and restart spinner
+  createEffect(
+    on(
+      () => params.id,
+      () => {
+        refetch();
+        displayLoading();
+      },
+    ),
+  );
 
   return (
     <div class={style.article}>
-      <Toolbar selfId={params.id} />
+      <Toolbar
+        selfId={params.id}
+        prevId={info()?.prevURL}
+        nextId={info()?.nextURL}
+      />
       <div
         style={{
           "aspect-ratio": (info()?.imageInfo?.previewWidth ?? 512) / 512,

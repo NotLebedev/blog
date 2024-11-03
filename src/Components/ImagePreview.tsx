@@ -2,7 +2,7 @@ import { createSignal, onMount, ParentComponent, Show } from "solid-js";
 import Loading from "./Loading";
 import debounce from "../Util/Debounce";
 import classList, { ClassList } from "../Util/Classes";
-import { getPreviewURL, ImageInfo } from "../Data/Database";
+import { ImageInfo } from "../Data/Database";
 import style from "./ImagePreview.module.css";
 
 const ImagePreview: ParentComponent<{
@@ -28,7 +28,7 @@ const ImagePreview: ParentComponent<{
       <img
         width={props.info.previewWidth}
         height={512}
-        src={getPreviewURL(props.info)}
+        src={props.info.getPreviewURL()}
         ref={imageRef}
         class={style.hidden}
         loading="lazy"
