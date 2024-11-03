@@ -1,3 +1,6 @@
+import { Filters, Fuzzy, Tags } from "./Filters";
+import { ImagesSearch } from "./ImagesSearch";
+
 type ImageInfo = {
   id: string;
   name: string;
@@ -10,16 +13,52 @@ type ImageInfo = {
   tags: string[];
 };
 
-type Database = {
-  images: ImageInfo[];
-};
+class ImagesSearch {
+  fuzzy: Fuzzy<ImageInfo>;
+  tags: Tags<ImageInfo>;
+  filters: Filters<ImageInfo>;
+
+  constructor(images: ImageInfo[]) {
+    this.fuzzy = new Fuzzy<ImageInfo>(
+      (image) =>
+        image.name +
+        " " +
+        image.description +
+        " " +
+        image.tags.reduce((prev, curr) => prev + " " + curr, ""),
+    );
+    this.tags = new Tags<ImageInfo>((image) => image.tags);
+
+    this.filters = new Filters(images, this.fuzzy, this.tags);
+  }
+}
+
+class Database {
+  images!: ImageInfo[];
+  imageSearch?: ImagesSearch;
+
+  constructor(json: object) {
+    Object.assign(this, json);
+  }
+
+  search(search: string, tags: string[]): ImageInfo[] {
+    if (this.imageSearch === undefined) {
+      this.imageSearch = new ImagesSearch(this.images);
+    }
+
+    this.imageSearch.fuzzy.query(search);
+    this.imageSearch.tags.query(tags);
+
+    return this.imageSearch.filters.filter();
+  }
+}
 
 let db: Database | undefined = undefined;
 
 async function fetchDB(): Promise<Database | undefined> {
   const response = await fetch("/db.json");
   if (response.ok) {
-    return await response.json();
+    return new Database(await response.json());
   } else {
     return undefined;
   }

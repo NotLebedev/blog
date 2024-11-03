@@ -9,14 +9,12 @@ import {
   onMount,
   onCleanup,
   createEffect,
-  createMemo,
   untrack,
 } from "solid-js";
 import getDB, { Database, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
 import { ArrowUpRight, CaretCircleDown, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
-import { Filters, Fuzzy, Tags } from "../Data/Filters";
 import { SetParams, useLocation, useNavigate } from "@solidjs/router";
 import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
@@ -107,7 +105,7 @@ const GridPlaceholder: Component<{ width: number }> = (props) => {
 };
 
 const SearchBar: Component<{
-  images: ImageInfo[];
+  db: Database;
   displayResults: (result: ImageInfo[]) => void;
 }> = (props) => {
   const searchParams = useLocation().query;
@@ -142,22 +140,11 @@ const SearchBar: Component<{
     });
   }
 
-  const fuzzy = new Fuzzy<ImageInfo>(
-    (image) =>
-      image.name +
-      " " +
-      image.description +
-      " " +
-      image.tags.reduce((prev, curr) => prev + " " + curr, ""),
-  );
-  const tags = new Tags<ImageInfo>((image) => image.tags);
-  const search = createMemo(() => new Filters(props.images, fuzzy, tags));
-
   createEffect<ImageInfo[] | undefined>((prevResult) => {
-    fuzzy.query(searchParams.search ?? "");
-    tags.query(searchParams.tags?.split(",") ?? []);
+    const search = searchParams.search ?? "";
+    const tags = searchParams.tags?.split(",") ?? [];
 
-    const result = search().filter();
+    const result = props.db.search(search, tags);
 
     // Prevent calling displayResults if results did not actually change
     // This avoids infinite recursion when result is empty
@@ -212,7 +199,9 @@ const SearchBar: Component<{
       </span>
 
       <ul class={style.tagsList} ref={setCollapsible}>
-        <For each={[...new Set(props.images.flatMap((image) => image.tags))]}>
+        <For
+          each={[...new Set(props.db.images.flatMap((image) => image.tags))]}
+        >
           {(tag) => (
             <li class={style.tagInList}>
               <input
@@ -336,7 +325,7 @@ const PhotoList: Component<{ db: Database }> = (props) => {
 
   return (
     <>
-      <SearchBar images={props.db.images} displayResults={setUpImageChnage} />
+      <SearchBar db={props.db} displayResults={setUpImageChnage} />
       <div
         {...classList(style.grid, { [style.hidden]: gridHidden() })}
         ref={grid}
