@@ -112,8 +112,6 @@
 
   width: 100%;
 
-  cursor: pointer;
-
   .alwaysShow {
     display: flex;
     flex-direction: row;
@@ -173,8 +171,10 @@
 
 .tagInList {
   display: inline-block;
-  margin-top: 0.5rem;
-  margin-right: 0.6rem;
+  margin-top: 0.6rem;
+  margin-right: 0.5rem;
+
+  cursor: pointer;
 
   > * {
     margin-top: 0;
