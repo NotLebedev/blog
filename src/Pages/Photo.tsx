@@ -174,6 +174,15 @@ const SearchBar: Component<{
     return searchParams.tags?.split(",")?.includes(tag) ?? false;
   }
 
+  function adjustOnExpand() {
+    const el = collapsible();
+    if (el === undefined) {
+      return;
+    }
+
+    el.style.maxHeight = `${el.scrollHeight}px`;
+  }
+
   return (
     <Card
       {...classList(style.searchBox)}
@@ -217,7 +226,7 @@ const SearchBar: Component<{
               <label for={`inputTag${tag}`}>
                 <Tag {...classList(style.tagInList)}>
                   <span>{tag}</span>
-                  <CheckCircle />
+                  <CheckCircle onTransitionEnd={adjustOnExpand} />
                 </Tag>
               </label>
             </>
