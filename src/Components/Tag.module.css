@@ -1,0 +1,25 @@
+:where(.tag) {
+  font-size: 1.2rem;
+  text-decoration: none;
+
+  border-radius: 10rem;
+  border: 0.15rem solid;
+
+  color: var(--tag-unfocused);
+  border-color: var(--tag-unfocused);
+  background-color: var(--tag-unfocused-light);
+
+  transition:
+    color 0.1s,
+    border-color 0.1s,
+    background-color 0.1s;
+
+  padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+  margin-right: 0.5rem;
+
+  &:hover {
+    border-color: var(--link-focus);
+    background-color: var(--link-focus-light);
+    color: var(--link-focus);
+  }
+}

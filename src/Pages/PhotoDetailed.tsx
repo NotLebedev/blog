@@ -28,6 +28,7 @@ import Loading from "../Components/Loading";
 import debounce from "../Util/Debounce";
 import Card from "../Components/Card";
 import classList from "../Util/Classes";
+import Tag from "../Components/Tag";
 
 const Toolbar: Component<{
   selfId: string;
@@ -77,7 +78,7 @@ const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
       <For each={props.tags} fallback={<></>}>
         {(item) => (
           <a class={style.tagLink} href={`/photo?tags=${item}`}>
-            {item}
+            <Tag>{item}</Tag>
           </a>
         )}
       </For>

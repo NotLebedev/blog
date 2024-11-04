@@ -22,6 +22,7 @@ import createDropDown from "../Util/DropDown";
 import Card from "../Components/Card";
 import classList from "../Util/Classes";
 import ImagePreview from "../Components/ImagePreview";
+import Tag from "../Components/Tag";
 
 type DisplayableImage = {
   info: ImageInfo;
@@ -198,13 +199,14 @@ const SearchBar: Component<{
         </div>
       </span>
 
-      <ul class={style.tagsList} ref={setCollapsible}>
+      <div class={style.tagsList} ref={setCollapsible}>
         <For
           each={[...new Set(props.db.images.flatMap((image) => image.tags))]}
         >
           {(tag) => (
-            <li class={style.tagInList}>
+            <>
               <input
+                class={style.tagInput}
                 id={`inputTag${tag}`}
                 type="checkbox"
                 checked={hasTag(tag)}
@@ -213,13 +215,15 @@ const SearchBar: Component<{
                 }
               />
               <label for={`inputTag${tag}`}>
-                {tag}
-                <CheckCircle />
+                <Tag {...classList(style.tagInList)}>
+                  <span>{tag}</span>
+                  <CheckCircle />
+                </Tag>
               </label>
-            </li>
+            </>
           )}
         </For>
-      </ul>
+      </div>
     </Card>
   );
 };
