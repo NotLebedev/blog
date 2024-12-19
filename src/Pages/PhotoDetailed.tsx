@@ -47,25 +47,25 @@ const Toolbar: Component<{
         <X size="2rem" />
       </a>
 
-      <Show when={props.prevId !== undefined}>
-        <a
-          class={style.photoInfoButton}
-          id={style.prev}
-          href={`/photo/${props.prevId}${location.search}`}
-        >
-          <ArrowLeft size="2rem" />
-        </a>
-      </Show>
+      <a
+        {...classList(style.photoInfoButton, {
+          [style.hidden]: props.prevId === undefined,
+        })}
+        id={style.prev}
+        href={`/photo/${props.prevId ?? ""}${location.search}`}
+      >
+        <ArrowLeft size="2rem" />
+      </a>
 
-      <Show when={props.nextId !== undefined}>
-        <a
-          class={style.photoInfoButton}
-          id={style.next}
-          href={`/photo/${props.nextId}${location.search}`}
-        >
-          <ArrowRight size="2rem" />
-        </a>
-      </Show>
+      <a
+        {...classList(style.photoInfoButton, {
+          [style.hidden]: props.nextId === undefined,
+        })}
+        id={style.next}
+        href={`/photo/${props.nextId ?? ""}${location.search}`}
+      >
+        <ArrowRight size="2rem" />
+      </a>
 
       <ShareNetwork size="2rem" id={style.share} />
     </div>

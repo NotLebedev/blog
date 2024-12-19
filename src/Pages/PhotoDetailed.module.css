@@ -12,6 +12,11 @@
   align-items: center;
   position: relative;
   width: 100%;
+
+  > a.hidden {
+    display: hidden;
+    pointer-events: none;
+  }
 }
 
 @media screen and (min-width: 50rem) {
