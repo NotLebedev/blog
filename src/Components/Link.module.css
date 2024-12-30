@@ -1,0 +1,11 @@
+:where(.link) {
+  text-decoration: underline;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--link-focus);
+  transition: color 0.1s;
+
+  &:hover {
+    color: var(--link-focus);
+  }
+}
