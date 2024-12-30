@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
 
 import style from "./Footer.module.css";
+import Link from "./Link";
 
 const copyrightSince = 2024;
 
@@ -14,9 +15,11 @@ const Footer: Component = () => {
   return (
     <footer class={style.footer}>
       <p>
-        &copy;{copyrightYear}, @NotLebedev
+        &copy; {copyrightYear} NotLebedev
         <br />
-        All Rights Reserved
+        <Link href="https://creativecommons.org/licenses/by-nc/4.0/?ref=chooser-v1">
+          CC BY-NC 4.0
+        </Link>
       </p>
     </footer>
   );
