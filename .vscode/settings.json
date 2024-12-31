@@ -39,6 +39,7 @@
     "front",
     "tools",
     "dev",
-    "ci"
+    "ci",
+    "content"
   ]
 }
