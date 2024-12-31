@@ -41,6 +41,7 @@
           ruff
           cocogitto
         ];
+        npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
       in
       {
         devShells.default = pkgs.mkShell {
@@ -51,7 +52,6 @@
           name = "blog";
 
           src = self;
-          npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
 
           buildPhase = ''
             npm run build
@@ -64,7 +64,7 @@
             cp netlify.toml $out
           '';
 
-          inherit nativeBuildInputs;
+          inherit nativeBuildInputs npmDepsHash;
         };
 
         checks =
@@ -81,13 +81,12 @@
           {
             eslint = pkgs.buildNpmPackage (mkArgs {
               name = "eslint-check";
-              npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
 
               checkPhase = ''
                 npx eslint src
               '';
 
-              inherit nativeBuildInputs;
+              inherit nativeBuildInputs npmDepsHash;
             });
 
             mypy = pkgs.stdenvNoCC.mkDerivation (mkArgs {
