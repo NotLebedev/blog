@@ -1,6 +1,6 @@
+# yaml-language-server: $schema=../.schema.yaml
+
 name: Modern Capitol
-description: |-
-  Digital photo with film like preset applied
 camera: "Sony α7c"
 lens: "Samyang AF 24mm f/2.8"
 tags: [digital, architecture, moscow, film-like]
