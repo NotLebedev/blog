@@ -146,7 +146,8 @@
     grid-column: 2;
   }
 
-  > p.text {
+  > p.text,
+  > .text p {
     font-size: 1.5rem;
   }
 
