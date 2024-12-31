@@ -51,7 +51,7 @@
           name = "blog";
 
           src = self;
-          npmDepsHash = "sha256-wiuVKRqAfp5xB5OXMri5OC/Vz6oyw5n5rEhBt71vT00=";
+          npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
 
           buildPhase = ''
             npm run build
@@ -81,7 +81,7 @@
           {
             eslint = pkgs.buildNpmPackage (mkArgs {
               name = "eslint-check";
-              npmDepsHash = "sha256-wiuVKRqAfp5xB5OXMri5OC/Vz6oyw5n5rEhBt71vT00=";
+              npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
 
               checkPhase = ''
                 npx eslint src
