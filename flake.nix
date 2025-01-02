@@ -41,7 +41,7 @@
           ruff
           cocogitto
         ];
-        npmDepsHash = "sha256-ciPwAbmlovwsuUshju7jMFpipfiLrVaPI57E+QeE+Wk=";
+        npmDepsHash = "sha256-0jweYkFlsrIhiNVyxbVlVb0jm2+dtGVuLO9bjW3Z4wA=";
       in
       {
         devShells.default = pkgs.mkShell {
