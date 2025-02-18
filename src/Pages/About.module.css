@@ -1,0 +1,21 @@
+.techList {
+  /* margin-top: 2rem; */
+
+  > div {
+    padding: 0.7rem;
+    display: inline-block;
+
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+
+    > a:not(:last-child) {
+      margin-right: 1rem;
+    }
+
+    > a > svg {
+      color: white;
+      height: 3rem;
+    }
+  }
+}
