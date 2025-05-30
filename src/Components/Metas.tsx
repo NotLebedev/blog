@@ -25,6 +25,12 @@ const Metas: Component<{ title?: string; preview?: string }> = (props) => {
 
       <Meta property="og:url" content={url} />
       <Meta property="twitter:url" content={url} />
+
+      <Meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+      />
+      <Meta name="HandheldFriendly" content="true" />
     </>
   );
 };
