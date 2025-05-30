@@ -47,16 +47,10 @@ const Home: Component = () => {
   return (
     <>
       <Metas />
-      <h1>Welcome!</h1>
-      <p>
-        I'm Artemiy, a geek passionate about computers and software engineering
-        in all of it forms, photography and art in general and many other
-        things.
-      </p>
-      <p>
-        Posting eveything I see through the lens and think in the form of a blog
-        (soon) here.
-      </p>
+      <h1 {...classList(style.mainHeader)}>
+        Welcome!
+        <p>Photos and tech talk here</p>
+      </h1>
       <LatestPhoto />
     </>
   );
