@@ -57,8 +57,10 @@
 }
 
 .screenShadow {
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 0;
   position: fixed;
+  backdrop-filter: blur(5px);
 
   left: 0;
   top: 0;
@@ -70,7 +72,7 @@
   /* Set transitionto instant, but delay it by 0.3s
    * to transition only after full fade out */
   transition:
-    background-color 0.3s ease-in,
+    opacity 0.3s ease-in,
     width 0s ease 0.3s,
     height 0s ease 0.3s;
 
@@ -79,12 +81,12 @@
   }
 
   &.active {
-    background-color: rgba(0, 0, 0, 0.9);
+    opacity: 1;
     width: 100vw;
     height: 100vh;
 
     /* Transition background-color but don't delay width
      * and height (resize at start of transition) */
-    transition: background-color 0.3s ease-in;
+    transition: opacity 0.3s ease-in;
   }
 }
