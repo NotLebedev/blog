@@ -17,6 +17,7 @@ import {
   Nixos,
   Podman,
   Postgresql,
+  Proxmox,
   React,
   RockyLinux,
   Rust,
@@ -65,6 +66,7 @@ const techIKnow: [Component, string][][] = [
     [Nixos, "https://nixos.org/"],
     [RockyLinux, "https://rockylinux.org"],
     [Debian, "https://www.debian.org/"],
+    [Proxmox, "https://proxmox.com/"],
   ],
 ];
 

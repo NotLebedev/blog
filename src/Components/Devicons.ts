@@ -41,3 +41,4 @@ export const Docker = load("docker");
 export const GithubActions = load("githubactions");
 export const Gitlab = load("gitlab");
 export const Podman = load("podman");
+export const Proxmox = load("proxmox", "proxmox");
