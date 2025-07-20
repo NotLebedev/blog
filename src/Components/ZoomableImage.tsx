@@ -250,6 +250,9 @@ const ZoomableImage: Component<{
     if (event.touches.length === 0) {
       // All touches lifted
       prevTouches = undefined;
+
+      // In touch mode there is no click
+      // event, do it ourself
       if (!movedDuringClick) {
         clickDeactivate();
       }
@@ -283,7 +286,6 @@ const ZoomableImage: Component<{
 
   function handlePointerUp(event: PointerEvent) {
     event.preventDefault();
-    event.stopPropagation();
 
     if (event.pointerType !== "mouse") {
       return;
@@ -332,14 +334,6 @@ const ZoomableImage: Component<{
   function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
     return (event) => {
       if (enabled) {
-        func(event);
-      }
-    };
-  }
-
-  function ifDisabled<T>(func: (event: T) => void): (event: T) => void {
-    return (event) => {
-      if (!enabled) {
         func(event);
       }
     };
@@ -416,11 +410,10 @@ const ZoomableImage: Component<{
 
       window.addEventListener("resize", updateNeutralImageDimensions);
 
-      // When image is in disabled state make only it clickable
-      // to zoom in. When enabled make entire container (whole
-      // viewport) clickable to zoom out
-      image.addEventListener("click", ifDisabled(onClick));
-      container.addEventListener("click", ifEnabled(onClick));
+      // When image is in disabled state container is exactly the size of
+      // image and catches propagated events. When enabled container
+      // is whole viewport
+      container.addEventListener("click", onClick);
 
       // Handling touches and mouse need to be done sepearately
       // Event though pointerup and pointerdown respond to touch inputs
