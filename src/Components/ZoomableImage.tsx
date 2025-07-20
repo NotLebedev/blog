@@ -25,8 +25,7 @@ const ZoomableImage: Component<{
 
   // Dimensions of image when it is not resized
   let neutralImageDimensions!: {
-    height: number;
-    width: number;
+    size: Vector;
     center: Vector;
     // Max zoom factor to limit image size too 100% (1px on image == 1px on screen)
     zoomLimit: number;
@@ -41,7 +40,7 @@ const ZoomableImage: Component<{
   const [onTop, setOnTop] = createSignal(false);
 
   const [zoomState, setZoomState] = createSignal({
-    position: new Vector(0, 0),
+    position: Vector.zero(),
     scale: 1,
   });
 
@@ -81,8 +80,7 @@ const ZoomableImage: Component<{
     }
 
     neutralImageDimensions = {
-      height: height,
-      width: width,
+      size: new Vector(width, height),
       // Center is calculated based an container too
       center: new Vector(
         containerRect.left + containerRect.width / 2,
@@ -136,10 +134,7 @@ const ZoomableImage: Component<{
         {
           position: newPosition,
           scale: new Vector(scale, scale),
-          size: new Vector(
-            neutralImageDimensions.width,
-            neutralImageDimensions.height,
-          ),
+          size: neutralImageDimensions.size,
         },
         clampPosition,
       ),
@@ -195,6 +190,7 @@ const ZoomableImage: Component<{
     // At the start of sequence there is no movement
     movedDuringClick = false;
     activePointers.add(event.pointerId);
+    console.log("Add " + event.pointerId);
     image.style.cursor = "grabbing";
     if (activePointers.size === 1) {
       lastPointerPosition = Vector.fromClient(event);
@@ -206,6 +202,7 @@ const ZoomableImage: Component<{
   function handlePointerUp(event: PointerEvent) {
     event.preventDefault();
     activePointers.delete(event.pointerId);
+    console.log("Delete " + event.pointerId);
     lastPointerPosition = undefined;
     image.style.cursor = "";
     if (activePointers.size < 2) {
@@ -214,17 +211,12 @@ const ZoomableImage: Component<{
   }
 
   function handlePointerMove(event: PointerEvent) {
-    if (zoomState().scale === 1.0) {
-      return;
-    }
-
     event.preventDefault();
 
-    if (lastPointerPosition !== undefined) {
-      const newPointerPosition = Vector.fromClient(event);
-      const delta = newPointerPosition.sub(lastPointerPosition);
+    const newPointerPosition = Vector.fromClient(event);
 
-      lastPointerPosition = newPointerPosition;
+    if (lastPointerPosition !== undefined) {
+      const delta = newPointerPosition.sub(lastPointerPosition);
 
       // When using touch devices (or bad mouses) even fast taps
       // have some miniscule amount of motion which we need to dampen
@@ -242,15 +234,14 @@ const ZoomableImage: Component<{
           {
             position: state.position.add(delta),
             scale: new Vector(state.scale, state.scale),
-            size: new Vector(
-              neutralImageDimensions.width,
-              neutralImageDimensions.height,
-            ),
+            size: neutralImageDimensions.size,
           },
           clampPosition,
         ),
       });
     }
+
+    lastPointerPosition = newPointerPosition;
   }
 
   function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
@@ -297,7 +288,7 @@ const ZoomableImage: Component<{
   function clickDeactivate(): void {
     setNoTransition(false);
     setTinted(false);
-    setZoomState({ position: new Vector(0, 0), scale: 1 });
+    setZoomState({ position: Vector.zero(), scale: 1 });
     container.style.width = `${wrapper.getBoundingClientRect().width}px`;
     container.style.height = `${wrapper.getBoundingClientRect().height}px`;
     container.style.left = `${wrapper.getBoundingClientRect().left}px`;
@@ -351,6 +342,20 @@ const ZoomableImage: Component<{
       container.addEventListener("pointerdown", ifEnabled(handlePointerDown));
       container.addEventListener("pointerup", ifEnabled(handlePointerUp));
       container.addEventListener("pointermove", ifEnabled(handlePointerMove));
+
+      container.addEventListener(
+        "touchstart",
+        ifEnabled(() => {
+          console.log("touchstart");
+        }),
+      );
+
+      container.addEventListener(
+        "touchend",
+        ifEnabled(() => {
+          console.log("touchend");
+        }),
+      );
 
       if (props.onLoad !== undefined) {
         props.onLoad();
