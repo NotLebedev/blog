@@ -48,6 +48,8 @@ const ZoomableImage: Component<{
   let prevTouches: [Vector, Vector] | undefined = undefined;
   const activePointers: Set<number> = new Set();
   let lastPointerPosition: Vector | undefined = undefined;
+  // Track if current pointerdown -> pointerup sequence contained any movement
+  // See handlePointerDown and handlePointerMove for more details
   let movedDuringClick = false;
 
   /**
@@ -189,6 +191,8 @@ const ZoomableImage: Component<{
 
   function handlePointerDown(event: PointerEvent) {
     event.preventDefault();
+    // down -> move -> up sequence started
+    // At the start of sequence there is no movement
     movedDuringClick = false;
     activePointers.add(event.pointerId);
     image.style.cursor = "grabbing";
@@ -210,8 +214,6 @@ const ZoomableImage: Component<{
   }
 
   function handlePointerMove(event: PointerEvent) {
-    movedDuringClick = true;
-
     if (zoomState().scale === 1.0) {
       return;
     }
@@ -223,6 +225,16 @@ const ZoomableImage: Component<{
       const delta = newPointerPosition.sub(lastPointerPosition);
 
       lastPointerPosition = newPointerPosition;
+
+      // When using touch devices (or bad mouses) even fast taps
+      // have some miniscule amount of motion which we need to dampen
+      const isBigMovement = delta.abs() > 0.1;
+      // In movedDuringClick we calculate if any of the motions in sequence
+      // were big not just the last before release. User can
+      // drag image around and then hesitate for a long time before
+      // releasing click
+      movedDuringClick ||= isBigMovement;
+
       const state = zoomState();
       setZoomState({
         scale: state.scale,
