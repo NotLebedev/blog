@@ -1,7 +1,7 @@
 from typing import Optional
-
+from datetime import date
 from pydantic import AfterValidator, BaseModel, Field
-from typing_extensions import Annotated
+from typing import Annotated, Literal
 
 
 def valid_tags(tags: list[str]) -> list[str]:
@@ -28,9 +28,15 @@ class ImageInfo(BaseModel):
     tags: Annotated[list[str], AfterValidator(valid_tags)] = []
 
 
+class PostInfo(BaseModel):
+    id: str
+    title: str
+    date_published: date
+    date_modified: date
+    status: Literal["draft"] | Literal["published"] | Literal["hidden"]
+
+
 # Use pydantic class that will create a type-checking constructor
 class Database(BaseModel):
     images: list[ImageInfo]
-
-    def add_image(self, image: ImageInfo) -> None:
-        self.images.insert(0, image)
+    posts: list[PostInfo]

@@ -1,18 +1,25 @@
 import os
 import shutil
+import yaml
 from os import path
 from pathlib import Path
-from typing import Final, Optional
-
-import yaml
-from pydantic import BaseModel
-
 from lib import iterdirs
+from lib.model import ImageInfo
+from .tools import parse_numbered_dir_name
 from lib.image import create_resized, get_width
-from lib.model import Database, ImageInfo
+from typing import Final, Optional
+from pydantic import BaseModel
 
 PREVIEW_FILENAME: Final[str] = "preview.jpg"
 IMAGE_FILENAME: Final[str] = "image.jpg"
+INFO_YAML_DEFAULT: Final[str] = """# yaml-language-server: $schema=../.schema.yaml
+
+name:
+description:
+camera:
+lens:
+tags: []
+"""
 
 
 class ContentImageInfo(BaseModel):
@@ -26,16 +33,6 @@ class ContentImageInfo(BaseModel):
     tags: list[str] = []
 
 
-def parse_image_dir_name(image_dir: Path) -> tuple[int, str]:
-    """
-    Dirname is in format xxxx-image-name where xxxx is four digits
-    used to order images. Split at first dash and get only
-    last part containing actual id
-    """
-    [idx, id] = path.basename(image_dir).split("-", 1)
-    return int(idx), id
-
-
 def parse_image(image_dir: Path) -> tuple[int, ImageInfo]:
     """Creates database entry and copies files for a single image
 
@@ -47,7 +44,7 @@ def parse_image(image_dir: Path) -> tuple[int, ImageInfo]:
     Returns:
         index in resulting array, value for database
     """
-    idx, id = parse_image_dir_name(image_dir)
+    idx, id = parse_numbered_dir_name(image_dir)
 
     preview_width = get_width(image_dir.joinpath(PREVIEW_FILENAME))
 
@@ -69,29 +66,12 @@ def parse_image(image_dir: Path) -> tuple[int, ImageInfo]:
     )
 
 
-def parse_images(content_root: Path) -> list[ImageInfo]:
-    result: list[tuple[int, ImageInfo]] = []
-
-    content_images = content_root.joinpath("images")
-    iterdirs(
-        content_images,
-        lambda content_image: result.append(parse_image(content_image)),
-    )
-
-    result.sort(key=lambda tup: tup[0], reverse=True)
-    return [info for _, info in result]
-
-
-def parse_database(content_root: Path) -> Database:
-    return Database(images=parse_images(content_root))
-
-
 def copy_images(content_root: Path, result_root: Path) -> None:
     content_images = content_root.joinpath("images")
     result_images = result_root.joinpath("images")
 
     def copy_image(content_image: Path) -> None:
-        _, id = parse_image_dir_name(content_image)
+        _, id = parse_numbered_dir_name(content_image)
         result_image = result_images.joinpath(id)
 
         result_image.mkdir(parents=True, exist_ok=True)
@@ -110,24 +90,16 @@ def copy_images(content_root: Path, result_root: Path) -> None:
     iterdirs(content_images, copy_image)
 
 
-def make_database(content_root: Path, result_root: Path) -> None:
-    db = parse_database(content_root)
+def parse_images(content_root: Path) -> list[ImageInfo]:
+    result: list[tuple[int, ImageInfo]] = []
 
-    result_root.mkdir(parents=True, exist_ok=True)
-    with open(result_root.joinpath("db.json"), "w") as file:
-        file.write(db.model_dump_json(exclude_none=True, exclude_unset=True))
+    iterdirs(
+        content_root.joinpath("images"),
+        lambda content_image: result.append(parse_image(content_image)),
+    )
 
-    copy_images(content_root, result_root)
-
-
-INFO_YAML_DEFAULT: Final[str] = """# yaml-language-server: $schema=../.schema.yaml
-
-name:
-description:
-camera:
-lens:
-tags: []
-"""
+    result.sort(key=lambda tup: tup[0], reverse=True)
+    return [info for _, info in result]
 
 
 def touch_info(image_dir: Path):
@@ -141,7 +113,7 @@ def touch_info(image_dir: Path):
 
 def add_image(image: Path, id: str, content_root: Path):
     images = [
-        parse_image_dir_name(Path(img))
+        parse_numbered_dir_name(Path(img))
         for img in os.listdir(Path(content_root).joinpath("images"))
         if Path(content_root, "images", img).is_dir()
     ]

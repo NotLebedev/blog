@@ -6,17 +6,18 @@ from pathlib import Path
 from typing import Annotated, Final
 
 import typer
-from lib.content import (
-    add_image,
-    make_database,
-    parse_images,
-)
+from lib.content import make_database
+from lib.content.images import add_image, parse_images
 
 app = typer.Typer(
     help="Manage content database", no_args_is_help=True, add_completion=False
 )
+
 image_app = typer.Typer(help="Manipulate images in database", no_args_is_help=True)
+blog_app = typer.Typer(help="Manipulate blog posts in database", no_args_is_help=True)
+
 app.add_typer(image_app, name="image")
+app.add_typer(blog_app, name="blog")
 
 CONTENT_DEFAULT_PATH: Final[str] = "content"
 DATABASE_DEFAULT_PATH: Final[str] = "dist"
