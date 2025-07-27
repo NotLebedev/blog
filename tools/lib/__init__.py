@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Callable
 
@@ -10,10 +9,10 @@ def input_maybe(prompt: str) -> str | None:
 def iterdirs(basedir: Path, func: Callable[[Path], None]) -> None:
     """
     Call func on each directory inside basedir, providing
-    basedir/dirname as argument
+    directories Path as argument
     """
-    for dirname in os.listdir(basedir):
-        fullpath = basedir.joinpath(dirname)
+    for dirname in basedir.iterdir():
+        fullpath = basedir / dirname
 
         if fullpath.is_dir():
             func(fullpath)

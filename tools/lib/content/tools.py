@@ -1,4 +1,3 @@
-from os import path
 from pathlib import Path
 
 
@@ -8,5 +7,5 @@ def parse_numbered_dir_name(image_dir: Path) -> tuple[int, str]:
     used to order images. Split at first dash and get only
     last part containing actual id
     """
-    [idx, id] = path.basename(image_dir).split("-", 1)
+    [idx, id] = image_dir.name.split("-", 1)
     return int(idx), id

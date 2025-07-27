@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from lib import iterdirs
 from lib.model import PostInfo
-from .tools import parse_numbered_dir_name
+from lib.content.tools import parse_numbered_dir_name
 
 INFO_FILENAME: Final[str] = "info.yaml"
 
@@ -42,7 +42,7 @@ def parse_posts(content_root: Path) -> list[PostInfo]:
     result: list[tuple[int, PostInfo]] = []
 
     iterdirs(
-        content_root.joinpath("blog"),
+        content_root / "blog",
         lambda content_post: result.append(parse_post(content_post)),
     )
 

@@ -1,14 +1,13 @@
-import os
 import shutil
 import yaml
-from os import path
 from pathlib import Path
-from lib import iterdirs
-from lib.model import ImageInfo
-from .tools import parse_numbered_dir_name
-from lib.image import create_resized, get_width
 from typing import Final, Optional
 from pydantic import BaseModel
+
+from lib import iterdirs
+from lib.model import ImageInfo
+from lib.content.tools import parse_numbered_dir_name
+from lib.image import create_resized, get_width
 
 PREVIEW_FILENAME: Final[str] = "preview.jpg"
 IMAGE_FILENAME: Final[str] = "image.jpg"
@@ -46,9 +45,9 @@ def parse_image(image_dir: Path) -> tuple[int, ImageInfo]:
     """
     idx, id = parse_numbered_dir_name(image_dir)
 
-    preview_width = get_width(image_dir.joinpath(PREVIEW_FILENAME))
+    preview_width = get_width(image_dir / PREVIEW_FILENAME)
 
-    with open(path.join(image_dir, "info.yaml")) as file:
+    with open(image_dir / "info.yaml") as file:
         image_info = ContentImageInfo(**yaml.safe_load(file))
 
     return (
@@ -67,23 +66,23 @@ def parse_image(image_dir: Path) -> tuple[int, ImageInfo]:
 
 
 def copy_images(content_root: Path, result_root: Path) -> None:
-    content_images = content_root.joinpath("images")
-    result_images = result_root.joinpath("images")
+    content_images = content_root / "images"
+    result_images = result_root / "images"
 
     def copy_image(content_image: Path) -> None:
         _, id = parse_numbered_dir_name(content_image)
-        result_image = result_images.joinpath(id)
+        result_image = result_images / id
 
         result_image.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(
-            content_image.joinpath(PREVIEW_FILENAME),
-            result_image.joinpath(PREVIEW_FILENAME),
+            content_image / PREVIEW_FILENAME,
+            result_image / PREVIEW_FILENAME,
             follow_symlinks=True,
         )
 
         shutil.copyfile(
-            content_image.joinpath(IMAGE_FILENAME),
-            result_image.joinpath(IMAGE_FILENAME),
+            content_image / IMAGE_FILENAME,
+            result_image / IMAGE_FILENAME,
             follow_symlinks=True,
         )
 
@@ -94,7 +93,7 @@ def parse_images(content_root: Path) -> list[ImageInfo]:
     result: list[tuple[int, ImageInfo]] = []
 
     iterdirs(
-        content_root.joinpath("images"),
+        content_root / "images",
         lambda content_image: result.append(parse_image(content_image)),
     )
 
@@ -103,7 +102,7 @@ def parse_images(content_root: Path) -> list[ImageInfo]:
 
 
 def touch_info(image_dir: Path):
-    info = image_dir.joinpath("info.yaml")
+    info = image_dir / "info.yaml"
     if info.exists():
         return
 
@@ -111,19 +110,19 @@ def touch_info(image_dir: Path):
         file.write(INFO_YAML_DEFAULT)
 
 
-def add_image(image: Path, id: str, content_root: Path):
+def add_image(image: Path, name: str, content_root: Path):
     images = [
-        parse_numbered_dir_name(Path(img))
-        for img in os.listdir(Path(content_root).joinpath("images"))
-        if Path(content_root, "images", img).is_dir()
+        parse_numbered_dir_name(img)
+        for img in (content_root / "images").iterdir()
+        if (content_root / "images" / img).is_dir()
     ]
 
-    next_idx = max((tup[0] for tup in images), default=-1) + 1
+    next_idx = max((idx for idx, _ in images), default=-1) + 1
 
-    if tup := next((tup for tup in images if tup[1] == id), None):
+    if tup := next((tup for tup in images if tup[1] == name), None):
         # Images already exists, use existing idx
         next_idx = tup[0]
 
-    image_dir = Path(content_root, "images", f"{next_idx:04d}-{id}")
+    image_dir = Path(content_root, "images", f"{next_idx:04d}-{name}")
     create_resized(image_dir, image)
     touch_info(image_dir)
