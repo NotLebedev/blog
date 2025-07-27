@@ -1,4 +1,5 @@
 import yaml
+import shutil
 from datetime import date
 from pathlib import Path
 from typing import Final, Literal
@@ -9,6 +10,7 @@ from lib.model import PostInfo
 from lib.content.tools import parse_numbered_dir_name
 
 INFO_FILENAME: Final[str] = "info.yaml"
+ARTICLE_FILENAME: Final[str] = "article.md"
 
 
 class ContentPostInfo(BaseModel):
@@ -48,3 +50,21 @@ def parse_posts(content_root: Path) -> list[PostInfo]:
 
     result.sort(key=lambda tup: tup[0], reverse=True)
     return [info for _, info in result]
+
+
+def copy_posts(content_root: Path, result_root: Path) -> None:
+    content_blog = content_root / "blog"
+    result_blog = result_root / "blog"
+
+    def copy_image(content_image: Path) -> None:
+        _, name = parse_numbered_dir_name(content_image)
+        result_post = result_blog / name
+
+        result_post.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(
+            content_image / ARTICLE_FILENAME,
+            result_post / ARTICLE_FILENAME,
+            follow_symlinks=True,
+        )
+
+    iterdirs(content_blog, copy_image)
