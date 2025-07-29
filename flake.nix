@@ -29,6 +29,13 @@
 
             types-pyyaml
             types-pillow
+
+            python-lsp-server
+            pylsp-mypy
+            python-lsp-ruff
+
+            ruff
+            mypy
           ]
         );
         nativeBuildInputs = with pkgs; [
@@ -37,8 +44,6 @@
           nodePackages.typescript-language-server
 
           pythonPkgs
-          mypy
-          ruff
           cocogitto
         ];
         npmDepsHash = "sha256-PYaiQhl4vswxitUrdR91nuwi8ZqwsnE/2ZjJ7AbIAd4=";
