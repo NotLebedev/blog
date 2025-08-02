@@ -1,0 +1,11 @@
+.postCard {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  .main {
+    flex-grow: 2;
+  }
+  .side {
+    flex-shrink: 1;
+  }
+}

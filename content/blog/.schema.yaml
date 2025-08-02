@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=http://json-schema.org/draft-07/schema#
+%YAML 1.1
+---
+$schema: http://json-schema.org/draft-07/schema#
+id: blog-info-schema
+title: info.yaml schema
+description: |
+  Schema for individual info.yaml description for individual blog posts
+type: object
+required:
+  - title
+  - date_published
+  - date_modified
+  - status
+properties:
+  title:
+    type: string
+  date_published:
+    type: string
+  date_modified:
+    type: string
+  status:
+    type: string
+    enum:
+      - draft
+      - published
+      - hidden
