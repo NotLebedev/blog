@@ -1,4 +1,6 @@
+import { JSX } from "solid-js";
 import { Filters, Fuzzy, Tags } from "./Filters";
+import { photos } from "virtual:data";
 
 class ImageInfo {
   id!: string;
@@ -116,5 +118,17 @@ async function getDB(): Promise<Database | undefined> {
   return db;
 }
 
+function description(description: {
+  name: string;
+  description?: JSX.Element;
+  camera?: string;
+  lens?: string;
+  film?: string;
+  tags: string[];
+}) {
+  description;
+}
+
 export type { Database, ImageInfo };
+export { description };
 export default getDB;
