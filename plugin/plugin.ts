@@ -1,4 +1,6 @@
 import fs from "node:fs/promises";
+import path from "node:path";
+import sharp from "sharp";
 
 function dataPlugin() {
   const virtualModuleId = "virtual:data";
@@ -27,6 +29,8 @@ function dataPlugin() {
           }
 
           descriptions.push(match.groups!["description"]);
+
+          const image = sharp(path.join(path.dirname(info), "image.jpg"));
         }
 
         return `

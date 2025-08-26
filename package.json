@@ -22,6 +22,7 @@
     "eslint-plugin-solid": "^0.14.0",
     "globals": "^15.1.0",
     "prettier": "3.2.5",
+    "sharp": "^0.34.3",
     "solid-devtools": "^0.29.2",
     "typescript": "^5.3.3",
     "typescript-eslint": "^7.8.0",
