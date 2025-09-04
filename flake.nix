@@ -19,29 +19,14 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        pythonPkgs = pkgs.python312.withPackages (
-          python-pkgs: with python-pkgs; [
-            pydantic
-            typer
-            pillow
-            pyyaml
-            pytest
-
-            types-pyyaml
-            types-pillow
-          ]
-        );
         nativeBuildInputs = with pkgs; [
           nodejs
           nodePackages.typescript
           nodePackages.typescript-language-server
 
-          pythonPkgs
-          mypy
-          ruff
           cocogitto
         ];
-        npmDepsHash = "sha256-k5E2TceIA+E4cHTtXlx/YkfmxcposZuaGN6R8lvM+P4=";
+        npmDepsHash = "sha256-ANNbKxsYaS1cAdlKJVpxhqITqnZo/Ziz8+/acpSfLuM=";
       in
       {
         devShells.default = pkgs.mkShell {
@@ -55,7 +40,6 @@
 
           buildPhase = ''
             npm run build
-            python3 tools/database.py build
           '';
 
           installPhase = ''
@@ -87,39 +71,6 @@
               '';
 
               inherit nativeBuildInputs npmDepsHash;
-            });
-
-            mypy = pkgs.stdenvNoCC.mkDerivation (mkArgs {
-              name = "mypy-check";
-
-              checkPhase = ''
-                mypy tools
-              '';
-
-              nativeBuildInputs = [
-                pkgs.mypy
-                pythonPkgs
-              ];
-            });
-
-            ruff = pkgs.stdenvNoCC.mkDerivation (mkArgs {
-              name = "ruff-check";
-
-              checkPhase = ''
-                ruff check tools
-              '';
-
-              nativeBuildInputs = [ pkgs.ruff ];
-            });
-
-            ruff-format = pkgs.stdenvNoCC.mkDerivation (mkArgs {
-              name = "ruff-format-check";
-
-              checkPhase = ''
-                ruff format --diff tools
-              '';
-
-              nativeBuildInputs = [ pkgs.ruff ];
             });
           };
       }
