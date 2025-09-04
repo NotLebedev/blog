@@ -29,7 +29,7 @@ function debounce<THIS, ARGS extends Array<unknown>>(
       result.cancel();
       fn.call(this, ...args);
     };
-    timeout = setTimeout(flush, wait);
+    timeout = window.setTimeout(flush, wait);
   };
 
   result.cancel = () => {

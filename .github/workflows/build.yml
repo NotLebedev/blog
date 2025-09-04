@@ -15,6 +15,16 @@ jobs:
         run: |
           nix build .#checks.x86_64-linux.eslint --print-build-logs
 
+  tsc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Run Check
+        run: |
+          nix build .#checks.x86_64-linux.tsc --print-build-logs
+
   cog:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}

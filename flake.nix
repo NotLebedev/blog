@@ -59,19 +59,26 @@
               doCheck = true;
               dontBuild = true;
               installPhase = "mkdir $out";
+
+              inherit nativeBuildInputs npmDepsHash;
             };
-            mkArgs = args: (args // common);
+            mkCheck = args: pkgs.buildNpmPackage (args // common);
           in
           {
-            eslint = pkgs.buildNpmPackage (mkArgs {
+            eslint = mkCheck {
               name = "eslint-check";
 
               checkPhase = ''
                 npx eslint src
               '';
+            };
+            tsc = mkCheck {
+              name = "eslint-check";
 
-              inherit nativeBuildInputs npmDepsHash;
-            });
+              checkPhase = ''
+                tsc
+              '';
+            };
           };
       }
     );
