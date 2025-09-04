@@ -1,20 +1,6 @@
 import { JSX } from "solid-js";
 import { Filters, Fuzzy, Tags } from "./Filters";
-
-interface ImageInfo {
-  id: string;
-  name: string;
-  // All previews are 512 high
-  previewWidth: number;
-  description?: string;
-  camera?: string;
-  lens?: string;
-  film?: string;
-  tags: string[];
-
-  imageUrl: string;
-  previewUrl: string;
-}
+import { ImageInfo } from "virtual:data";
 
 class ImagesSearch {
   fuzzy: Fuzzy<ImageInfo>;
