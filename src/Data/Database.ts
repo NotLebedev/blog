@@ -1,29 +1,19 @@
 import { JSX } from "solid-js";
 import { Filters, Fuzzy, Tags } from "./Filters";
-import { photos } from "virtual:data";
 
-class ImageInfo {
-  id!: string;
-  name!: string;
+interface ImageInfo {
+  id: string;
+  name: string;
   // All previews are 512 high
-  previewWidth!: number;
+  previewWidth: number;
   description?: string;
   camera?: string;
   lens?: string;
   film?: string;
-  tags!: string[];
+  tags: string[];
 
-  constructor(json: object) {
-    Object.assign(this, json);
-  }
-
-  getImageURL(): string {
-    return `/images/${this.id}/image.jpg`;
-  }
-
-  getPreviewURL(): string {
-    return `/images/${this.id}/preview.jpg`;
-  }
+  imageUrl: string;
+  previewUrl: string;
 }
 
 class ImagesSearch {
@@ -47,12 +37,11 @@ class ImagesSearch {
 }
 
 class Database {
-  images!: ImageInfo[];
+  images: ImageInfo[];
   imageSearch?: ImagesSearch;
 
-  constructor(json: object) {
-    Object.assign(this, json);
-    this.images = this.images.map((raw) => new ImageInfo(raw));
+  constructor(images: ImageInfo[]) {
+    this.images = images;
   }
 
   search(search: string, tags: string[]): ImageInfo[] {
@@ -101,18 +90,15 @@ class Database {
 
 let db: Database | undefined = undefined;
 
-async function fetchDB(): Promise<Database | undefined> {
-  const response = await fetch("/db.json");
-  if (response.ok) {
-    return new Database(await response.json());
-  } else {
-    return undefined;
-  }
+async function fetchDB(): Promise<Database> {
+  const data = await import("virtual:data");
+  return new Database(data.photos);
 }
 
-async function getDB(): Promise<Database | undefined> {
+async function getDB(): Promise<Database> {
   if (db === undefined) {
     db = await fetchDB();
+    console.log(db);
   }
 
   return db;

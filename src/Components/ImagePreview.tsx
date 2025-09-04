@@ -28,7 +28,7 @@ const ImagePreview: ParentComponent<{
       <img
         width={props.info.previewWidth}
         height={512}
-        src={props.info.getPreviewURL()}
+        src={props.info.previewUrl}
         ref={imageRef}
         class={style.hidden}
         loading="lazy"

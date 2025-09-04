@@ -103,8 +103,8 @@ const PhotoDetailed: Component = () => {
       return undefined;
     }
 
-    const imageURL = imageInfo.getImageURL();
-    const previewURL = imageInfo.getPreviewURL();
+    const imageURL = imageInfo.imageUrl;
+    const previewURL = imageInfo.previewUrl;
 
     const prevURL = db.prevBefore(
       imageInfo.id,
