@@ -1,7 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { Metadata } from "sharp";
 import { Plugin } from "vite";
+
+function calcWidth(targetHeight: number, metadata: Metadata) {
+  return metadata.width * (targetHeight / metadata.height);
+}
 
 function dataPlugin(): Plugin {
   const virtualModuleId = "virtual:data";
@@ -69,6 +73,8 @@ function dataPlugin(): Plugin {
 
           descriptions.push(`{
             ${match.groups!["description"]}
+            id: "${path.basename(infoDir)}",
+            previewWidth: ${calcWidth(512, await sharp(path.join(infoDir, "image.jpg")).metadata())},
             imageUrl: ${imageOutPath},
             previewUrl: ${previewOutPath},
           }`);
