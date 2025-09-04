@@ -5,3 +5,4 @@ public
 .vite
 **/__pycache__
 .mypy_cache
+result
