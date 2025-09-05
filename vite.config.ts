@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import solidSvg from "vite-plugin-solid-svg";
-import { dataPlugin } from "./plugin/plugin";
+import contentPlugin from "./plugin/plugin";
 // import devtools from 'solid-devtools/vite';
 
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
     // devtools(),
     solidPlugin(),
     solidSvg(),
-    dataPlugin(),
+    contentPlugin(),
   ],
   base: "/",
   server: {
