@@ -8,7 +8,7 @@ const VIRTUAL_MODULE_NAME = "virtual:data";
 const RESOLVED_VIRTUAL_MODULE_NAME = VIRTUAL_MODULE_NAME + ".tsx";
 const IMAGES_SERVE_PREFIX = "/__images__";
 
-const CONTENT_DIR = "src/Data/photos";
+const CONTENT_DIR = "src/Content/photos";
 const CONTENT_PHOTO = "image.jpg";
 
 const OUTPUT_DIR = "assets/images";
