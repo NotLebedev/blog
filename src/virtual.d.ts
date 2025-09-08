@@ -13,8 +13,18 @@ declare module "virtual:data" {
     imageUrl: string;
     previewUrl: string;
   }
+  function photo(description: {
+    name: string;
+    description?: JSX.Element;
+    camera?: string;
+    lens?: string;
+    film?: string;
+    tags: string[];
+  });
 
   export type { ImageInfo };
+
+  export { photo };
 
   export const photos: ImageInfo[];
 }

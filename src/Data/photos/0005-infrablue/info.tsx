@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "Infrablue",
   description: (
     <p>

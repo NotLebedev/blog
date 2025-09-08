@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "Other side",
   camera: "Minolta Dynax 500si",
   lens: "Tamron 28-80 f/3.5-5.6",
