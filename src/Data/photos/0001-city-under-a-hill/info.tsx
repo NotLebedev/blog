@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "City Under a Hill",
   camera: "Sony α7c",
   lens: "Sony 90mm f/2.8 Macro",

@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "Modern Capitol",
   camera: "Sony α7c",
   lens: "Samyang AF 24mm f/2.8",

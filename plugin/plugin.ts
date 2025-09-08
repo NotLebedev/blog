@@ -85,9 +85,7 @@ function contentPlugin(): Plugin {
           path.join(CONTENT_DIR, "*", "info.tsx"),
         )) {
           const contents = await fs.readFile(info, { encoding: "utf-8" });
-          const match = contents.match(
-            /description\(\{(?<description>[\S\s]*)\}\);/,
-          );
+          const match = contents.match(/photo\(\{(?<description>[\S\s]*)\}\);/);
           if (match === null) {
             throw new Error(`Could not parse ${info}`);
           }

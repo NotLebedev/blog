@@ -1,4 +1,3 @@
-import { JSX } from "solid-js";
 import { Filters, Fuzzy, Tags } from "./Filters";
 import { ImageInfo } from "virtual:data";
 
@@ -89,16 +88,5 @@ async function getDB(): Promise<Database> {
   return db;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function description(description: {
-  name: string;
-  description?: JSX.Element;
-  camera?: string;
-  lens?: string;
-  film?: string;
-  tags: string[];
-}) {}
-
 export type { Database, ImageInfo };
-export { description };
 export default getDB;

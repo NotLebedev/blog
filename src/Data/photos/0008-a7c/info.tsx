@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "α7c",
   description:
     'Beautiful Sony α7c that I use most of the time. Has a nice retro look to it, especially with this "pancake" (by fullframe mirrorless camera standard) Samyang 24mm f/2.8 lens\n\nExperiment with macro photography and focus stacking',

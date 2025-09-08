@@ -1,6 +1,6 @@
-import { description } from "../../Database";
+import { photo } from "virtual:data";
 
-description({
+photo({
   name: "Pathways",
   camera: "Sony α7c",
   lens: "Samyang 24mm f/2.8",
