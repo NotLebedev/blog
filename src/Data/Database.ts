@@ -1,6 +1,20 @@
 import { Filters, Fuzzy, Tags } from "./Filters";
 import { ImageInfo } from "virtual:data";
 
+class PostInfo {
+  id!: string;
+  title!: string;
+  date_published!: Date;
+  date_modified!: Date;
+  status!: "draft" | "published" | "hidden";
+
+  constructor(json: object) {
+    Object.assign(this, json);
+    this.date_published = new Date(this.date_published);
+    this.date_modified = new Date(this.date_modified);
+  }
+}
+
 class ImagesSearch {
   fuzzy: Fuzzy<ImageInfo>;
   tags: Tags<ImageInfo>;
@@ -23,10 +37,12 @@ class ImagesSearch {
 
 class Database {
   images: ImageInfo[];
+  posts: PostInfo[];
   imageSearch?: ImagesSearch;
 
   constructor(images: ImageInfo[]) {
     this.images = images;
+    this.posts = [];
   }
 
   search(search: string, tags: string[]): ImageInfo[] {
@@ -88,5 +104,5 @@ async function getDB(): Promise<Database> {
   return db;
 }
 
-export type { Database, ImageInfo };
+export type { Database, ImageInfo, PostInfo };
 export default getDB;
