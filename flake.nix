@@ -26,7 +26,7 @@
 
           cocogitto
         ];
-        npmDepsHash = "sha256-ANNbKxsYaS1cAdlKJVpxhqITqnZo/Ziz8+/acpSfLuM=";
+        npmDepsHash = "sha256-AAGNHCeqqBxGbonR2YJf/tz4eXWH6KT9avTVFRQWj6g=";
       in
       {
         devShells.default = pkgs.mkShell {
