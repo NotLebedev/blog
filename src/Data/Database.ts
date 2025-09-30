@@ -84,12 +84,12 @@ async function fetchDB(): Promise<Database> {
 async function getDB(): Promise<Database> {
   if (db === undefined) {
     db = await fetchDB();
-    console.log(db);
   }
 
   return db;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function description(description: {
   name: string;
   description?: JSX.Element;
@@ -97,9 +97,7 @@ function description(description: {
   lens?: string;
   film?: string;
   tags: string[];
-}) {
-  description;
-}
+}) {}
 
 export type { Database, ImageInfo };
 export { description };
