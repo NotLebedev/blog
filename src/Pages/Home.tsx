@@ -5,7 +5,6 @@ import Card from "../Components/Card";
 import ImagePreview from "../Components/ImagePreview";
 import classList from "../Util/Classes";
 import style from "./Home.module.css";
-import Md from "../Components/Md";
 
 const LatestPhoto: Component = () => {
   const [info] = createResource(async () => {
@@ -32,7 +31,7 @@ const LatestPhoto: Component = () => {
                 />
                 <div class={style.description}>
                   <h2>{info()!.name}</h2>
-                  <Md text={info()!.description ?? ""} />
+                  {info()!.description ?? ""}
                 </div>
               </Card>
             </a>
