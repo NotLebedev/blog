@@ -1,19 +1,5 @@
 import { Filters, Fuzzy, Tags } from "./Filters";
-import { ImageInfo } from "virtual:data";
-
-class PostInfo {
-  id!: string;
-  title!: string;
-  date_published!: Date;
-  date_modified!: Date;
-  status!: "draft" | "published" | "hidden";
-
-  constructor(json: object) {
-    Object.assign(this, json);
-    this.date_published = new Date(this.date_published);
-    this.date_modified = new Date(this.date_modified);
-  }
-}
+import { ImageInfo, PostInfo } from "virtual:data";
 
 class ImagesSearch {
   fuzzy: Fuzzy<ImageInfo>;
@@ -40,9 +26,9 @@ class Database {
   posts: PostInfo[];
   imageSearch?: ImagesSearch;
 
-  constructor(images: ImageInfo[]) {
-    this.images = images;
-    this.posts = [];
+  constructor(data: { photos: ImageInfo[]; posts: PostInfo[] }) {
+    this.images = data.photos;
+    this.posts = data.posts;
   }
 
   search(search: string, tags: string[]): ImageInfo[] {
@@ -93,7 +79,7 @@ let db: Database | undefined = undefined;
 
 async function fetchDB(): Promise<Database> {
   const data = await import("virtual:data");
-  return new Database(data.photos);
+  return new Database(data);
 }
 
 async function getDB(): Promise<Database> {
