@@ -1,0 +1,27 @@
+.postCard {
+  @media screen and (min-width: 30rem) {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+      .side {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .header > .main > h2 {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .cut {
+    margin-top: 2rem;
+    max-width: 50rem;
+  }
+}

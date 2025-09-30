@@ -15,6 +15,16 @@ declare module "virtual:data" {
     imageUrl: string;
     previewUrl: string;
   }
+
+  interface PostInfo {
+    id: string;
+    title: string;
+    date_published: Date;
+    date_modified: Date;
+    status: "draft" | "published" | "hidden";
+    cut: JSX.Element;
+  }
+
   function photo(description: {
     name: string;
     description?: JSX.Element;
@@ -24,9 +34,18 @@ declare module "virtual:data" {
     tags: string[];
   });
 
-  export type { ImageInfo };
+  function post(description: {
+    title: string;
+    date_modified: Date;
+    date_published: Date;
+    status: "draft" | "published" | "hidden";
+    cut: JSX.Element;
+  });
 
-  export { photo };
+  export type { ImageInfo, PostInfo };
+
+  export { photo, post };
 
   export const photos: ImageInfo[];
+  export const posts: PostInfo[];
 }
