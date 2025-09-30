@@ -29,7 +29,6 @@ import debounce from "../Util/Debounce";
 import Card from "../Components/Card";
 import classList from "../Util/Classes";
 import Tag from "../Components/Tag";
-import Md from "../Components/Md";
 
 const Toolbar: Component<{
   selfId: string;
@@ -192,8 +191,8 @@ const PhotoDetailed: Component = () => {
 
             <Show when={info()!.imageInfo.description !== undefined}>
               <ArticleNyTimes class={style.icon} />
-              <Md
-                text={info()!.imageInfo.description!}
+              <div
+                children={info()!.imageInfo.description!}
                 {...classList(style.text)}
               />
             </Show>

@@ -1,10 +1,12 @@
+import { JSX } from "solid-js";
+
 declare module "virtual:data" {
   interface ImageInfo {
     id: string;
     name: string;
     // All previews are 512 high
     previewWidth: number;
-    description?: string;
+    description?: JSX.Element;
     camera?: string;
     lens?: string;
     film?: string;
