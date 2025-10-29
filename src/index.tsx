@@ -29,7 +29,6 @@ render(
         component={FullPage}
         children={
           <>
-            <Route path="/" component={Home} />
             <Route path="/photo" component={Photo} />
             <Route path="/blog" component={Blog} />
             <Route path="/about" component={About} />
@@ -42,6 +41,7 @@ render(
         component={NoHeaderPage}
         children={
           <>
+            <Route path="/" component={Home} />
             <Route
               path="/photo/:id"
               component={ImageDetailed}
