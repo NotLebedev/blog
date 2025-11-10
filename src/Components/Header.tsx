@@ -52,7 +52,7 @@ const Header: Component = () => {
     <Card {...classList(style.headerWrapper)} narrow={true}>
       <header>
         <span class={style.header}>
-          <a class={style.name}>@NotLebedev</a>
+          <a class={style.name}>NotLebedev</a>
           <div class={style.altNav}>
             <nav class={style.headerNav} role="navigation">
               <Blog />

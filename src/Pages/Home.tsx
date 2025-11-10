@@ -11,7 +11,7 @@ const Home: Component = () => {
       <Metas />
       <ShaderBackground />
       <Card {...classList(style.greetCard)}>
-        <h1>@NotLebedev</h1>
+        <h1>NotLebedev</h1>
         <p>
           Welcome to my corner of internet. <br />
           Explore my work, art or learn more about me.

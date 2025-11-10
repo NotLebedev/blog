@@ -3,7 +3,7 @@ import { useLocation } from "@solidjs/router";
 import { Component, Show } from "solid-js";
 
 const Metas: Component<{ title?: string; preview?: string }> = (props) => {
-  const titlePrefix = "@NotLebedev";
+  const titlePrefix = "NotLebedev";
 
   const url = useLocation().pathname;
   const title = () =>
