@@ -39,11 +39,13 @@
     /* On wide screens disable hamburger menu and show
        all nav menu buttons in header */
     @media screen and (min-width: 50rem) {
-      .headerNav {
-        display: grid;
-      }
-
       .hamburgerMenu {
+        display: none;
+      }
+    }
+
+    @media screen and (max-width: 50rem) {
+      .headerNav {
         display: none;
       }
     }

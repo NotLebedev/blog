@@ -18,19 +18,19 @@
   overflow: hidden;
   position: relative;
   grid-template-columns: repeat(3, 1fr);
-  max-width: 30rem;
+  width: fit-content;
   padding-bottom: 0.4rem;
 
   .navFocus {
-    --extra-width: -2rem;
+    --extra-width: -1.5rem;
     --show: 0;
     --index: 0;
     position: absolute;
     background-color: var(--link-focus);
-    left: calc(var(--index) * 33%);
+    left: calc(var(--index) * (1 / 3) * 100%);
     top: 2.2rem;
-    align-self: center;
     width: calc((100% / 3 + var(--extra-width)) * var(--show));
+    align-self: center;
     height: 0.2rem;
     border-radius: 0.1rem;
     transition:
@@ -58,7 +58,7 @@
   /* align-items: center; */
   a {
     list-style: none;
-    margin-right: 2rem;
+    margin-right: 1.5rem;
     text-align: center;
     text-decoration: none;
     z-index: 3;
