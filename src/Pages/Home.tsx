@@ -4,6 +4,7 @@ import classList from "../Util/Classes";
 import style from "./Home.module.css";
 import ShaderBackground from "../Components/ShaderBackground";
 import Card from "../Components/Card";
+import { DesktopNav } from "../Components/Nav";
 
 const Home: Component = () => {
   return (
@@ -16,6 +17,7 @@ const Home: Component = () => {
           Welcome to my corner of internet. <br />
           Explore my work, art or learn more about me.
         </p>
+        <DesktopNav />
       </Card>
     </>
   );
