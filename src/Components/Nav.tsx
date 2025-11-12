@@ -51,4 +51,23 @@ const DesktopNav: Component<{ classList?: ClassList }> = (props) => {
   );
 };
 
-export { DesktopNav };
+const MobileNav: Component<{
+  classList?: ClassList;
+  ref?: (el: HTMLElement) => void;
+  onClick?: () => void;
+}> = (props) => {
+  return (
+    <nav
+      {...classList(style.dropDown, props.classList)}
+      ref={props.ref}
+      role="navigation"
+      onClick={() => props.onClick && props.onClick()}
+    >
+      <Blog />
+      <Photo />
+      <About />
+    </nav>
+  );
+};
+
+export { DesktopNav, MobileNav };

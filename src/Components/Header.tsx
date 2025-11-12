@@ -4,7 +4,7 @@ import style from "./Header.module.css";
 import createDropDown from "../Util/DropDown";
 import Card from "./Card";
 import classList from "../Util/Classes";
-import { DesktopNav } from "./Nav";
+import { DesktopNav, MobileNav } from "./Nav";
 
 const Header: Component = () => {
   const [navList, setNavList] = createSignal<HTMLElement>();
@@ -33,16 +33,11 @@ const Header: Component = () => {
             </div>
           </div>
         </span>
-        <nav
-          {...classList(style.dropDown)}
+        <MobileNav
+          {...classList(style.verticalNav)}
           ref={setNavList}
-          role="navigation"
           onClick={() => setShowDropDown(false)}
-        >
-          {/*<Blog />
-          <Photo />
-          <About />*/}
-        </nav>
+        />
       </header>
     </Card>
   );

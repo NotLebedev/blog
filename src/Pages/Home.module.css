@@ -4,11 +4,19 @@
 
   > h1 {
     font-family: var(--monospace-font);
-    font-size: 4rem;
-    white-space-collapse: preserve;
+    font-size: 3rem;
+    margin-bottom: 3rem;
   }
 
-  > p {
-    max-width: 30rem;
+  @media screen and (min-width: 50rem) {
+    > div > .verticalNav {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 50rem) {
+    > div > .horizontalNav {
+      display: none;
+    }
   }
 }

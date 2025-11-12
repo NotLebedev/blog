@@ -68,3 +68,11 @@
     }
   }
 }
+
+.dropDown {
+  overflow: hidden;
+
+  .navLink {
+    margin-top: 1rem;
+  }
+}

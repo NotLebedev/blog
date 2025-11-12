@@ -4,7 +4,7 @@ import classList from "../Util/Classes";
 import style from "./Home.module.css";
 import ShaderBackground from "../Components/ShaderBackground";
 import Card from "../Components/Card";
-import { DesktopNav } from "../Components/Nav";
+import { DesktopNav, MobileNav } from "../Components/Nav";
 
 const Home: Component = () => {
   return (
@@ -13,11 +13,10 @@ const Home: Component = () => {
       <ShaderBackground />
       <Card {...classList(style.greetCard)}>
         <h1>NotLebedev</h1>
-        <p>
-          Welcome to my corner of internet. <br />
-          Explore my work, art or learn more about me.
-        </p>
-        <DesktopNav />
+        <div>
+          <DesktopNav {...classList(style.horizontalNav)} />
+          <MobileNav {...classList(style.verticalNav)} />
+        </div>
       </Card>
     </>
   );
