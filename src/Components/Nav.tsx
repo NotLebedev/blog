@@ -8,9 +8,9 @@ function activePath(): number | undefined {
   const location = useLocation();
 
   switch (location.pathname.split("/").at(1) ?? "") {
-    case "blog":
-      return 0;
     case "photo":
+      return 0;
+    case "blog":
       return 1;
     case "about":
       return 2;
@@ -37,8 +37,8 @@ const About: Component = makeNavLink("About", "/about", Question as Icon);
 const DesktopNav: Component<{ classList?: ClassList }> = (props) => {
   return (
     <nav {...classList(style.headerNav, props.classList)} role="navigation">
-      <Blog />
       <Photo />
+      <Blog />
       <About />
       <span
         class={style.navFocus}
@@ -63,8 +63,8 @@ const MobileNav: Component<{
       role="navigation"
       onClick={() => props.onClick && props.onClick()}
     >
-      <Blog />
       <Photo />
+      <Blog />
       <About />
     </nav>
   );
