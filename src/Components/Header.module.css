@@ -1,16 +1,5 @@
 .headerWrapper {
-  transition:
-    margin-left 0.5s,
-    margin-right 0.5s;
-  box-sizing: border-box;
-  /* Needed because heade is part of body, not main */
-  margin-left: var(--page-padding);
-  margin-right: var(--page-padding);
-
   background-color: #960018;
-  z-index: 100;
-
-  transition: top 0.3s;
 }
 
 .header {

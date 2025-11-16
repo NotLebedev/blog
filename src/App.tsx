@@ -4,13 +4,9 @@ import {
   JSX,
   Show,
   createContext,
-  createSignal,
-  onMount,
   useContext,
   type Component,
 } from "solid-js";
-
-import styles from "./App.module.css";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import { MetaProvider } from "@solidjs/meta";
@@ -26,26 +22,13 @@ const Page: Component<{
   children?: JSX.Element;
   withHeader: boolean;
 }> = (props) => {
-  let topDetector!: HTMLDivElement;
-
-  const [atTop, setAtTop] = createSignal(true);
-
-  onMount(() => {
-    new IntersectionObserver((entries) => {
-      setAtTop(entries[0].isIntersecting);
-    }).observe(topDetector);
-  });
-
   return (
     <MetaProvider>
-      <pageContext.Provider value={{ atTop: atTop }}>
-        <div class={styles.positionDetector} ref={topDetector} />
-        <Show when={props.withHeader}>
-          <Header />
-        </Show>
-        <main>{props.children}</main>
-        <Footer />
-      </pageContext.Provider>
+      <Show when={props.withHeader}>
+        <Header />
+      </Show>
+      <main>{props.children}</main>
+      <Footer />
     </MetaProvider>
   );
 };

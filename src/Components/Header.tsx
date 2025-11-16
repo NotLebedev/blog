@@ -3,10 +3,10 @@ import { List } from "phosphor-solid-js";
 import style from "./Header.module.css";
 import createDropDown from "../Util/DropDown";
 import Card from "./Card";
-import classList from "../Util/Classes";
+import classList, { ClassList } from "../Util/Classes";
 import { DesktopNav, MobileNav } from "./Nav";
 
-const Header: Component = () => {
+const Header: Component<{ classList?: ClassList }> = (props) => {
   const [navList, setNavList] = createSignal<HTMLElement>();
   const [showDropDown, setShowDropDown] = createDropDown(navList);
 
@@ -20,8 +20,8 @@ const Header: Component = () => {
   });
 
   return (
-    <Card {...classList(style.headerWrapper)} narrow={true}>
-      <header>
+    <header>
+      <Card {...classList(style.headerWrapper, props.classList)} narrow={true}>
         <span class={style.header}>
           <a class={style.name}>NotLebedev</a>
           <div class={style.altNav}>
@@ -38,8 +38,8 @@ const Header: Component = () => {
           ref={setNavList}
           onClick={() => setShowDropDown(false)}
         />
-      </header>
-    </Card>
+      </Card>
+    </header>
   );
 };
 

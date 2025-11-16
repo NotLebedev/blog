@@ -71,3 +71,51 @@ body {
 html {
   overscroll-behavior: none;
 }
+
+header,
+main,
+footer {
+  transition:
+    margin-left 0.5s,
+    margin-right 0.5s;
+  margin-left: var(--page-padding);
+  margin-right: var(--page-padding);
+}
+
+main {
+  min-height: 100vh;
+  text-align: left;
+  position: relative;
+  padding-top: 1rem;
+  color: white;
+
+  & > :first-child {
+    margin-top: 0;
+  }
+}
+
+:where(h1) {
+  font-size: 4rem;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+:where(h2) {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+:where(p) {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-size: 1.2rem;
+}
+
+:where(a) {
+  color: white;
+  transition: color 0.1s;
+  text-decoration: none;
+}
