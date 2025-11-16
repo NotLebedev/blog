@@ -34,7 +34,7 @@ const Blog: Component = makeNavLink("Blog", "/blog", Books as Icon);
 const Photo: Component = makeNavLink("Photo", "/photo", Image as Icon);
 const About: Component = makeNavLink("About", "/about", Question as Icon);
 
-const DesktopNav: Component<{ classList?: ClassList }> = (props) => {
+const HorizontalNav: Component<{ classList?: ClassList }> = (props) => {
   return (
     <nav {...classList(style.headerNav, props.classList)} role="navigation">
       <Photo />
@@ -51,7 +51,7 @@ const DesktopNav: Component<{ classList?: ClassList }> = (props) => {
   );
 };
 
-const MobileNav: Component<{
+const VerticalNav: Component<{
   classList?: ClassList;
   ref?: (el: HTMLElement) => void;
   onClick?: () => void;
@@ -70,4 +70,4 @@ const MobileNav: Component<{
   );
 };
 
-export { DesktopNav, MobileNav };
+export { HorizontalNav, VerticalNav };
