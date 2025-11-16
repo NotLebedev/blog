@@ -23,7 +23,9 @@ const Header: Component<{ classList?: ClassList }> = (props) => {
     <header>
       <Card {...classList(style.headerWrapper, props.classList)} narrow={true}>
         <span class={style.header}>
-          <a class={style.name}>NotLebedev</a>
+          <a class={style.name} href="/">
+            NotLebedev
+          </a>
           <div class={style.altNav}>
             <DesktopNav {...classList(style.headerNav)} />
             <div class={style.hamburgerMenu}>
