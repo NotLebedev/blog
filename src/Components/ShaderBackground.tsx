@@ -1,4 +1,4 @@
-import { Component, onMount } from "solid-js";
+import { Component, onCleanup, onMount } from "solid-js";
 import styles from "./ShaderBackground.module.css";
 
 const fragShaderSrc = `#version 300 es
@@ -47,13 +47,20 @@ const ShaderBackground: Component = () => {
     const gl = maybeGl;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Request size of canvas from size of element.
+      // We size element with 100vh, 100vw and position
+      // fixed at 0 0, this way everything looks perfect
+      // and does not jump when different
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     };
 
     resize();
     window.addEventListener("resize", resize);
+    onCleanup(() => {
+      window.removeEventListener("resize", resize);
+    });
 
     function compile(type: number, source: string) {
       const shader = gl.createShader(type);

@@ -26,9 +26,15 @@ const Metas: Component<{ title?: string; preview?: string }> = (props) => {
       <Meta property="og:url" content={url} />
       <Meta property="twitter:url" content={url} />
 
+      {/* These metas disable pinch-zooming to avoid
+        wierdness with image viewer and whatnot. Also mobile
+        viewport resize behavior is configured according to
+        https://developer.chrome.com/blog/viewport-resize-behavior?hl=en
+        to prevent layout shifting when bars, keyboards and other
+        overlays may appear */}
       <Meta
         name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-visual"
       />
       <Meta name="HandheldFriendly" content="true" />
     </>
