@@ -2,6 +2,7 @@ import {
   Accessor,
   Context,
   JSX,
+  ParentComponent,
   Show,
   createContext,
   useContext,
@@ -21,6 +22,7 @@ export function usePageContext(): PageContext {
 const Page: Component<{
   children?: JSX.Element;
   withHeader: boolean;
+  withFooter: boolean;
 }> = (props) => {
   return (
     <MetaProvider>
@@ -28,17 +30,27 @@ const Page: Component<{
         <Header />
       </Show>
       <main>{props.children}</main>
-      <Footer />
+      <Show when={props.withFooter}>
+        <Footer />
+      </Show>
     </MetaProvider>
   );
 };
 
 const FullPage: Component<{ children?: JSX.Element }> = (props) => {
-  return <Page children={props.children} withHeader={true} />;
+  return <Page children={props.children} withHeader={true} withFooter={true} />;
 };
 
 const NoHeaderPage: Component<{ children?: JSX.Element }> = (props) => {
-  return <Page children={props.children} withHeader={false} />;
+  return (
+    <Page children={props.children} withHeader={false} withFooter={true} />
+  );
 };
 
-export { FullPage, NoHeaderPage };
+const EmptyPage: ParentComponent = (props) => {
+  return (
+    <Page children={props.children} withHeader={false} withFooter={false} />
+  );
+};
+
+export { FullPage, NoHeaderPage, EmptyPage };

@@ -4,7 +4,7 @@ import { lazy } from "solid-js";
 import { Router, Route } from "@solidjs/router";
 
 import "./index.css";
-import { FullPage, NoHeaderPage } from "./App";
+import { EmptyPage, FullPage, NoHeaderPage } from "./App";
 
 const Home = lazy(() => import("./Pages/Home"));
 const Photo = lazy(() => import("./Pages/Photo"));
@@ -41,12 +41,20 @@ render(
         component={NoHeaderPage}
         children={
           <>
-            <Route path="/" component={Home} />
             <Route
               path="/photo/:id"
               component={ImageDetailed}
               info={{ noHeader: true }}
             />
+          </>
+        }
+      />
+      <Route
+        // path="/"
+        component={EmptyPage}
+        children={
+          <>
+            <Route path="/" component={Home} />
           </>
         }
       />

@@ -1,5 +1,6 @@
 .greetCard {
-  margin-top: 50vh;
+  /* Use padding to avoid collapsing margins */
+  padding-top: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;

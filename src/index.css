@@ -82,11 +82,14 @@ footer {
   margin-right: var(--page-padding);
 }
 
+header {
+  margin-bottom: 1rem;
+}
+
 main {
   min-height: 100vh;
   text-align: left;
   position: relative;
-  padding-top: 1rem;
   color: white;
 
   & > :first-child {
