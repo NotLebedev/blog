@@ -65,10 +65,6 @@
     justify-content: center;
 
     transition: color 0.5s;
-
-    &:hover {
-      color: var(--link-focus);
-    }
   }
 }
 

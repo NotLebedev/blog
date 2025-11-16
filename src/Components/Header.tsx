@@ -25,6 +25,7 @@ const Header: Component<{ classList?: ClassList }> = (props) => {
         <span class={style.header}>
           <a class={style.name} href="/">
             NotLebedev
+            <span class={style.nameUnderline} />
           </a>
           <div class={style.altNav}>
             <DesktopNav {...classList(style.headerNav)} />
