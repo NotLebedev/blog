@@ -1,11 +1,19 @@
 .greetCard {
-  background-color: #960018;
   margin-top: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   > h1 {
     font-family: var(--monospace-font);
     font-size: 3rem;
     margin-bottom: 3rem;
+  }
+
+  .verticalNav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   @media screen and (min-width: 50rem) {
