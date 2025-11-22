@@ -12,6 +12,7 @@ import getDB, { PostInfo } from "../Data/Database";
 import Card from "../Components/Card";
 import style from "./Blog.module.css";
 import classList from "../Util/Classes";
+import UnderConstruction from "../Components/UnderConstruction";
 
 const Post: Component<{ post: PostInfo }> = (props) => {
   const date_published = () => props.post.date_published;
@@ -47,7 +48,9 @@ const Blog: Component = () => {
             <p>Error loading latest posts.</p>
           </Match>
           <Match when={true}>
-            <For each={posts()!}>{(post) => <Post post={post} />}</For>
+            <For each={posts()!} fallback={<UnderConstruction />}>
+              {(post) => <Post post={post} />}
+            </For>
           </Match>
         </Switch>
       </Suspense>

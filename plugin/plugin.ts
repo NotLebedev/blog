@@ -24,6 +24,10 @@ type ImagePrepareInfo = {
   previewUrl: string;
 };
 
+function isDev(): boolean {
+  return process.env.NODE_ENV === "development";
+}
+
 function prepareImageForDev(id: string): ImagePrepareInfo {
   const imageUrl = `"${path.join(
     IMAGES_SERVE_PREFIX,
@@ -86,10 +90,9 @@ async function makePhotos(ctx: PluginContext) {
 
     // imageOutPath and previewOutPath are
     // code, strings need to be quoted
-    const { imageUrl, previewUrl } =
-      process.env.NODE_ENV === "development"
-        ? prepareImageForDev(id)
-        : await prepareImageForBuild(ctx, src, id);
+    const { imageUrl, previewUrl } = isDev()
+      ? prepareImageForDev(id)
+      : await prepareImageForBuild(ctx, src, id);
 
     photos.push(`{
       ${infoMap}
@@ -116,6 +119,12 @@ async function makePosts(): Promise<string[]> {
     const infoMap = match.groups!["description"];
     const infoDir = path.dirname(info);
     const id = path.basename(infoDir);
+
+    // TODO: this is awful, I should really use ts parser
+    // to transform these files
+    if (!isDev() && infoMap.match(/ {2}status: "draft"/) !== null) {
+      continue;
+    }
 
     posts.push(`{
       ${infoMap}
