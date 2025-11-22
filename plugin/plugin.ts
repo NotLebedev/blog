@@ -8,7 +8,7 @@ const VIRTUAL_MODULE_NAME = "virtual:data";
 const RESOLVED_VIRTUAL_MODULE_NAME = VIRTUAL_MODULE_NAME + ".tsx";
 const IMAGES_SERVE_PREFIX = "/__images__";
 
-const CONTENT_DIR = "src/Data/photos";
+const CONTENT_DIR = "src/Content/photos";
 const CONTENT_PHOTO = "image.jpg";
 
 const OUTPUT_DIR = "assets/images";
@@ -23,6 +23,10 @@ type ImagePrepareInfo = {
   imageUrl: string;
   previewUrl: string;
 };
+
+function isDev(): boolean {
+  return process.env.NODE_ENV === "development";
+}
 
 function prepareImageForDev(id: string): ImagePrepareInfo {
   const imageUrl = `"${path.join(
@@ -68,6 +72,68 @@ async function prepareImageForBuild(
   return { imageUrl, previewUrl };
 }
 
+async function makePhotos(ctx: PluginContext) {
+  const photos = [];
+  for await (const info of fs.glob(path.join(CONTENT_DIR, "*", "info.tsx"))) {
+    const contents = await fs.readFile(info, { encoding: "utf-8" });
+    const match = contents.match(/photo\(\{(?<description>[\S\s]*)\}\);/);
+    if (match === null) {
+      throw new Error(`Could not parse ${info}`);
+    }
+    const infoMap = match.groups!["description"];
+
+    const infoDir = path.dirname(info);
+    const id = path.basename(infoDir);
+
+    const src = path.join(infoDir, CONTENT_PHOTO);
+    const previewWidth = calcWidth(512, await sharp(src).metadata());
+
+    // imageOutPath and previewOutPath are
+    // code, strings need to be quoted
+    const { imageUrl, previewUrl } = isDev()
+      ? prepareImageForDev(id)
+      : await prepareImageForBuild(ctx, src, id);
+
+    photos.push(`{
+      ${infoMap}
+      id: "${id}",
+      previewWidth: ${previewWidth},
+      imageUrl: ${imageUrl},
+      previewUrl: ${previewUrl},
+    }`);
+  }
+
+  return photos;
+}
+
+async function makePosts(): Promise<string[]> {
+  const posts: string[] = [];
+  for await (const info of fs.glob(
+    path.join("src/Content/blogs", "*", "post.tsx"),
+  )) {
+    const contents = await fs.readFile(info, { encoding: "utf-8" });
+    const match = contents.match(/post\(\{(?<description>[\S\s]*)\}\);/);
+    if (match === null) {
+      throw new Error(`Could not parse ${info}`);
+    }
+    const infoMap = match.groups!["description"];
+    const infoDir = path.dirname(info);
+    const id = path.basename(infoDir);
+
+    // TODO: this is awful, I should really use ts parser
+    // to transform these files
+    if (!isDev() && infoMap.match(/ {2}status: "draft"/) !== null) {
+      continue;
+    }
+
+    posts.push(`{
+      ${infoMap}
+      id: "${id}",
+    }`);
+  }
+  return posts;
+}
+
 function contentPlugin(): Plugin {
   return {
     name: "vite-data-plugin",
@@ -80,45 +146,16 @@ function contentPlugin(): Plugin {
 
     async load(id: string) {
       if (id === RESOLVED_VIRTUAL_MODULE_NAME) {
-        const photos = [];
-        for await (const info of fs.glob(
-          path.join(CONTENT_DIR, "*", "info.tsx"),
-        )) {
-          const contents = await fs.readFile(info, { encoding: "utf-8" });
-          const match = contents.match(
-            /description\(\{(?<description>[\S\s]*)\}\);/,
-          );
-          if (match === null) {
-            throw new Error(`Could not parse ${info}`);
-          }
-          const infoMap = match.groups!["description"];
-
-          const infoDir = path.dirname(info);
-          const id = path.basename(infoDir);
-
-          const src = path.join(infoDir, CONTENT_PHOTO);
-          const previewWidth = calcWidth(512, await sharp(src).metadata());
-
-          // imageOutPath and previewOutPath are
-          // code, strings need to be quoted
-          const { imageUrl, previewUrl } =
-            process.env.NODE_ENV === "development"
-              ? prepareImageForDev(id)
-              : await prepareImageForBuild(this, src, id);
-
-          photos.push(`{
-            ${infoMap}
-            id: "${id}",
-            previewWidth: ${previewWidth},
-            imageUrl: ${imageUrl},
-            previewUrl: ${previewUrl},
-          }`);
-        }
-
         return `
           export const photos = [
-            ${photos.join(",\n")}
+            ${(await makePhotos(this)).join(",\n")}
           ];
+
+          export const posts = [
+            ${(await makePosts()).join(",\n")}
+          ];
+
+          export function post(any) {}
         `;
       }
     },

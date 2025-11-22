@@ -34,7 +34,7 @@
   --page-padding-small: 1rem;
   --page-padding: var(--page-padding-small);
 
-  --background-base: hsl(240, 12%, 8%);
+  --background-base: #000814;
   --background-color: var(--background-base);
 
   --link-focus: #ff9000;

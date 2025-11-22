@@ -1,0 +1,14 @@
+import { photo } from "virtual:data";
+
+photo({
+  name: "Eve 2025",
+  description: (
+    <p>
+      Happy New Year! Here's to a fresh chapter &mdash; one that's even brighter
+      and better for all of us!
+    </p>
+  ),
+  camera: "Sony α7c",
+  lens: "Tamron 28-75mm F2.8 Di III VXD G2",
+  tags: ["digital", "macro", "product"],
+});

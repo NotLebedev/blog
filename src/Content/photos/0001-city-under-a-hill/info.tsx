@@ -1,0 +1,8 @@
+import { photo } from "virtual:data";
+
+photo({
+  name: "City Under a Hill",
+  camera: "Sony α7c",
+  lens: "Sony 90mm f/2.8 Macro",
+  tags: ["digital", "architecture", "moscow"],
+});

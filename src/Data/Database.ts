@@ -1,6 +1,5 @@
-import { JSX } from "solid-js";
 import { Filters, Fuzzy, Tags } from "./Filters";
-import { ImageInfo } from "virtual:data";
+import { ImageInfo, PostInfo } from "virtual:data";
 
 class ImagesSearch {
   fuzzy: Fuzzy<ImageInfo>;
@@ -24,10 +23,12 @@ class ImagesSearch {
 
 class Database {
   images: ImageInfo[];
+  posts: PostInfo[];
   imageSearch?: ImagesSearch;
 
-  constructor(images: ImageInfo[]) {
-    this.images = images;
+  constructor(data: { photos: ImageInfo[]; posts: PostInfo[] }) {
+    this.images = data.photos;
+    this.posts = data.posts;
   }
 
   search(search: string, tags: string[]): ImageInfo[] {
@@ -78,7 +79,7 @@ let db: Database | undefined = undefined;
 
 async function fetchDB(): Promise<Database> {
   const data = await import("virtual:data");
-  return new Database(data.photos);
+  return new Database(data);
 }
 
 async function getDB(): Promise<Database> {
@@ -89,16 +90,5 @@ async function getDB(): Promise<Database> {
   return db;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function description(description: {
-  name: string;
-  description?: JSX.Element;
-  camera?: string;
-  lens?: string;
-  film?: string;
-  tags: string[];
-}) {}
-
-export type { Database, ImageInfo };
-export { description };
+export type { Database, ImageInfo, PostInfo };
 export default getDB;
