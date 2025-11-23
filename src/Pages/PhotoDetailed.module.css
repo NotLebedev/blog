@@ -7,15 +7,64 @@
 
 .toolbar {
   min-height: var(--page-padding-large);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   position: relative;
   width: 100%;
 
   > a.hidden {
     display: hidden;
     pointer-events: none;
+  }
+
+  > #close {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+  }
+
+  > #prev {
+    position: fixed;
+    left: 33vw;
+    top: 1rem;
+  }
+
+  > #next {
+    position: fixed;
+    right: 33vw;
+    top: 1rem;
+  }
+
+  > #share {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    display: flex;
+    align-items: center;
+
+    > p {
+      max-width: 0;
+      margin-top: 0;
+      overflow: hidden;
+    }
+    &.animate > p {
+      animation-name: copiedAnimation;
+      animation-duration: 1s;
+      animation-timing-function: ease-out;
+    }
+  }
+}
+
+@keyframes copiedAnimation {
+  0% {
+    max-width: 0;
+  }
+  30% {
+    max-width: 5rem;
+  }
+  70% {
+    max-width: 5rem;
+  }
+  100% {
+    max-width: 0;
   }
 }
 
@@ -119,10 +168,6 @@
   font: inherit;
   cursor: pointer;
   outline: inherit;
-
-  &:hover {
-    color: white;
-  }
 }
 
 .infoBlock {

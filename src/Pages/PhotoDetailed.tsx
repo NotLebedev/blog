@@ -36,6 +36,16 @@ const Toolbar: Component<{
   nextId: string | undefined;
 }> = (props) => {
   const location = useLocation();
+  const [animateShare, setAnimateShare] = createSignal(false);
+
+  function copyShare(this: HTMLButtonElement) {
+    navigator.clipboard.writeText(window.location.origin + location.pathname);
+    setAnimateShare(true);
+    this.onanimationend = () => {
+      setAnimateShare(false);
+      this.onanimationend = null;
+    };
+  }
 
   return (
     <div class={style.toolbar}>
@@ -67,7 +77,16 @@ const Toolbar: Component<{
         <ArrowRight size="2rem" />
       </a>
 
-      <ShareNetwork size="2rem" id={style.share} />
+      <button
+        id={style.share}
+        {...classList(style.photoInfoButton, {
+          [style.animate]: animateShare(),
+        })}
+        onClick={copyShare}
+      >
+        <ShareNetwork size="2rem" />
+        <p>Copied</p>
+      </button>
     </div>
   );
 };
