@@ -1,4 +1,4 @@
-import { post } from "virtual:data";
+import post from "virtual:post";
 
 post({
   title: "Making an image viewer",

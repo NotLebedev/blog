@@ -9,7 +9,11 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": ["vite-plugin-solid-svg/types-component-solid", "vite/client"],
-    "paths": { "virtual:data": ["./src/virtual.d.ts"] },
+    "paths": {
+      "virtual:data": ["./src/Virtual/data.d.ts"],
+      "virtual:photo": ["./src/Virtual/photo.d.ts"],
+      "virtual:post": ["./src/Virtual/post.d.ts"]
+    },
     "noEmit": true,
     "skipLibCheck": true,
     "isolatedModules": true,

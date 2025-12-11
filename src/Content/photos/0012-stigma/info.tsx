@@ -1,8 +1,8 @@
-import { photo } from "virtual:data";
+import photo from "virtual:photo";
 
 photo({
   name: "Stigma",
   camera: "Sony α7c",
   lens: "Sony 90mm f/2.8 macro G OSS",
-  tags: ["digital", "macro", "nature", "flowers"],
+  tags: ["digital", "macro", "nature"],
 });

@@ -25,26 +25,9 @@ declare module "virtual:data" {
     cut: JSX.Element;
   }
 
-  function photo(description: {
-    name: string;
-    description?: JSX.Element;
-    camera?: string;
-    lens?: string;
-    film?: string;
-    tags: string[];
-  });
-
-  function post(description: {
-    title: string;
-    date_modified: Date;
-    date_published: Date;
-    status: "draft" | "published" | "hidden";
-    cut: JSX.Element;
-  });
-
   export type { ImageInfo, PostInfo };
 
-  export { photo, post };
+  export { post };
 
   export const photos: ImageInfo[];
   export const posts: PostInfo[];

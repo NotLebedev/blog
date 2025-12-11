@@ -1,4 +1,4 @@
-import { photo } from "virtual:data";
+import photo from "virtual:photo";
 
 photo({
   name: "Other side",
