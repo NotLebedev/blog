@@ -2,6 +2,12 @@
   display: block;
   transition: opacity 0.3s ease-in-out;
   position: relative;
+  /*
+    Fix for https://issues.chromium.org/issues/41333059
+    both original problem of corners leaking still present in some
+    chromiums like brave and also the new bug after the supposed "fix"
+    */
+  backdrop-filter: blur(0px);
 
   .hidden {
     opacity: 0;
