@@ -46,6 +46,7 @@ jobs:
     needs:
       - eslint
       - cog
+      - tsc
 
     steps:
       - name: Check other jovs
