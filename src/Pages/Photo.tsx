@@ -11,11 +11,12 @@ import {
   createEffect,
   untrack,
 } from "solid-js";
+import { useLocation, useNavigate, _mergeSearchString } from "@solidjs/router";
+import { SetSearchParams } from "@solidjs/router/dist/types";
+import { ArrowUpRight, CaretCircleDown, CheckCircle } from "phosphor-solid-js";
 import getDB, { Database, ImageInfo } from "../Data/Database";
 import style from "./Photo.module.css";
-import { ArrowUpRight, CaretCircleDown, CheckCircle } from "phosphor-solid-js";
 import Metas from "../Components/Metas";
-import { SetParams, useLocation, useNavigate } from "@solidjs/router";
 import Arrays from "../Util/Arrays";
 import UniqueEventListener from "../Util/UniqueEventListener";
 import createDropDown from "../Util/DropDown";
@@ -111,43 +112,37 @@ const SearchBar: Component<{
   db: Database;
   displayResults: (result: ImageInfo[]) => void;
 }> = (props) => {
-  const searchParams = useLocation().query;
+  const searchParams: {
+    search?: string;
+    tags?: string | string[];
+  } = useLocation().query;
   const navigate = useNavigate();
   const [collapsible, setCollapsible] = createSignal<HTMLUListElement>();
   const [expand, setExpand] = createDropDown(collapsible);
 
-  setExpand(searchParams.tags !== undefined && searchParams.tags !== "");
+  setExpand(searchParams.tags !== undefined && searchParams.tags !== undefined);
 
   /**
    * Custom setSearchParams method of `useSearchParams` that
    * strips the fragment identifier (aka hash) from url
-   * @see https://github.com/solidjs/solid-router/blob/24dbf2c80bc9c73e5bffae621a4634cc9f46fa51/src/routing.ts#L106
+   * @see https://github.com/solidjs/solid-router/blob/890c520d511fc7a6f5de0e6a4a34cba283de4c4b/src/routing.ts#L223
    */
-  function setSearchParams(params: SetParams) {
-    untrack(() => {
-      const searchParams = new URLSearchParams(location.search);
-      Object.entries(params).forEach(([key, value]) => {
-        if (value == null || value === "") {
-          searchParams.delete(key);
-        } else {
-          searchParams.set(key, String(value));
-        }
-      });
-
-      const s = searchParams.toString();
-      navigate(s ? `?${s}` : "", {
-        resolve: true,
-        scroll: false,
-        replace: true,
-      });
+  function setSearchParams(params: SetSearchParams) {
+    const searchString = untrack(() =>
+      _mergeSearchString(location.search, params),
+    );
+    navigate(searchString, {
+      resolve: true,
+      scroll: false,
+      replace: true,
     });
   }
 
   createEffect<ImageInfo[] | undefined>((prevResult) => {
     const search = searchParams.search ?? "";
-    const tags = searchParams.tags?.split(",") ?? [];
+    const tags = searchParams.tags ?? [];
 
-    const result = props.db.search(search, tags);
+    const result = props.db.search(search, toArray(tags));
 
     // Prevent calling displayResults if results did not actually change
     // This avoids infinite recursion when result is empty
@@ -161,19 +156,27 @@ const SearchBar: Component<{
   }, undefined);
 
   function addTag(tag: string) {
-    const currentTags = new Set(searchParams.tags?.split(",") ?? []);
+    const currentTags = new Set(toArray(searchParams.tags ?? []));
     currentTags.add(tag);
-    setSearchParams({ tags: [...currentTags].join(",") });
+    setSearchParams({ tags: [...currentTags] });
   }
 
   function removeTag(tag: string) {
-    const currentTags = new Set(searchParams.tags?.split(",") ?? []);
+    const currentTags = new Set(toArray(searchParams.tags ?? []));
     currentTags.delete(tag);
-    setSearchParams({ tags: [...currentTags].join(",") });
+    setSearchParams({ tags: [...currentTags] });
   }
 
   function hasTag(tag: string): boolean {
-    return searchParams.tags?.split(",")?.includes(tag) ?? false;
+    return searchParams.tags?.includes(tag) ?? false;
+  }
+
+  function toArray(strOrArray: string | string[]): string[] {
+    if (typeof strOrArray == "string") {
+      return [strOrArray];
+    } else {
+      return strOrArray;
+    }
   }
 
   function adjustOnExpand() {

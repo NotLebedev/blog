@@ -107,7 +107,10 @@ const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
 
 const PhotoDetailed: Component = () => {
   const params = useParams();
-  const searchParams = useLocation().query;
+  const searchParams: {
+    search?: string;
+    tags?: string | string[];
+  } = useLocation().query;
 
   const [info, { refetch }] = createResource(async () => {
     const db = await getDB();
@@ -124,16 +127,21 @@ const PhotoDetailed: Component = () => {
     const imageURL = imageInfo.imageUrl;
     const previewURL = imageInfo.previewUrl;
 
+    let tags = searchParams.tags ?? [];
+    if (typeof tags == "string") {
+      tags = [tags];
+    }
+
     const prevURL = db.prevBefore(
       imageInfo.id,
       searchParams.search ?? "",
-      searchParams.tags?.split(",") ?? [],
+      tags,
     )?.id;
 
     const nextURL = db.nextAfter(
       imageInfo.id,
       searchParams.search ?? "",
-      searchParams.tags?.split(",") ?? [],
+      tags,
     )?.id;
 
     return {
@@ -167,7 +175,7 @@ const PhotoDetailed: Component = () => {
   return (
     <div class={style.article}>
       <Toolbar
-        selfId={params.id}
+        selfId={params.id!}
         prevId={info()?.prevURL}
         nextId={info()?.nextURL}
       />

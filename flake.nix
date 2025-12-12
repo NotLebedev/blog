@@ -20,13 +20,13 @@
       let
         pkgs = import nixpkgs { inherit system; };
         nativeBuildInputs = with pkgs; [
-          nodejs
+          nodejs_25
           nodePackages.typescript
           nodePackages.typescript-language-server
 
           cocogitto
         ];
-        npmDepsHash = "sha256-YmvG2Lshjn08Yh8O3zzUQ8xXDXgeC09zp8nLLNrpgMc";
+        npmDepsHash = "sha256-XAzDSXub5xLzoUYXosH2Gqy9De0bzOgfoyOB4jFUKJU=";
       in
       {
         devShells.default = pkgs.mkShell {
