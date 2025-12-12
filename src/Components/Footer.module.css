@@ -12,8 +12,10 @@
 
   & > p > a {
     text-decoration-color: var(--link-focus-light);
-    &:hover {
-      color: var(--link-focus-light);
+    @media (hover: hover) {
+      &:hover {
+        color: var(--link-focus-light);
+      }
     }
   }
 

@@ -26,12 +26,14 @@
     padding-left: 0;
   }
 
-  &:hover {
-    /* .gridItem is an <a>, unset highlighting on hover */
-    color: white;
+  @media (hover: hover) {
+    &:hover {
+      /* .gridItem is an <a>, unset highlighting on hover */
+      color: white;
 
-    .overlay {
-      opacity: 1;
+      .overlay {
+        opacity: 1;
+      }
     }
   }
 

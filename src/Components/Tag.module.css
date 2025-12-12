@@ -17,9 +17,11 @@
   padding: 0.2rem 0.5rem 0.2rem 0.5rem;
   margin-right: 0.5rem;
 
-  &:hover {
-    border-color: var(--link-focus);
-    background-color: var(--link-focus-light);
-    color: var(--link-focus);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--link-focus);
+      background-color: var(--link-focus-light);
+      color: var(--link-focus);
+    }
   }
 }

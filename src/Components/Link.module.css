@@ -5,7 +5,9 @@
   text-decoration-color: var(--link-focus);
   transition: color 0.1s;
 
-  &:hover {
-    color: var(--link-focus);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--link-focus);
+    }
   }
 }
