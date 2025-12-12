@@ -140,14 +140,14 @@ const SearchBar: Component<{
 
   createEffect<ImageInfo[] | undefined>((prevResult) => {
     const search = searchParams.search ?? "";
-    const tags = searchParams.tags ?? [];
+    const tags = Arrays.fromMaybeArray(searchParams.tags);
 
-    const result = props.db.search(search, toArray(tags));
+    const result = props.db.search(search, tags);
 
     // Prevent calling displayResults if results did not actually change
     // This avoids infinite recursion when result is empty
     // and fixes issues with rerendering when result did not actually
-    // change but
+    // change but query did
     if (prevResult === undefined || !Arrays.equal(prevResult, result)) {
       props.displayResults(result);
     }
@@ -156,27 +156,19 @@ const SearchBar: Component<{
   }, undefined);
 
   function addTag(tag: string) {
-    const currentTags = new Set(toArray(searchParams.tags ?? []));
+    const currentTags = new Set(Arrays.fromMaybeArray(searchParams.tags));
     currentTags.add(tag);
     setSearchParams({ tags: [...currentTags] });
   }
 
   function removeTag(tag: string) {
-    const currentTags = new Set(toArray(searchParams.tags ?? []));
+    const currentTags = new Set(Arrays.fromMaybeArray(searchParams.tags));
     currentTags.delete(tag);
     setSearchParams({ tags: [...currentTags] });
   }
 
   function hasTag(tag: string): boolean {
     return searchParams.tags?.includes(tag) ?? false;
-  }
-
-  function toArray(strOrArray: string | string[]): string[] {
-    if (typeof strOrArray == "string") {
-      return [strOrArray];
-    } else {
-      return strOrArray;
-    }
   }
 
   function adjustOnExpand() {

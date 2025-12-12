@@ -29,6 +29,7 @@ import debounce from "../Util/Debounce";
 import Card from "../Components/Card";
 import classList from "../Util/Classes";
 import Tag from "../Components/Tag";
+import Arrays from "../Util/Arrays";
 
 const Toolbar: Component<{
   selfId: string;
@@ -127,10 +128,7 @@ const PhotoDetailed: Component = () => {
     const imageURL = imageInfo.imageUrl;
     const previewURL = imageInfo.previewUrl;
 
-    let tags = searchParams.tags ?? [];
-    if (typeof tags == "string") {
-      tags = [tags];
-    }
+    const tags = Arrays.fromMaybeArray(searchParams.tags);
 
     const prevURL = db.prevBefore(
       imageInfo.id,

@@ -18,6 +18,16 @@ class Arrays {
 
     return true;
   }
+
+  static fromMaybeArray<T>(maybeArray: T | T[] | undefined): T[] {
+    if (Array.isArray(maybeArray)) {
+      return maybeArray;
+    } else if (!maybeArray) {
+      return [];
+    } else {
+      return [maybeArray];
+    }
+  }
 }
 
 export default Arrays;
