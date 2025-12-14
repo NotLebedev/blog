@@ -1,86 +1,78 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/x86_64-linux";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
   };
 
   outputs =
     {
       self,
-      flake-utils,
       nixpkgs,
       ...
     }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        nativeBuildInputs = with pkgs; [
-          nodejs_25
-          nodePackages.typescript
-          nodePackages.typescript-language-server
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
+      nativeBuildInputs = with pkgs; [
+        nodejs_25
+        nodePackages.typescript
+        nodePackages.typescript-language-server
 
-          cocogitto
-        ];
-        npmDepsHash = "sha256-XAzDSXub5xLzoUYXosH2Gqy9De0bzOgfoyOB4jFUKJU=";
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          inherit nativeBuildInputs;
-        };
+        cocogitto
+      ];
+      npmDepsHash = "sha256-XAzDSXub5xLzoUYXosH2Gqy9De0bzOgfoyOB4jFUKJU=";
+    in
+    {
+      devShells.${system}.default = pkgs.mkShell {
+        inherit nativeBuildInputs;
+      };
 
-        packages.default = pkgs.buildNpmPackage {
-          name = "blog";
+      packages.${system}.default = pkgs.buildNpmPackage {
+        name = "blog";
 
-          src = self;
+        src = self;
 
-          buildPhase = ''
-            npm run build
-          '';
+        buildPhase = ''
+          npm run build
+        '';
 
-          installPhase = ''
-            mkdir $out
-            cp -r dist/* $out
-            cp netlify.toml $out
-          '';
+        installPhase = ''
+          mkdir $out
+          cp -r dist/* $out
+          cp netlify.toml $out
+        '';
 
-          inherit nativeBuildInputs npmDepsHash;
-        };
+        inherit nativeBuildInputs npmDepsHash;
+      };
 
-        checks =
-          let
-            common = {
-              src = self;
-              buildPhase = "";
-              doCheck = true;
-              dontBuild = true;
-              installPhase = "mkdir $out";
+      checks.${system} =
+        let
+          common = {
+            src = self;
+            buildPhase = "";
+            doCheck = true;
+            dontBuild = true;
+            installPhase = "mkdir $out";
 
-              inherit nativeBuildInputs npmDepsHash;
-            };
-            mkCheck = args: pkgs.buildNpmPackage (args // common);
-          in
-          {
-            eslint = mkCheck {
-              name = "eslint-check";
-
-              checkPhase = ''
-                npx eslint src
-              '';
-            };
-            tsc = mkCheck {
-              name = "eslint-check";
-
-              checkPhase = ''
-                tsc
-              '';
-            };
+            inherit nativeBuildInputs npmDepsHash;
           };
-      }
-    );
+          mkCheck = args: pkgs.buildNpmPackage (args // common);
+        in
+        {
+          eslint = mkCheck {
+            name = "eslint-check";
+
+            checkPhase = ''
+              npx eslint src
+            '';
+          };
+          tsc = mkCheck {
+            name = "eslint-check";
+
+            checkPhase = ''
+              tsc
+            '';
+          };
+        };
+    };
 
 }
