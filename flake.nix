@@ -38,7 +38,6 @@
         installPhase = ''
           mkdir $out
           cp -r dist/* $out
-          cp netlify.toml $out
         '';
 
         inherit nativeBuildInputs npmDepsHash;
