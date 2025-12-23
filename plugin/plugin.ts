@@ -47,13 +47,33 @@ function prepareImageForDev(id: string): ImagePrepareInfo {
   return { imageUrl, previewUrl };
 }
 
+const JPEG_OPTIONS: sharp.JpegOptions = {
+  chromaSubsampling: "4:4:4",
+  progressive: true,
+  mozjpeg: true,
+};
+
+async function makeImage(src: string): Promise<Buffer> {
+  const ext = path.extname(src);
+  if (ext != ".jpg" && ext != ".jpeg") {
+    throw new Error(src + ": Original photos must come in jpg format.");
+  }
+
+  // Don't further touch original photos
+  return await fs.readFile(src);
+}
+
+async function makePreview(src: string): Promise<Buffer> {
+  return await sharp(src).resize(undefined, 512).jpeg(JPEG_OPTIONS).toBuffer();
+}
+
 async function prepareImageForBuild(
   ctx: PluginContext,
   src: string,
   id: string,
 ): Promise<ImagePrepareInfo> {
-  const image = await sharp(src).jpeg().toBuffer();
-  const preview = await sharp(src).resize(undefined, 512).jpeg().toBuffer();
+  const image = await makeImage(src);
+  const preview = await makePreview(src);
 
   const ROLLUP_PREFIX = "import.meta.ROLLUP_FILE_URL_";
 
@@ -181,13 +201,15 @@ function contentPlugin(): Plugin {
           const [, , id, filename] = req.url.split("/");
           const dirName = idToDirName.get(id) ?? id;
 
-          let s = sharp(path.join(CONTENT_DIR, dirName, CONTENT_PHOTO));
+          const src = path.join(CONTENT_DIR, dirName, CONTENT_PHOTO);
 
+          let imageBuffer;
           switch (filename) {
             case OUTPUT_PREVIEW_FILE_NAME:
-              s = s.resize(undefined, 512);
+              imageBuffer = await makePreview(src);
               break;
             case OUTPUT_FULL_FILE_NAME:
+              imageBuffer = await makeImage(src);
               break;
             default:
               throw new Error(
@@ -196,7 +218,7 @@ function contentPlugin(): Plugin {
           }
 
           res.setHeader("Content-Type", "image/jpg");
-          res.end(await s.toBuffer());
+          res.end(imageBuffer);
         } catch (err) {
           res.statusCode = 500;
           res.end("Error: " + (err as Error).message);
