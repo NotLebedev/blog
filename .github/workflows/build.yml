@@ -37,38 +37,14 @@ jobs:
           git --no-pager log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
           nix develop . --command cog check ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
 
-  build-docker:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      statuses: write
     steps:
       - uses: actions/checkout@v5
       - uses: DeterminateSystems/determinate-nix-action@v3
       - name: Build site
         run: |
           nix build --print-build-logs
-          mkdir dist
-          cp -r --no-preserve=mode,ownership,timestamps result/* dist/
-
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: ghcr.io/${{ github.repository }}
-      - uses: docker/login-action@v3
-        if: github.event_name != 'pull_request'
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: deploy/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
 
   success:
     if: always()
@@ -78,10 +54,10 @@ jobs:
       - eslint
       - cog
       - tsc
-      - build-docker
+      - build
 
     steps:
-      - name: Check other jovs
+      - name: Check other jobs
         uses: re-actors/alls-green@release/v1
         with:
           allowed-skips: cog
