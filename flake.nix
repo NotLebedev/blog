@@ -31,13 +31,15 @@
 
         src = self;
 
-        buildPhase = ''
-          npm run build
-        '';
-
         installPhase = ''
           mkdir $out
-          cp -r dist/* $out
+          tar -cz \
+            --sort=name \
+            --mtime="@$SOURCE_DATE_EPOCH" \
+            --owner=0 --group=0 --numeric-owner \
+            --format=gnu \
+            -f $out/notlebedev.tar.gz \
+            -C dist .
         '';
 
         inherit nativeBuildInputs npmDepsHash;
