@@ -331,9 +331,12 @@ const ZoomableImage: Component<{
     }
   }
 
-  function ifEnabled<T>(func: (event: T) => void): (event: T) => void {
+  function ifEnabled<T extends Event>(
+    func: (event: T) => void,
+  ): (event: T) => void {
     return (event) => {
       if (enabled) {
+        event.stopPropagation();
         func(event);
       }
     };
