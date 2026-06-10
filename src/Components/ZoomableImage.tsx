@@ -393,13 +393,17 @@ const ZoomableImage: Component<{
     };
   }
 
-  function onClick() {
-    if (movedDuringClick) {
-      return;
-    }
-
-    if (enabled) {
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
       clickDeactivate();
+    }
+  }
+
+  function onClick() {
+    if (enabled) {
+      if (!movedDuringClick) {
+        clickDeactivate();
+      }
     } else {
       clickActivate();
     }
@@ -412,6 +416,7 @@ const ZoomableImage: Component<{
       updateNeutralImageDimensions();
 
       window.addEventListener("resize", updateNeutralImageDimensions);
+      window.addEventListener("keydown", ifEnabled(handleKeyDown));
 
       // When image is in disabled state container is exactly the size of
       // image and catches propagated events. When enabled container
@@ -441,6 +446,7 @@ const ZoomableImage: Component<{
 
   onCleanup(() => {
     window.removeEventListener("resize", updateNeutralImageDimensions);
+    window.removeEventListener("keydown", handleKeyDown);
   });
 
   return (
