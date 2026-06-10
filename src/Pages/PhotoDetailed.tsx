@@ -8,7 +8,7 @@ import {
   createEffect,
   on,
 } from "solid-js";
-import { useLocation, useParams } from "@solidjs/router";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
 import getDB from "../Data/Database";
@@ -30,6 +30,7 @@ import Card from "../Components/Card";
 import classList from "../Util/Classes";
 import Tag from "../Components/Tag";
 import Arrays from "../Util/Arrays";
+import swipe from "../Util/Swipe";
 
 const Toolbar: Component<{
   selfId: string;
@@ -108,10 +109,12 @@ const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
 
 const PhotoDetailed: Component = () => {
   const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const searchParams: {
     search?: string;
     tags?: string | string[];
-  } = useLocation().query;
+  } = location.query;
 
   const [info, { refetch }] = createResource(async () => {
     const db = await getDB();
@@ -169,6 +172,13 @@ const PhotoDetailed: Component = () => {
       },
     ),
   );
+
+  swipe((dir) => {
+    if (dir === "right" && info()?.prevURL !== undefined)
+      navigate(`/photo/${info()!.prevURL}${location.search}`);
+    else if (dir === "left" && info()?.nextURL !== undefined)
+      navigate(`/photo/${info()!.nextURL}${location.search}`);
+  });
 
   return (
     <div class={style.article}>
