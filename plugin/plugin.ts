@@ -28,6 +28,9 @@ function isDev(): boolean {
   return process.env.NODE_ENV === "development";
 }
 
+// Maps clean photo id (e.g. "electric-trinity") → source dir name (e.g. "0014-electric-trinity")
+const idToDirName = new Map<string, string>();
+
 function prepareImageForDev(id: string): ImagePrepareInfo {
   const imageUrl = `"${path.join(
     IMAGES_SERVE_PREFIX,
@@ -83,7 +86,9 @@ async function makePhotos(ctx: PluginContext) {
     const infoMap = match.groups!["description"];
 
     const infoDir = path.dirname(info);
-    const id = path.basename(infoDir);
+    const dirName = path.basename(infoDir);
+    const id = dirName.replace(/^\d+-/, "");
+    idToDirName.set(id, dirName);
 
     const src = path.join(infoDir, CONTENT_PHOTO);
     const previewWidth = calcWidth(512, await sharp(src).metadata());
@@ -168,8 +173,9 @@ function contentPlugin(): Plugin {
 
         try {
           const [, , id, filename] = req.url.split("/");
+          const dirName = idToDirName.get(id) ?? id;
 
-          let s = sharp(path.join(CONTENT_DIR, id, CONTENT_PHOTO));
+          let s = sharp(path.join(CONTENT_DIR, dirName, CONTENT_PHOTO));
 
           switch (filename) {
             case OUTPUT_PREVIEW_FILE_NAME:
