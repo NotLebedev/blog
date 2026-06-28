@@ -175,27 +175,40 @@ const PhotoDetailed: Component = () => {
     ),
   );
 
-  swipe((dir) => {
-    if (dir === "right" && info()?.prevURL !== undefined)
+  function navPrev() {
+    if (info()?.prevURL !== undefined)
       navigate(`/photo/${info()!.prevURL}${location.search}`);
-    else if (dir === "left" && info()?.nextURL !== undefined)
+  }
+
+  function navNext() {
+    if (info()?.nextURL !== undefined)
       navigate(`/photo/${info()!.nextURL}${location.search}`);
+  }
+
+  function navClose() {
+    navigate(`/photo${location.search}#${params.id}`);
+  }
+
+  swipe((dir) => {
+    switch (dir) {
+      case "right":
+        return navPrev();
+      case "left":
+        return navNext();
+      case "down":
+        return navClose();
+    }
   });
 
   onMount(() => {
     function onKeyDown(e: KeyboardEvent) {
       switch (e.key) {
         case "Escape":
-          navigate(`/photo${location.search}#${params.id}`);
-          break;
+          return navClose();
         case "ArrowLeft":
-          if (info()?.prevURL !== undefined)
-            navigate(`/photo/${info()!.prevURL}${location.search}`);
-          break;
+          return navPrev();
         case "ArrowRight":
-          if (info()?.nextURL !== undefined)
-            navigate(`/photo/${info()!.nextURL}${location.search}`);
-          break;
+          return navNext();
       }
     }
     document.addEventListener("keydown", onKeyDown);
