@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import fs_sync from "node:fs";
 import path from "node:path";
 import sharp, { Metadata } from "sharp";
 import { Plugin } from "vite";
@@ -76,39 +77,44 @@ async function prepareImageForBuild(
 }
 
 async function makePhotos(ctx: PluginContext) {
-  const photos = [];
-  for await (const info of fs.glob(path.join(CONTENT_DIR, "*", "info.tsx"))) {
-    const contents = await fs.readFile(info, { encoding: "utf-8" });
-    const match = contents.match(/photo\(\{(?<description>[\S\s]*)\}\);/);
-    if (match === null) {
-      throw new Error(`Could not parse ${info}`);
-    }
-    const infoMap = match.groups!["description"];
+  const infoPaths = fs_sync.globSync(path.join(CONTENT_DIR, "*", "info.tsx"));
+  infoPaths.sort((a, b) =>
+    path
+      .basename(path.dirname(b))
+      .localeCompare(path.basename(path.dirname(a))),
+  );
+  return Promise.all(
+    infoPaths.map(async (info) => {
+      const contents = await fs.readFile(info, { encoding: "utf-8" });
+      const match = contents.match(/photo\(\{(?<description>[\S\s]*)\}\);/);
+      if (match === null) {
+        throw new Error(`Could not parse ${info}`);
+      }
+      const infoMap = match.groups!["description"];
 
-    const infoDir = path.dirname(info);
-    const dirName = path.basename(infoDir);
-    const id = dirName.replace(/^\d+-/, "");
-    idToDirName.set(id, dirName);
+      const infoDir = path.dirname(info);
+      const dirName = path.basename(infoDir);
+      const id = dirName.replace(/^\d+-/, "");
+      idToDirName.set(id, dirName);
 
-    const src = path.join(infoDir, CONTENT_PHOTO);
-    const previewWidth = calcWidth(512, await sharp(src).metadata());
+      const src = path.join(infoDir, CONTENT_PHOTO);
+      const previewWidth = calcWidth(512, await sharp(src).metadata());
 
-    // imageOutPath and previewOutPath are
-    // code, strings need to be quoted
-    const { imageUrl, previewUrl } = isDev()
-      ? prepareImageForDev(id)
-      : await prepareImageForBuild(ctx, src, id);
+      // imageOutPath and previewOutPath are
+      // code, strings need to be quoted
+      const { imageUrl, previewUrl } = isDev()
+        ? prepareImageForDev(id)
+        : await prepareImageForBuild(ctx, src, id);
 
-    photos.push(`{
-      ${infoMap}
-      id: "${id}",
-      previewWidth: ${previewWidth},
-      imageUrl: ${imageUrl},
-      previewUrl: ${previewUrl},
-    }`);
-  }
-
-  return photos;
+      return `{
+        ${infoMap}
+        id: "${id}",
+        previewWidth: ${previewWidth},
+        imageUrl: ${imageUrl},
+        previewUrl: ${previewUrl},
+      }`;
+    }),
+  );
 }
 
 async function makePosts(): Promise<string[]> {
