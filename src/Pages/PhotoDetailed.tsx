@@ -13,7 +13,7 @@ import {
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
 
 import style from "./PhotoDetailed.module.css";
-import getDB from "../Data/Database";
+import getDB, { ImageInfo } from "../Data/Database";
 import ZoomableImage from "../Components/ZoomableImage";
 import {
   Aperture,
@@ -106,6 +106,48 @@ const Tags: Component<{ class: string; tags?: string[] }> = (props) => {
         )}
       </For>
     </p>
+  );
+};
+
+const InfoCard: Component<{
+  imageInfo: ImageInfo;
+  previewURL: string;
+}> = (props) => {
+  return (
+    <>
+      <Metas
+        title={props.imageInfo.name}
+        preview={new URL(props.previewURL, document.baseURI).href}
+      />
+      <Card classList={{ [style.infoBlock]: true }}>
+        <h2 class={style.text}>{props.imageInfo.name}</h2>
+
+        <Show when={props.imageInfo.description !== undefined}>
+          <ArticleNyTimes class={style.icon} />
+          <div
+            children={props.imageInfo.description!}
+            {...classList(style.text)}
+          />
+        </Show>
+
+        <Show when={props.imageInfo.camera !== undefined}>
+          <Camera class={style.icon} />
+          <p class={style.text}>{props.imageInfo.camera}</p>
+        </Show>
+
+        <Show when={props.imageInfo.lens !== undefined}>
+          <Aperture class={style.icon} />
+          <p class={style.text}>{props.imageInfo.lens}</p>
+        </Show>
+
+        <Show when={props.imageInfo.film !== undefined}>
+          <FilmStrip class={style.icon} />
+          <p class={style.text}>{props.imageInfo.film}</p>
+        </Show>
+
+        <Tags class={style.text} tags={props.imageInfo.tags} />
+      </Card>
+    </>
   );
 };
 
@@ -252,38 +294,10 @@ const PhotoDetailed: Component = () => {
           when={!(info.error || info() == undefined)}
           fallback={<p>Could not load image info</p>}
         >
-          <Metas
-            title={info()!.imageInfo.name}
-            preview={new URL(info()!.previewURL, document.baseURI).href}
+          <InfoCard
+            imageInfo={info()!.imageInfo}
+            previewURL={info()!.previewURL}
           />
-          <Card classList={{ [style.infoBlock]: true }}>
-            <h2 class={style.text}>{info()!.imageInfo.name}</h2>
-
-            <Show when={info()!.imageInfo.description !== undefined}>
-              <ArticleNyTimes class={style.icon} />
-              <div
-                children={info()!.imageInfo.description!}
-                {...classList(style.text)}
-              />
-            </Show>
-
-            <Show when={info()!.imageInfo.camera !== undefined}>
-              <Camera class={style.icon} />
-              <p class={style.text}>{info()!.imageInfo.camera}</p>
-            </Show>
-
-            <Show when={info()!.imageInfo.lens !== undefined}>
-              <Aperture class={style.icon} />
-              <p class={style.text}>{info()!.imageInfo?.lens}</p>
-            </Show>
-
-            <Show when={info()!.imageInfo.film !== undefined}>
-              <FilmStrip class={style.icon} />
-              <p class={style.text}>{info()!.imageInfo.film}</p>
-            </Show>
-
-            <Tags class={style.text} tags={info()!.imageInfo.tags} />
-          </Card>
         </Show>
       </Suspense>
     </div>
