@@ -6,6 +6,8 @@ import {
   For,
   createSignal,
   createEffect,
+  onCleanup,
+  onMount,
   on,
 } from "solid-js";
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
@@ -178,6 +180,26 @@ const PhotoDetailed: Component = () => {
       navigate(`/photo/${info()!.prevURL}${location.search}`);
     else if (dir === "left" && info()?.nextURL !== undefined)
       navigate(`/photo/${info()!.nextURL}${location.search}`);
+  });
+
+  onMount(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case "Escape":
+          navigate(`/photo${location.search}#${params.id}`);
+          break;
+        case "ArrowLeft":
+          if (info()?.prevURL !== undefined)
+            navigate(`/photo/${info()!.prevURL}${location.search}`);
+          break;
+        case "ArrowRight":
+          if (info()?.nextURL !== undefined)
+            navigate(`/photo/${info()!.nextURL}${location.search}`);
+          break;
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    onCleanup(() => document.removeEventListener("keydown", onKeyDown));
   });
 
   return (
