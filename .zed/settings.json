@@ -1,0 +1,13 @@
+{
+  "languages": {
+    "TypeScript": {
+      "tab_size": 2,
+    },
+    "TSX": {
+      "tab_size": 2,
+    },
+    "JavaScript": {
+      "tab_size": 2,
+    },
+  },
+}
