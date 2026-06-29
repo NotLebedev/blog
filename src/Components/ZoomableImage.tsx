@@ -8,6 +8,45 @@ function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
 }
 
+type State =
+  // Image is not active and can not be interacted with
+  | { enabled: false }
+  // Image is active but is not actively interacted with
+  | { enabled: true }
+  // Image is active and has active pointer interaction
+  | {
+      enabled: true;
+      movedDuringInteraction: boolean; // TODO: do we need this in pointer interaction?
+      lastPointerPosition: Vector;
+    }
+  // Image is active and has active single touch interaction
+  | { enabled: true; movedDuringInteraction: boolean; prevTouches: [Vector] }
+  // Image is active and has active two touch (pinch) interaction
+  | {
+      enabled: true;
+      movedDuringInteraction: boolean;
+      prevTouches: [Vector, Vector];
+    };
+
+function clampPosition(args: {
+  position: number;
+  scale: number;
+  size: number;
+}): number {
+  const halfSize = args.size / 2;
+  // Beginning moved past original beginning
+  if (args.position - halfSize * args.scale > -halfSize) {
+    return halfSize * (args.scale - 1);
+  }
+
+  // End moved before original end
+  if (args.position + halfSize * args.scale < halfSize) {
+    return -halfSize * (args.scale - 1);
+  } else {
+    return args.position;
+  }
+}
+
 const ZoomableImage: Component<{
   src: string;
   classList?: {
@@ -29,8 +68,6 @@ const ZoomableImage: Component<{
     zoomLimit: number;
   };
 
-  let enabled = false;
-
   // Styles
   const [active, setActive] = createSignal(false);
   const [tinted, setTinted] = createSignal(false);
@@ -42,12 +79,7 @@ const ZoomableImage: Component<{
     scale: 1,
   });
 
-  let prevTouches: [Vector] | [Vector, Vector] | undefined = undefined;
-  let lastPointerPosition: Vector | undefined = undefined;
-  // Track if current pointer/touch down -> pointer/touch up sequence
-  // contained any movement
-  // See handlePointerDown and handlePointerMove for more details
-  let movedDuringClick = false;
+  let state: State = { enabled: false };
 
   /**
    * Call this function in {@link onMount} and on resize to calculate
@@ -92,25 +124,6 @@ const ZoomableImage: Component<{
     setZoomState(calcNewState(0, Vector.zero()));
   }
 
-  function clampPosition(args: {
-    position: number;
-    scale: number;
-    size: number;
-  }): number {
-    const halfSize = args.size / 2;
-    // Beginning moved past original beginning
-    if (args.position - halfSize * args.scale > -halfSize) {
-      return halfSize * (args.scale - 1);
-    }
-
-    // End moved before original end
-    if (args.position + halfSize * args.scale < halfSize) {
-      return -halfSize * (args.scale - 1);
-    } else {
-      return args.position;
-    }
-  }
-
   function calcNewState(
     delta: number,
     point: Vector,
@@ -152,49 +165,61 @@ const ZoomableImage: Component<{
   function handleTouchStart(event: TouchEvent) {
     event.preventDefault();
 
-    // We want only single finger tap to decativate
-    // the focused state. Any other touch combination
-    // and we assume that some movement was made
-    // and do not deactivate
-    movedDuringClick = true;
-
     if (event.touches.length === 1) {
-      // If a touch was added and now there is one in activeTouches
-      // then that is the touch that was added
-      prevTouches = [Vector.fromClient(event.changedTouches[0])];
-      // Only single touch can deactivate when no movement
-      movedDuringClick = false;
+      state = {
+        enabled: true,
+        // Only single touch can deactivate when no movement
+        movedDuringInteraction: false,
+        // If a touch was added and now there is one in activeTouches
+        // then that is the touch that was added
+        prevTouches: [Vector.fromClient(event.changedTouches[0])],
+      };
     } else if (event.touches.length === 2) {
-      if (event.changedTouches.length === 1) {
-        // One touch added. We promote from one touch dragging to two touch resizing
-        prevTouches = [
-          prevTouches![0], // Can not be undefined, one touch already added
-          Vector.fromClient(event.changedTouches[0]),
-        ];
+      // We want only single finger tap to decativate the focused state. Any
+      // other touch combination and we assume that some movement was made
+      // and set movedDuringInteraction = true
+
+      // One touch added. We promote from one touch dragging to two touch resizing.
+      // We would also expect that prevTouches is already set and has one element,
+      // and fall back to creating two touches just in case
+      if (event.changedTouches.length === 1 && "prevTouches" in state) {
+        state = {
+          enabled: true,
+          movedDuringInteraction: true,
+          prevTouches: [
+            state.prevTouches[0],
+            Vector.fromClient(event.changedTouches[0]),
+          ],
+        };
       } else {
         // Two touches added at once
-        prevTouches = [
-          Vector.fromClient(event.changedTouches[0]),
-          Vector.fromClient(event.changedTouches[1]),
-        ];
+        state = {
+          enabled: true,
+          movedDuringInteraction: true,
+          prevTouches: [
+            Vector.fromClient(event.changedTouches[0]),
+            Vector.fromClient(event.changedTouches[1]),
+          ],
+        };
       }
     } else {
       // Three and more touches are ignored
-      prevTouches = undefined;
+      state = { enabled: true };
     }
   }
 
   function handleTouchMove(event: TouchEvent) {
     event.preventDefault();
 
-    if (prevTouches === undefined) {
+    // touchmove but no touchstart? Strange, ignore it just in case
+    if (!("prevTouches" in state)) {
       return;
     }
 
-    if (prevTouches.length === 1) {
+    if (state.prevTouches.length === 1) {
       const newPointerPosition = Vector.fromClient(event.touches[0]);
-      const delta = newPointerPosition.sub(prevTouches[0]);
-      prevTouches[0] = newPointerPosition;
+      const delta = newPointerPosition.sub(state.prevTouches[0]);
+      state.prevTouches[0] = newPointerPosition;
 
       // When using touch devices (or bad mouses) even fast taps
       // have some miniscule amount of motion which we need to dampen
@@ -203,15 +228,15 @@ const ZoomableImage: Component<{
       // were big not just the last before release. User can
       // drag image around and then hesitate for a long time before
       // releasing click
-      movedDuringClick ||= isBigMovement;
+      state.movedDuringInteraction ||= isBigMovement;
 
-      const state = zoomState();
+      const zoomSt = zoomState();
       setZoomState({
-        scale: state.scale,
+        scale: zoomSt.scale,
         position: apply_on_rows(
           {
-            position: state.position.add(delta),
-            scale: new Vector(state.scale, state.scale),
+            position: zoomSt.position.add(delta),
+            scale: new Vector(zoomSt.scale, zoomSt.scale),
             size: neutralImageDimensions.size,
           },
           clampPosition,
@@ -223,15 +248,15 @@ const ZoomableImage: Component<{
         Vector,
       ];
 
-      const centerPrev = prevTouches[0].add(prevTouches[1]).div(2);
+      const centerPrev = state.prevTouches[0].add(state.prevTouches[1]).div(2);
       const centerCur = touches[0].add(touches[1]).div(2);
       const centerMove = centerCur.sub(centerPrev);
 
       const scale =
         touches[0].sub(touches[1]).abs() /
-        prevTouches[0].sub(prevTouches[1]).abs();
+        state.prevTouches[0].sub(state.prevTouches[1]).abs();
 
-      prevTouches = touches;
+      state.prevTouches = touches;
 
       if (Math.abs(scale - 1) > 0.00001) {
         setZoomState(
@@ -248,26 +273,39 @@ const ZoomableImage: Component<{
     event.preventDefault();
 
     if (event.touches.length === 0) {
-      // All touches lifted
-      prevTouches = undefined;
-
-      // In touch mode there is no click
-      // event, do it ourself
-      if (!movedDuringClick) {
+      if ("movedDuringInteraction" in state && !state.movedDuringInteraction) {
+        // One touch -> zero touches with no movement.
+        // We detected a click.
+        // (note: there are no click events in touch mode)
         clickDeactivate();
+      } else {
+        // Went from 2+ touches to zero or there was movement.
+        // Does not count as a click.
+        state = { enabled: true };
       }
     } else if (event.touches.length === 1) {
       // Down to one touch, use it
-      prevTouches = [Vector.fromClient(event.touches[0])];
+      state = {
+        enabled: true,
+        // We went from 2+ touches down to. This should not be
+        // considered a click if no movement happens.
+        movedDuringInteraction: true,
+        prevTouches: [Vector.fromClient(event.touches[0])],
+      };
     } else if (event.touches.length === 2) {
-      // Down to two touches
-      prevTouches = [...event.touches].map(Vector.fromClient) as [
-        Vector,
-        Vector,
-      ];
+      // Down to two touches, we can start tracking this interaction
+      state = {
+        enabled: true,
+        // Ignoring two touches. See handleTouchStart
+        movedDuringInteraction: true,
+        prevTouches: [
+          Vector.fromClient(event.changedTouches[0]),
+          Vector.fromClient(event.changedTouches[1]),
+        ],
+      };
     } else {
       // Still too much touches
-      prevTouches = undefined;
+      state = { enabled: true };
     }
   }
 
@@ -278,10 +316,14 @@ const ZoomableImage: Component<{
       return;
     }
 
-    // At the start of sequence there is no movement
-    movedDuringClick = false;
     image.style.cursor = "grabbing";
-    lastPointerPosition = Vector.fromClient(event);
+
+    state = {
+      enabled: true,
+      // At the start of sequence there is no movement
+      movedDuringInteraction: false,
+      lastPointerPosition: Vector.fromClient(event),
+    };
   }
 
   function handlePointerUp(event: PointerEvent) {
@@ -291,51 +333,58 @@ const ZoomableImage: Component<{
       return;
     }
 
-    lastPointerPosition = undefined;
     image.style.cursor = "";
+    if ("movedDuringInteraction" in state && !state.movedDuringInteraction) {
+      clickDeactivate();
+    } else {
+      state = { enabled: true };
+    }
   }
 
   function handlePointerMove(event: PointerEvent) {
     event.preventDefault();
 
+    // Separate touch operation from mouse handling entierly
     if (event.pointerType !== "mouse") {
       return;
     }
 
-    if (lastPointerPosition !== undefined) {
-      const newPointerPosition = Vector.fromClient(event);
-      const delta = newPointerPosition.sub(lastPointerPosition);
-      lastPointerPosition = newPointerPosition;
-
-      // When using touch devices (or bad mouses) even fast taps
-      // have some miniscule amount of motion which we need to dampen
-      const isBigMovement = delta.abs() > 0.1;
-      // In movedDuringClick we calculate if any of the motions in sequence
-      // were big not just the last before release. User can
-      // drag image around and then hesitate for a long time before
-      // releasing click
-      movedDuringClick ||= isBigMovement;
-
-      const state = zoomState();
-      setZoomState({
-        scale: state.scale,
-        position: apply_on_rows(
-          {
-            position: state.position.add(delta),
-            scale: new Vector(state.scale, state.scale),
-            size: neutralImageDimensions.size,
-          },
-          clampPosition,
-        ),
-      });
+    if (!("lastPointerPosition" in state)) {
+      return;
     }
+
+    const newPointerPosition = Vector.fromClient(event);
+    const delta = newPointerPosition.sub(state.lastPointerPosition);
+    state.lastPointerPosition = newPointerPosition;
+
+    // When using touch devices (or bad mouses) even fast taps
+    // have some miniscule amount of motion which we need to dampen
+    const isBigMovement = delta.abs() > 0.1;
+    // In movedDuringClick we calculate if any of the motions in sequence
+    // were big not just the last before release. User can
+    // drag image around and then hesitate for a long time before
+    // releasing click
+    state.movedDuringInteraction ||= isBigMovement;
+
+    const zoomSt = zoomState();
+    setZoomState({
+      scale: zoomSt.scale,
+      position: apply_on_rows(
+        {
+          position: zoomSt.position.add(delta),
+          scale: new Vector(zoomSt.scale, zoomSt.scale),
+          size: neutralImageDimensions.size,
+        },
+        clampPosition,
+      ),
+    });
   }
 
   function ifEnabled<T extends Event>(
     func: (event: T) => void,
   ): (event: T) => void {
     return (event) => {
-      if (enabled) {
+      if (state.enabled) {
         event.stopPropagation();
         func(event);
       }
@@ -351,6 +400,15 @@ const ZoomableImage: Component<{
     container.style.left = `${-container.getBoundingClientRect().left}px`;
     container.style.top = `${-container.getBoundingClientRect().top}px`;
     image.style.borderRadius = "0";
+    // During enabled state we use pointerdown pointerup pair
+    // and pointermove events in between to differentiate if movement was
+    // a click or a dragging motion. See how movedDuringInteraction is used.
+    // Click can not be reliably used for this because movementX/Y property
+    // measures from last event, not from start of click and is generally
+    // unreliable (see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/movementX).
+    // We need to remove click listener because it still fires even if pointerup was
+    // handled and interferes with state handling
+    container.removeEventListener("click", clickActivate);
 
     container.ontransitionend = () => {
       container.style.width = "";
@@ -363,7 +421,7 @@ const ZoomableImage: Component<{
 
       setActive(true);
       setNoTransition(true);
-      enabled = true;
+      state = { enabled: true };
     };
   }
 
@@ -377,12 +435,13 @@ const ZoomableImage: Component<{
     container.style.top = `${wrapper.getBoundingClientRect().top}px`;
     image.style.borderRadius = "1rem";
 
-    enabled = false;
+    state = { enabled: false };
 
     container.ontransitionend = () => {
       setNoTransition(true);
       setActive(false);
       setOnTop(false);
+      container.addEventListener("click", clickActivate);
       container.style.width = "";
       container.style.height = "";
       container.style.left = "";
@@ -399,16 +458,6 @@ const ZoomableImage: Component<{
     }
   }
 
-  function onClick() {
-    if (enabled) {
-      if (!movedDuringClick) {
-        clickDeactivate();
-      }
-    } else {
-      clickActivate();
-    }
-  }
-
   // Wait not only for image component to mount, but also until
   // blob is properly loaded
   onMount(() =>
@@ -421,11 +470,11 @@ const ZoomableImage: Component<{
       // When image is in disabled state container is exactly the size of
       // image and catches propagated events. When enabled container
       // is whole viewport
-      container.addEventListener("click", onClick);
+      container.addEventListener("click", clickActivate);
 
       // Handling touches and mouse need to be done sepearately
       // Event though pointerup and pointerdown respond to touch inputs
-      // they behave strangely, e.g. pointerup does not fire e.t.c
+      // they behave strangely, e.g. pointerup does not fire sometimes e.t.c
 
       // These handle touch devices exclusively
       container.addEventListener("touchstart", ifEnabled(handleTouchStart));
