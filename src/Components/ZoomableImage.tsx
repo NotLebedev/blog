@@ -3,6 +3,7 @@ import { Component, createSignal, onCleanup, onMount } from "solid-js";
 import style from "./ZoomableImage.module.css";
 import { Vector, apply_on_rows } from "../Data/Vector";
 import classList from "../Util/Classes";
+import keyHandlerStack from "../Util/KeyHandlerStack";
 
 function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
@@ -422,10 +423,12 @@ const ZoomableImage: Component<{
       setActive(true);
       setNoTransition(true);
       state = { enabled: true };
+      keyHandlerStack.push(keyEventHandler);
     };
   }
 
   function clickDeactivate(): void {
+    keyHandlerStack.pop(keyEventHandler);
     setNoTransition(false);
     setTinted(false);
     setZoomState({ position: Vector.zero(), scale: 1 });
@@ -458,6 +461,8 @@ const ZoomableImage: Component<{
     }
   }
 
+  const keyEventHandler = { keydown: handleKeyDown };
+
   // Wait not only for image component to mount, but also until
   // blob is properly loaded
   onMount(() =>
@@ -465,7 +470,6 @@ const ZoomableImage: Component<{
       updateNeutralImageDimensions();
 
       window.addEventListener("resize", updateNeutralImageDimensions);
-      window.addEventListener("keydown", ifEnabled(handleKeyDown));
 
       // When image is in disabled state container is exactly the size of
       // image and catches propagated events. When enabled container
@@ -495,7 +499,7 @@ const ZoomableImage: Component<{
 
   onCleanup(() => {
     window.removeEventListener("resize", updateNeutralImageDimensions);
-    window.removeEventListener("keydown", handleKeyDown);
+    keyHandlerStack.pop(keyEventHandler);
   });
 
   return (

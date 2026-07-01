@@ -20,4 +20,16 @@ export default [
     },
   },
   eslintPluginPrettierRecommended,
+  {
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.property.name='addEventListener'][arguments.0.value=/^(keydown|keyup|keypress)$/]",
+          message: "Do not add keyboard listeners addEventListener(). Use ",
+        },
+      ],
+    },
+  },
 ];

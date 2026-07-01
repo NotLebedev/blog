@@ -33,6 +33,7 @@ import classList from "../Util/Classes";
 import Tag from "../Components/Tag";
 import Arrays from "../Util/Arrays";
 import swipe from "../Util/Swipe";
+import keyHandlerStack from "../Util/KeyHandlerStack";
 
 const Toolbar: Component<{
   selfId: string;
@@ -253,8 +254,10 @@ const PhotoDetailed: Component = () => {
           return navNext();
       }
     }
-    document.addEventListener("keydown", onKeyDown);
-    onCleanup(() => document.removeEventListener("keydown", onKeyDown));
+    const keyEventHandler = { keydown: onKeyDown };
+
+    keyHandlerStack.push(keyEventHandler);
+    onCleanup(() => keyHandlerStack.pop(keyEventHandler));
   });
 
   return (
