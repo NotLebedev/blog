@@ -26,7 +26,7 @@ import {
   SQLite,
   Tokio,
   Ts,
-} from "../Components/Devicons";
+} from "../Components/Icons";
 import Card from "../Components/Card";
 
 const techIKnow: [Component, string][][] = [

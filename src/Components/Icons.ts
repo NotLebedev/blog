@@ -1,8 +1,11 @@
-import { Component, JSX, lazy } from "solid-js";
+import { Component, JSX } from "solid-js";
 
 const icons = import.meta.glob("../Icons/**/*.svg", {
   query: "?component-solid",
+  eager: true,
 });
+
+console.log("icons", icons);
 
 type IconComponent = Component<JSX.SvgSVGAttributes<SVGSVGElement>>;
 
@@ -11,11 +14,9 @@ function load(name: string, location?: string): IconComponent {
     location = "devicon";
   }
 
-  return lazy(() => {
-    return icons[`../Icons/${location}/${name}.svg`]() as Promise<{
-      default: IconComponent;
-    }>;
-  });
+  return (
+    icons[`../Icons/${location}/${name}.svg`] as { default: IconComponent }
+  ).default;
 }
 
 export const Java = load("java");
