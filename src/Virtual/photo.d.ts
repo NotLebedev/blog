@@ -2,7 +2,12 @@ import { JSX } from "solid-js";
 
 declare module "virtual:photo" {
   type Medium = "digital" | "film" | "infrared";
-  type Location = "moscow" | "saint petersburg" | "veliky novgorod";
+  type Location =
+    | "moscow"
+    | "saint petersburg"
+    | "veliky novgorod"
+    | "austria"
+    | "lake baikal";
   type Genre =
     | "architecture"
     | "landscape"
