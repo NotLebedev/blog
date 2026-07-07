@@ -105,19 +105,24 @@ async function makePhotos(ctx: PluginContext) {
   );
   return Promise.all(
     infoPaths.map(async (info) => {
-      const contents = await fs.readFile(info, { encoding: "utf-8" });
+      const infoPath = path.resolve(info);
+      ctx.addWatchFile(infoPath);
+
+      const contents = await fs.readFile(infoPath, { encoding: "utf-8" });
       const match = contents.match(/photo\(\{(?<description>[\S\s]*)\}\);/);
       if (match === null) {
-        throw new Error(`Could not parse ${info}`);
+        throw new Error(`Could not parse ${infoPath}`);
       }
       const infoMap = match.groups!["description"];
 
-      const infoDir = path.dirname(info);
+      const infoDir = path.dirname(infoPath);
       const dirName = path.basename(infoDir);
       const id = dirName.replace(/^\d+-/, "");
       idToDirName.set(id, dirName);
 
       const src = path.join(infoDir, CONTENT_PHOTO);
+      ctx.addWatchFile(src);
+
       const previewWidth = calcWidth(512, await sharp(src).metadata());
 
       // imageOutPath and previewOutPath are
@@ -137,18 +142,21 @@ async function makePhotos(ctx: PluginContext) {
   );
 }
 
-async function makePosts(): Promise<string[]> {
+async function makePosts(ctx: PluginContext): Promise<string[]> {
   const posts: string[] = [];
   for await (const info of fs.glob(
     path.join("src/Content/blogs", "*", "post.tsx"),
   )) {
-    const contents = await fs.readFile(info, { encoding: "utf-8" });
+    const infoPath = path.resolve(info);
+    ctx.addWatchFile(infoPath);
+
+    const contents = await fs.readFile(infoPath, { encoding: "utf-8" });
     const match = contents.match(/post\(\{(?<description>[\S\s]*)\}\);/);
     if (match === null) {
-      throw new Error(`Could not parse ${info}`);
+      throw new Error(`Could not parse ${infoPath}`);
     }
     const infoMap = match.groups!["description"];
-    const infoDir = path.dirname(info);
+    const infoDir = path.dirname(infoPath);
     const id = path.basename(infoDir);
 
     // TODO: this is awful, I should really use ts parser
@@ -183,7 +191,7 @@ function contentPlugin(): Plugin {
           ];
 
           export const posts = [
-            ${(await makePosts()).join(",\n")}
+            ${(await makePosts(this)).join(",\n")}
           ];
 
           export function post(any) {}
