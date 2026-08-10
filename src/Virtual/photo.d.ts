@@ -7,7 +7,8 @@ declare module "virtual:photo" {
     | "saint petersburg"
     | "veliky novgorod"
     | "austria"
-    | "lake baikal";
+    | "lake baikal"
+    | "montenegro";
   type Genre =
     | "architecture"
     | "landscape"
